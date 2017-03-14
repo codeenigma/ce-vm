@@ -10,9 +10,8 @@ It will fire two VMs, an "app" one with nginx/php and a "db"one for the database
 
 ## Quick start
 
-Clone this template to anything you like 
-
-```git clone git@git.codeenigma.com:ce-drupal-dev-megazord/ce-vm.git mynewproject```
+Download and extract this template, renaming it to your liking:
+(https://github.com/codeenigma/ce-vm/archive/master.zip)
 
 Then
 1. Edit the ce-vm/config.yml file to your need
