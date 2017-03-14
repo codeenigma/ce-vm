@@ -4,14 +4,14 @@ Spins up a dev environment using Ansible - ala [DrupalVM](https://www.drupalvm.c
 It will fire two VMs, an "app" one with nginx/php and a "db"one for the database.
 
 ## Dependencies
-1. Install **Vagrant** from https://www.vagrantup.com
-1. Install **Virtualbox** from https://www.virtualbox.org
+1. Install **Vagrant** >=1.9.2 from https://www.vagrantup.com
+1. Install **Virtualbox** >=5.1.16 from https://www.virtualbox.org
 3. Install vagrant **vbguest** plugin:  ```vagrant plugin install vagrant-vbguest```
 
 ## Quick start
 
-Download and extract this template, renaming it to your liking:
-(https://github.com/codeenigma/ce-vm/archive/master.zip)
+Download and extract this template, renaming it to your liking: 
+https://github.com/codeenigma/ce-vm/archive/master.zip
 
 Then
 1. Edit the ce-vm/config.yml file to your need
