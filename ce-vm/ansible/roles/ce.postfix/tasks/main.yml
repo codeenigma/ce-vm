@@ -1,0 +1,14 @@
+---
+# Install postfix
+
+- name: Update apt cache.
+  apt: update_cache=yes cache_valid_time=86400
+  changed_when: false
+  
+- name: Ensure postfix is installed.
+  apt:
+    pkg: postfix
+    state: latest
+
+- name: Ensure postfix is started and enabled to start at boot.
+  service: name=postfix state=restarted enabled=yes

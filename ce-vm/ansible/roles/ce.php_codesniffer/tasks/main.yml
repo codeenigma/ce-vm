@@ -1,0 +1,20 @@
+---
+
+- name: Require PHP CodeSniffer.
+  command: >
+    composer global require squizlabs/php_codesniffer
+  become: true
+  become_user: vagrant
+
+
+- name: Make phpcs globally-accessible.
+  file:
+    src: "/home/vagrant/.composer/vendor/bin/phpcs"
+    dest: "/usr/local/bin/phpcs"
+    state: link
+
+- name: Make phpcbf globally-accessible.
+  file:
+    src: "/home/vagrant/.composer/vendor/bin/phpcbf"
+    dest: "/usr/local/bin/phpcbf"
+    state: link

@@ -1,0 +1,23 @@
+---
+
+- name: Update apt cache if needed.
+  apt: update_cache=yes cache_valid_time=86400
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+    force: yes
+
+- name: Get base tools.
+  apt: "name={{ item }} state=latest"
+  with_items:
+    - apt-transport-https
+    - curl
+    - python-apt
+    - python-pycurl
+    - build-essential
+    - sudo
+    - unzip
+    - vim
+    - software-properties-common
+    - wget

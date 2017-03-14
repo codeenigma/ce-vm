@@ -1,0 +1,50 @@
+---
+
+- name: Check if we already have a codebase.
+  stat: path="{{ project_dir }}/{{ webroot }}"
+  register: comp_install
+
+- name: Generates composer.json file if none exist.
+  template:
+    src: composer.json.j2
+    dest: "{{ project_dir }}/composer.json"
+    force: no
+    
+- name: Download Drupal with composer (if needed).
+  command: >
+    /usr/local/bin/composer install
+    chdir={{ project_dir }}
+  become: true
+  become_user: vagrant
+  when: not comp_install.stat.exists
+  
+- name: Generate default .gitignore (if needed).
+  template:
+    src: gitignore.j2
+    dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
+    force: no
+
+- name: Generates local.settings.php file.
+  template:
+    src: local.settings.php.j2
+    dest: "{{ project_dir }}/{{ webroot }}/sites/default/local.settings.php"
+    force: no
+
+- name: Check if we already have a settings.php file.
+  stat: path="{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
+  register: drupal_install
+  
+- name: Symlink settings.php if needed.
+  file:
+    src: "./local.settings.php"
+    dest: "{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
+    state: link
+  when: not drupal_install.stat.exists
+    
+- name: Install Drupal if no settings.php is found.
+  command: >
+    drush site-install -y -r "{{ project_dir }}/{{ webroot }}"
+  become: true
+  become_user: vagrant
+  when: not drupal_install.stat.exists
+  

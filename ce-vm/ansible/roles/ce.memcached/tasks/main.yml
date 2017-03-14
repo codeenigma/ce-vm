@@ -1,0 +1,14 @@
+---
+# Install memcached
+
+- name: Update apt cache.
+  apt: update_cache=yes cache_valid_time=86400
+  changed_when: false
+  
+- name: Ensure memcached is installed.
+  apt:
+    pkg: memcached
+    state: latest
+
+- name: Ensure memcached is started.
+  service: name=memcached state=restarted enabled=yes

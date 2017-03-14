@@ -1,0 +1,3 @@
+.vagrant
+.local.config.yml
+.local.ansible

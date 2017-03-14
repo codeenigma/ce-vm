@@ -1,0 +1,36 @@
+---
+# (Re) install nginx
+
+- name: Update apt cache.
+  apt: update_cache=yes cache_valid_time=86400
+  changed_when: false
+  
+- name: Ensure nginx is installed.
+  apt:
+    pkg: nginx-full
+    state: latest
+ 
+# Vhost.
+- name: Copy nginx configuration in place.
+  template:
+    src: vhosts.j2
+    dest: "/etc/nginx/sites-enabled/{{ project_name }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  
+- template:
+    src: drupal.j2
+    dest: "/etc/nginx/conf.d/drupal"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  
+- file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
+
+- name: Restart nginx.
+  service: name=nginx state=restarted enabled=yes

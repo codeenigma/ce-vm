@@ -1,0 +1,14 @@
+---
+
+- name: Require PHP Mess detector.
+  command: >
+    composer global require phpmd/phpmd
+  become: true
+  become_user: vagrant
+
+
+- name: Make phpmd globally-accessible.
+  file:
+    src: "/home/vagrant/.composer/vendor/bin/phpmd"
+    dest: "/usr/local/bin/phpmd"
+    state: link

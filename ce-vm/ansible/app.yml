@@ -1,0 +1,26 @@
+---
+
+- hosts: all
+  become: yes
+
+  pre_tasks:
+    
+    - include_vars: "{{ item }}"
+      with_fileglob: "{{ config_files }}"
+    
+    - name: Run init tasks
+      include: tasks/init-debian.yml
+
+  roles:
+    
+    - { role: ce.nginx }
+    - { role: ce.php }
+    - { role: ce.composer }
+    - { role: ce.memcached }
+    - { role: ce.php_codesniffer }
+    - { role: ce.php_messdetector }
+    - { role: ce.nodejs, when: nodejs_version == '4.x' or nodejs_version == '6.x'}
+    - { role: ce.drush, when: project_type == 'drupal' }
+    - { role: ce.drupal_console, when: project_type == 'drupal' }
+    - { role: ce.drupal_coder, when: project_type == 'drupal' }
+    - { role: ce.drupal, when: project_type == 'drupal' }

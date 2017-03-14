@@ -1,0 +1,33 @@
+---
+
+- name: Check if we already have a drush instance.
+  stat: path="/usr/local/bin/drush"
+  register: drush_install
+
+- name: Update apt cache.
+  apt: update_cache=yes cache_valid_time=86400
+  changed_when: false
+  
+- name: Ensure mysql-client is installed, drush needs it.
+  apt:
+    pkg: mysql-client
+    state: latest
+
+- name: Download Drush installer.
+  get_url:
+    url: https://s3.amazonaws.com/files.drush.org/drush.phar
+    dest: /tmp/drush.phar
+    mode: 0755
+  when: not drush_install.stat.exists
+
+- name: Move drush into globally-accessible location.
+  command: >
+    mv /tmp/drush.phar /usr/local/bin/drush
+  when: not drush_install.stat.exists
+  
+- name: Trigger drush init tasks.
+  command: >
+    /usr/local/bin/drush init -y
+  become: true
+  become_user: vagrant
+  when: not drush_install.stat.exists

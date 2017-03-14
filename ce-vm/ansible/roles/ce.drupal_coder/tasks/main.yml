@@ -1,0 +1,22 @@
+---
+
+- name: Require Drupal Coder "module".
+  command: >
+    composer global require drupal/coder
+  become: true
+  become_user: vagrant
+
+- name: Register Drupal syntax against phpcs.
+  command: >
+    phpcs --config-set installed_paths /home/vagrant/.composer/vendor/drupal/coder/coder_sniffer
+
+- name: Copy Drupal ruleset for phpmd.
+  template:
+    src: drupal-ruleset.xml.j2
+    dest: "/home/vagrant/drupal-ruleset.xml"
+
+- name: Copy drupal-coder utility script.
+  template:
+    src: drupal-coder.sh.j2
+    dest: "/usr/local/bin/drupal-coder"
+    mode: 0755
