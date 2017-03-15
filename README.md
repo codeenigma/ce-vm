@@ -107,4 +107,4 @@ Docker, but we have focused on VirtualBox for a first release, because it is
 a more mature product and performs more consistently across all the target
 platforms.
 
-After that, we're open to suggestion! Also be sure to check the [contributing/maintainers guide](https://github.com/codeenigma/ce-vm/blob/master/README.md)
+After that, we're open to suggestion! Also be sure to check the [contributing/maintainers guide](https://github.com/codeenigma/ce-vm/blob/master/CONTRIBUTING.md)
