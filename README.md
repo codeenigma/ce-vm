@@ -1,4 +1,4 @@
-# Project virtual machines for local Drupal development
+# Project virtual machines for local web development
 
 Spins up a dev environment using Ansible - ala [DrupalVM](https://www.drupalvm.com).
 It will fire two VMs, an "app" server with nginx/php and a "db" server for the database.
@@ -96,7 +96,7 @@ VMs. You may use this if you wish, if your project is for ACME, you can make
 a local vhost on the app server for acme.app-vm.codeenigma.com and this will 
 just work, no hosts entries required.
 
-There is an option to use NFS for mounting Drupal, instead of the inbuilt
+There is an option to use NFS for mounting your codebase, instead of the inbuilt
 VirtualBox file system. It can be a tricky to set up, but it is a fair bit
 quicker. See comments in "ce-vm/config.yml" for details.
 
@@ -107,4 +107,4 @@ Docker, but we have focused on VirtualBox for a first release, because it is
 a more mature product and performs more consistently across all the target
 platforms.
 
-After that, we're open to suggestion!
+After that, we're open to suggestion! Also be sure to check the [contributing/maintainers guide](https://github.com/codeenigma/ce-vm/blob/master/README.md)
