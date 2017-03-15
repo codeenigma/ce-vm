@@ -23,9 +23,9 @@ contain changes already merged into the major version branch
 ## Release strategy - tagging
 
 We try to stick with semantic versioning, (hence the major version branch).
-tag 1.1.1 > 1.1.1 : bugfix, minor amend
-tag 1.1.1 > 1.2.1 : new feature, backward compatible
-tag 1.1.1 > 2.1.1 : any change breaking backward compatibility
+- tag 1.1.1 > 1.1.1 : bugfix, minor amend
+- tag 1.1.1 > 1.2.1 : new feature, backward compatible
+- tag 1.1.1 > 2.1.1 : any change breaking backward compatibility
 Is considered non-backward compatible any change that means the main Vagrantfile
 from a given major version would stop working with the given changes.
 
