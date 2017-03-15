@@ -14,6 +14,7 @@ All the following should be latest version possible on your system:
 1. Install **Vagrant** from https://www.vagrantup.com
 1. Install **Virtualbox** from https://www.virtualbox.org
 3. Install vagrant **vbguest** plugin:  ```vagrant plugin install vagrant-vbguest```
+4. Install vagrant **trigger** plugin: ```vagrant plugin install vagrant-triggers```
 
 ## Quick start
 
