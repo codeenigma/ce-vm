@@ -27,6 +27,14 @@
     group: root
     mode: 0644
     force: yes
+
+- template:
+    src: symfony.j2
+    dest: "/etc/nginx/conf.d/symfony"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
   
 - file:
     path: "/etc/nginx/sites-enabled/default"
