@@ -89,10 +89,12 @@ don't need to manually place them on your local VM.
 
 ## Other useful suggestions
 
-At Code Enigma we have a DNS entry that points dev.codeenigma.com to
+At Code Enigma we have a DNS entry that points app-vm.codeenigma.com to
 192.168.56.2 so there is no need to mess with hosts files to use local
-development environments - anything.dev.codeenigma.com resolves to our local
-VMs.
+development environments - anything.app-vm.codeenigma.com resolves to your local
+VMs. You may use this if you wish, if your project is for ACME, you can make
+a local vhost on the app server for acme.app-vm.codeenigma.com and this will 
+just work, no hosts entries required.
 
 There is an option to use NFS for mounting Drupal, instead of the inbuilt
 VirtualBox file system. It can be a tricky to set up, but it is a fair bit
