@@ -18,7 +18,7 @@ Please make any pull requests against the major version branch (1.x currently),
 not against master directly.
 The master branch is considered the *stable* branch and should only
 contain changes already merged into the major version branch
-(keep in mind this is alpha though, so "stable" is whish more than anything)
+(keep in mind this is alpha though, so "stable" is a wish more than anything)
 
 ## Release strategy - tagging
 
