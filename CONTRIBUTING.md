@@ -33,4 +33,4 @@ from a given major version would stop working with the given changes.
 ## Documentation changes
 
 Trivial documentation amends, provided they do apply to current version,
-do not need to be tagged and can be made directly into the current major branch.
+do not need to be tagged and can be made directly into *the current major branch* (NOT directly into master please).
