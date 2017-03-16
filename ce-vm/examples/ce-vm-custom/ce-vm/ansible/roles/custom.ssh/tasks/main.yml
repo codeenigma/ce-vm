@@ -1,0 +1,11 @@
+---
+
+# Sets up ssh username.
+
+- name: Add custom .ssh/config file.
+  template:
+    src: "config.j2"
+    dest: "/home/vagrant/.ssh/config"
+    owner: 'vagrant'
+    group: 'vagrant'
+    mode: 0600
