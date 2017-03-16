@@ -22,7 +22,7 @@
 - name: Update apt cache.
   apt: update_cache=yes
   
-- name: Ensure mysql is installed.
+- name: Ensure node is installed.
   apt:
     pkg: "nodejs"
     state: latest

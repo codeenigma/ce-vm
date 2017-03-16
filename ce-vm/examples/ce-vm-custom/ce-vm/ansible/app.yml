@@ -1,0 +1,9 @@
+---
+
+- hosts: all
+  become: yes
+  
+  roles:
+    
+    - { role: custom.oh-my-zsh }
+    - { role: custom.ssh }

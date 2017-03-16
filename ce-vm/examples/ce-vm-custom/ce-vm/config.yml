@@ -1,0 +1,24 @@
+---
+
+# Configuration options in this file will be applied to all projects.
+
+# Composer token for github. Keep in mind this is stored as plain text,
+# so make sure to use a "read-only" one.
+composer_github_oauth_token: 'MYTOKEN'
+
+############# Provider settings.
+
+# Provider. Only virtualbox is currently supported.
+vagrant_provider: virtualbox
+
+####### VirtualBox specific settings.
+
+# Always use NFS.
+vbox_synced_folder_type: nfs
+
+# Got plenty of !
+vbox_app_memory: 4096
+vbox_app_cpus: 1
+vbox_db_memory: 2048
+vbox_db_cpus: 1
+
