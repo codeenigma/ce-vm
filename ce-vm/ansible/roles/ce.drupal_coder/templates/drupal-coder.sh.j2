@@ -10,7 +10,7 @@ if [ -z "$1" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
  exit 0
 fi
 
-DRUPAL_ROOT="/vagrant/{{ webroot }}"
+DRUPAL_ROOT="{{ project_dir }}/{{ webroot }}"
 
 if [ "$1" = "all" ]; then
   SNIFF_PATH="$DRUPAL_ROOT/modules/custom"

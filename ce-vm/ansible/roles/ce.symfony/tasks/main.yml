@@ -1,0 +1,37 @@
+---
+
+- name: Check if we already have a symfony CLI.
+  stat: path="/usr/local/bin/symfony"
+  register: symfony_install
+
+- name: Download Symfony installer.
+  get_url:
+    url: https://symfony.com/installer
+    dest: /usr/local/bin/symfony
+    mode: 0755
+  when: not symfony_install.stat.exists
+
+- name: Check if we already have a codebase.
+  stat: path="{{ project_dir }}/{{ webroot }}"
+  register: symfony_base
+    
+- name: Create Symfony codebase if needed.
+  command: >
+    symfony new {{ request_time }}
+    chdir=/tmp
+  become: true
+  become_user: vagrant
+  when: not symfony_base.stat.exists
+
+- name: Move Symfony codebase in place.
+  command: >
+    rsync -a --no-perms --no-owner --no-group /tmp/{{ request_time }}/ {{ project_dir }}
+  become: true
+  become_user: vagrant
+  when: not symfony_base.stat.exists
+  
+- name: Generate default .gitignore (if needed).
+  template:
+    src: gitignore.j2
+    dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
+    force: no
