@@ -1,2 +1,6 @@
 ---
-# Do nothing.
+
+- hosts: all
+  become: yes
+
+# We actually do nothing here, but need the playbook file.
