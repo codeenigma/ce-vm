@@ -78,7 +78,7 @@ ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
 
 # Remote.
 ce_vm_upstream_repo = 'https://github.com/codeenigma/ce-vm.git'
-ce_vm_upstream_branch = '1.x'
+ce_vm_upstream_branch = '2.x'
 
 ################ Configuration loading.
 ################################################################################
@@ -180,5 +180,11 @@ end
 run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
 # Gather config files to pass to Ansible.
 run_config_files = config_files_find(host_conf_files, guest_conf_files)
+# Configuration to pass to Ansible.
+ansible_extra_vars = {
+  config_files: "#{run_config_files}",
+  project_dir: "#{guest_project_dir}",
+  vm_dir: "#{vm_dir}",
+}
 # Call provider specific include.
 eval File.read "#{host_project_dir}/#{provisioning_dir}/Vagrantfile.#{parsed_conf['vagrant_provider']}"

@@ -10,5 +10,46 @@
     pkg: postfix
     state: latest
 
+- name: Configure postfix main.cf.
+  template:
+    src: main.cf.j2
+    dest: "/etc/postfix/main.cf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
+- name: Configure procmail to local.
+  file:
+    path: "/etc/procmailrc"
+    state: absent
+  when: mail_delivery == 'guest'
+
+- name: Configure procmail to NULL.
+  template:
+    src: procmailrc_null.j2
+    dest: "/etc/procmailrc"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  when: mail_delivery == 'discard'
+
+- name: Configure procmail to host directory.
+  template:
+    src: procmailrc_host.j2
+    dest: "/etc/procmailrc"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  when: mail_delivery == 'host'
+
+- name: Ensure host maildir exists.
+  file:
+    path: "{{ project_dir }}/{{ vm_dir }}/var/Maildir"
+    state: directory
+  when: mail_delivery == 'host'
+
 - name: Ensure postfix is started and enabled to start at boot.
   service: name=postfix state=restarted enabled=yes

@@ -1,0 +1,7 @@
+---
+
+- name: Install PHP imagick library.
+  apt: "name=php{{ php_version }}-imagick state=latest"
+  
+- name: Ensure php-fpm is restarted.
+  service: name=php{{ php_version }}-fpm state=restarted enabled=yes

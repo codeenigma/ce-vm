@@ -43,10 +43,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     run_playbook_dirs.each do |ansible_folder|
         db.vm.provision 'ansible_local' do |ansible|
           ansible.playbook = "#{ansible_folder}/db.yml"
-          ansible.extra_vars = {
-            config_files: "#{run_config_files}",
-            project_dir: "#{guest_project_dir}",
-          }
+          ansible.extra_vars = ansible_extra_vars
         end
     end
     # VirtualBox settings.
@@ -75,10 +72,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     run_playbook_dirs.each do |ansible_folder|
         app.vm.provision 'ansible_local' do |ansible|
           ansible.playbook = "#{ansible_folder}/app.yml"
-          ansible.extra_vars = {
-            config_files: "#{run_config_files}",
-            project_dir: "#{guest_project_dir}",
-          }
+          ansible.extra_vars = ansible_extra_vars
         end
     end
     # VirtualBox settings.
