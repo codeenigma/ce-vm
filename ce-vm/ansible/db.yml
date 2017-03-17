@@ -15,4 +15,5 @@
     
   roles:
     
+    - { role: ce.postfix }
     - { role: ce.mysql }

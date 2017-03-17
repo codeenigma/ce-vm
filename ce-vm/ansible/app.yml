@@ -15,6 +15,7 @@
 
   roles:
     
+    - { role: ce.postfix }
     - { role: ce.nginx }
     - { role: ce.php }
     - { role: ce.composer }
