@@ -9,12 +9,14 @@ project_name: example
 
 # PHP version. Can be one of 5.5, 5.6, 7.0.
 php_version: 5.6
+# Enable xdebug for PHP-FPM
+php_xdebug: yes
 
 # Database engine. Can be one of mysql, mariadb or percona-server (recommended)
 mysql_engine: percona-server
 
 # NodeJS version. Either 4.x or 6.x.
-nodejs_version: 4.x
+nodejs_version: ''
 
 # Project type, only 'drupal' is supported for now.
 project_type: drupal
