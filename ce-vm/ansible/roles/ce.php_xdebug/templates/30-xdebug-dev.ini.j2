@@ -3,11 +3,11 @@
 xdebug.max_nesting_level=1024
 ; Enable remote trace
 xdebug.trace_enable_trigger=1
-xdebug.trace_output_dir="{{ project_dir }}/{{ vm_dir }}/var/php"
+xdebug.trace_output_dir="{{ project_dir }}/{{ vm_dir }}/var/php-xdebug"
 xdebug.trace_output_name=trace.%u
 ; Enable remote profiler
 xdebug.profiler_enable_trigger=1
-xdebug.profiler_output_dir="{{ project_dir }}/{{ vm_dir }}/var/php"
+xdebug.profiler_output_dir="{{ project_dir }}/{{ vm_dir }}/var/php-xdebug"
 xdebug.profiler_output_name=profiler.%u
 ; Enable remote debugging
 xdebug.remote_port=9000

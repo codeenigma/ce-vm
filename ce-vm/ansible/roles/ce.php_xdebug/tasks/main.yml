@@ -9,9 +9,9 @@
     pkg: php-xdebug
     state: latest
 
-- name: Ensure host trace/profiling exists.
+- name: Ensure host trace/profiling folder exists.
   file:
-    path: "{{ project_dir }}/{{ vm_dir }}/var/php"
+    path: "{{ project_dir }}/{{ vm_dir }}/var/php-xdebug"
     state: directory
 
 - name: Copy xdebug configuration in place.
