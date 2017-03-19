@@ -11,3 +11,4 @@
   roles:
     
     - { role: php-imagick }
+    - { role: drush_aliases }

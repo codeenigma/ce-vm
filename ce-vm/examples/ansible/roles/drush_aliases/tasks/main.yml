@@ -1,0 +1,9 @@
+---
+
+- name: Generate site aliases.
+  template:
+    src: aliases.drushrc.php.j2
+    dest: "/home/vagrant/.drush/aliases.drushrc.php"
+    owner: vagrant
+    group: vagrant
+    force: yes
