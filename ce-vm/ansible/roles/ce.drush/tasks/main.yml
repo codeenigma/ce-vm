@@ -31,3 +31,11 @@
   become: true
   become_user: vagrant
   when: not drush_install.stat.exists
+  
+- name: Generate site aliases.
+  template:
+    src: aliases.drushrc.php.j2
+    dest: "/home/vagrant/.drush/aliases.drushrc.php"
+    owner: vagrant
+    group: vagrant
+    force: yes
