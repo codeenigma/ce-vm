@@ -23,6 +23,7 @@
     - { role: ce.php_codesniffer }
     - { role: ce.php_messdetector }
     - { role: ce.php_xdebug, when: php_xdebug }
+    - { role: ce.php_blackfire, when: php_blackfire }
     - { role: ce.nodejs, when: nodejs_version == '4.x' or nodejs_version == '6.x'}
     - { role: ce.drush, when: project_type == 'drupal' }
     - { role: ce.drupal_console, when: project_type == 'drupal' }
