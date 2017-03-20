@@ -15,6 +15,7 @@ php_xdebug: yes
 php_blackfire: no
 # Agent server id and token. You typically would not set it here,
 # but use ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
+# You can find those at https://blackfire.io/account.
 php_blackfire_agent_server_id: XXXX-XXXX-XXXX-XXXX-XXX
 php_blackfire_agent_server_token: XXXXXXXXXXXXXXXXXXXXXXXXXXX
 php_blackfire_agent_client_id: XXXX-XXXX-XXXX-XXXX-XXX
