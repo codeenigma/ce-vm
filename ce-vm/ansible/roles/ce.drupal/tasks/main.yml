@@ -8,7 +8,7 @@
   template:
     src: composer.json.j2
     dest: "{{ project_dir }}/composer.json"
-    force: no
+    when: not comp_install.stat.exists
     
 - name: Download Drupal with composer (if needed).
   command: >
