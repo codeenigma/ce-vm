@@ -11,7 +11,7 @@
 
 - name: Ensure host trace/profiling folder exists.
   file:
-    path: "{{ project_dir }}/{{ vm_dir }}/var/php-xdebug"
+    path: "{{ local_var_dir }}/php-xdebug"
     state: directory
 
 - name: Copy xdebug configuration in place.

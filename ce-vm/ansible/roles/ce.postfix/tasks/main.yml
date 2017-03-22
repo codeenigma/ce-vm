@@ -47,7 +47,7 @@
 
 - name: Ensure host maildir exists.
   file:
-    path: "{{ project_dir }}/{{ vm_dir }}/var/Maildir"
+    path: "{{ local_var_dir }}/Maildir"
     state: directory
   when: mail_delivery == 'host'
 
