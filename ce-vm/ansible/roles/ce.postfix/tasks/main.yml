@@ -51,5 +51,15 @@
     state: directory
   when: mail_delivery == 'host'
 
+- name: Manually force postfix stop.
+  service: name=postfix state=stopped
+  when: vagrant_provider == 'docker'
+  
+- name: Force postfix pid file removal
+  file:
+    path: "/var/spool/postfix/pid/master.pid"
+    state: absent
+  when: vagrant_provider == 'docker'
+
 - name: Ensure postfix is started and enabled to start at boot.
   service: name=postfix state=restarted enabled=yes
