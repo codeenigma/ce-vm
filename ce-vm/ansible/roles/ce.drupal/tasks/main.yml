@@ -28,6 +28,8 @@
   template:
     src: local.settings.php.j2
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/local.settings.php"
+    owner: vagrant
+    group: vagrant
     force: no
 
 - name: Check if we already have a settings.php file.
@@ -39,6 +41,8 @@
     src: "./local.settings.php"
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
     state: link
+    owner: vagrant
+    group: vagrant
   when: not drupal_install.stat.exists
     
 - name: Install Drupal if no settings.php is found.
