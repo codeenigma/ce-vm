@@ -17,7 +17,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "db-vm" do |db|
     # Base properties.
     db.ssh.host = '127.0.0.1'
-    db.ssh.guest_port = '2223'
+    db.ssh.guest_port = parsed_conf['docker_db_ssh_port']
     db.vm.hostname = "#{vdb}"
     # Shared folders
     shared_volumes.each do |synced_folder|
@@ -42,7 +42,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "--ip",
         "192.168.56.3",
       ]
-      d.ports = ["2223:22", "3306:3306"]
+      d.ports = parsed_conf['docker_db_fwd_ports']
       d.has_ssh = true
     end
   end
@@ -52,7 +52,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "app-vm", primary: true do |app|
     # Base properties.
     app.ssh.host = '127.0.0.1'
-    app.ssh.guest_port = '2224'
+    app.ssh.guest_port = parsed_conf['docker_app_ssh_port']
     app.vm.hostname = "#{vapp}"
     # Shared folders
     shared_volumes.each do |synced_folder|
@@ -77,7 +77,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "--ip",
         "192.168.56.2",
       ]
-      d.ports = ["2224:22", "8080:80"]
+      d.ports = parsed_conf['docker_app_fwd_ports']
       d.has_ssh = true
     end
   end

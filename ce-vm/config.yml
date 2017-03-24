@@ -61,7 +61,7 @@ composer_github_oauth_token: ''
 
 ############# Provider settings.
 
-# Provider. Only virtualbox is currently supported.
+# Provider. Either virtualbox (safest) or docker (experimental).
 vagrant_provider: virtualbox
 
 ####### VirtualBox specific settings.
@@ -81,3 +81,14 @@ vbox_app_cpus: 1
 vbox_db_memory: 1024
 vbox_db_cpus: 1
 
+####### Docker specific settings.
+# Networking.
+docker_app_ssh_port: 22202
+docker_app_fwd_ports:
+ - "22202:22"
+ - "8080:80"
+
+docker_db_ssh_port: 22203
+docker_db_fwd_ports: 
+ - "22203:22"
+ - "3306:3306"
