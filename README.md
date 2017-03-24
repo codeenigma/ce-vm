@@ -6,8 +6,7 @@ This is because we find the performance is significantly better with a pair of V
 
 ## Dependencies
 
-Supported on all systems that natively support Vagrant, e.g. Windows, most main
-distributions of Linux and Apple's OSX.
+Supported on all systems that natively support Vagrant: Apple's OSX, Windows and main distributions of Linux. You also need some reasonable amount of free RAM.
 
 All the following should be latest version possible on your system:
 
@@ -24,20 +23,18 @@ wherever you want it:
 
 Then:
 
-1. Edit the "ce-vm/config.yml" file to meet your needs
+1. Edit the "ce-vm/config.yml" file to meet your needs 
 2. From within the "ce-vm" folder, use ```vagrant up``` to start and provision the VMs
 3. Go make a cup of tea while Ansible does its thing
 
-When you get back, you'll find a clean Drupal 8 installation waiting for you at:
+When you get back, you'll find your app at:
 
-http://192.168.56.2
+http://app-vm.codeenigma.com (http://192.168.56.2)
 
-There will be a new "www" folder next to "ce-vm" which contains your Drupal code.
+There will be one or several new folders next to "ce-vm" which contains your codebase and utilities.
 
 You can then "hack" away at the Ansible playbooks at will. If you make changes,
 just ```vagrant provision``` in the "ce-vm" folder to apply them.
-
-You can also open that "www" directory in your favourite IDE and hack away at Drupal!
 
 ## "Upstream" workflow
 
@@ -46,8 +43,7 @@ and not treat this as a pure fork, you can easily do so:
 
 ### Additional requirements
 
-1. Install vagrant triggers plugin: ```vagrant plugin install vagrant-triggers```
-2. Ensure "git" is accessible on your host computer.
+Ensure "git" is accessible on your host computer.
 
 ### Usage
 
@@ -87,14 +83,7 @@ is the most efficient way to handle files, if you have a staging site somewhere
 online. It automatically connects Drupal to files on your stage site, so you
 don't need to manually place them on your local VM.
 
-## Other useful suggestions
 
-At Code Enigma we have a DNS entry that points app-vm.codeenigma.com to
-192.168.56.2 so there is no need to mess with hosts files to use local
-development environments - anything.app-vm.codeenigma.com resolves to your local
-VMs. You may use this if you wish, if your project is for ACME, you can make
-a local vhost on the app server for acme.app-vm.codeenigma.com and this will 
-just work, no hosts entries required.
 
 There is an option to use NFS for mounting your codebase, instead of the inbuilt
 VirtualBox file system. It can be a tricky to set up, but it is a fair bit
