@@ -1,0 +1,4 @@
+---
+
+- name: Restore db dump.
+  command: drush sql-cli -y -r "{{ project_dir }}/{{ webroot }}" < /vagrant/db/init.sql
