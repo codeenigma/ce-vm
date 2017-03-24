@@ -82,8 +82,15 @@ vbox_db_memory: 1024
 vbox_db_cpus: 1
 
 ####### Docker specific settings.
-# Networking.
+
+# SSH port for vagrant to use. 
+# It must match what is forwarded to port 22 below.
 docker_app_ssh_port: 22202
+# Ports to forward from the host to the guest,
+# in "host:guest" format.
+# Be sure the host port is free. Typically port 80
+# on your host might be already used by an Apache
+# instance on mac OS X.
 docker_app_fwd_ports:
  - "22202:22"
  - "8080:80"
