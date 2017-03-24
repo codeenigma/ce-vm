@@ -31,3 +31,5 @@
     - { role: ce.drupal_coder, when: project_type == 'drupal' }
     - { role: ce.drupal, when: project_type == 'drupal' }
     - { role: ce.symfony, when: project_type == 'symfony' }
+    - { role: ce.wp_cli, when: project_type == 'wordpress' }
+    - { role: ce.wordpress, when: project_type == 'wordpress' }
