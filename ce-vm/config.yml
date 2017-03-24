@@ -31,6 +31,7 @@ nodejs_version: ''
 project_type: drupal
 
 # Webroot, relative to project.
+# Symfony usually expect this to be "web".
 webroot: www
 
 # Mail delivery.

@@ -30,8 +30,26 @@
   become_user: vagrant
   when: not symfony_base.stat.exists
   
-- name: Generate default .gitignore (if needed).
+- name: Remove Symfony var folder.
+  file: 
+    path: "{{ project_dir }}/var"
+    state: absent
+  when: not symfony_base.stat.exists
+  
+- name: Create a var symlink to /tmp.
+  file: 
+    dest: "{{ project_dir }}/var"
+    src: "/tmp"
+    state: link
+  when: not symfony_base.stat.exists
+
+- name: Change dev IP.
+  command: >
+    sed -ie 's/127.0.0.1/192.168.56.1/g' "{{ project_dir }}/{{ webroot }}/app_dev.php"
+  when: not symfony_base.stat.exists and vagrant_provider == 'virtualbox'
+  
+- name: Generate default .gitignore.
   template:
     src: gitignore.j2
     dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
-    force: no
+  when: not symfony_base.stat.exists
