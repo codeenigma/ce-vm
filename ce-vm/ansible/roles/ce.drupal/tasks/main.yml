@@ -47,7 +47,7 @@
     
 - name: Install Drupal if no settings.php is found.
   command: >
-    drush site-install -y -r "{{ project_dir }}/{{ webroot }}"
+    drush site-install -y -r "{{ project_dir }}/{{ webroot }}" --account-name=admin --account-pass=admin
   become: true
   become_user: vagrant
   when: not drupal_install.stat.exists
