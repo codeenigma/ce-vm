@@ -18,3 +18,4 @@
     
     - { role: ce.postfix }
     - { role: ce.mysql }
+    - { role: ce.solr }
