@@ -67,12 +67,18 @@ vagrant_provider: virtualbox
 
 ####### VirtualBox specific settings.
 
-# Shared folder mode.
-# NFS offers better performance, but is not supported on Windows hosts.
-# In doubt, leave blank to use virtualbox, which offers poor performances,
-# but is less likely to fail.
+# Shared folder mode. Can be one of:
+# - virtualbox (default if empty): Safest choice, should work for all hosts,
+#   but poor performances.
+# - nfs: good performances, supported on Linux and Mac OS hosts only.
+# - rsync: best performances, but one-way (host > guest) only, which is
+#   not always very convenient. Require rsync on the host.
+# @see https://www.vagrantup.com/docs/synced-folders/
 vbox_synced_folder_type: ''
 #vbox_synced_folder_type: nfs
+
+# Custom sharing options, enterly overrides the defaults above.
+vbox_synced_folder_options_overrides: ''
 
 # Memory and CPU to use for the app VM.
 vbox_app_memory: 2048
