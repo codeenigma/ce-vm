@@ -23,7 +23,7 @@ if(parsed_conf['vbox_synced_folder_type'] == "nfs")
   end
 end
 # Custom mount.
-if(parsed_conf['vbox_synced_folder_options_overrides'])
+if(parsed_conf['vbox_synced_folder_options_overrides'] != "")
   folder_sync_options = parsed_conf['vbox_synced_folder_options_overrides']
 end
 
