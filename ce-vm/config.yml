@@ -71,8 +71,11 @@ vagrant_provider: virtualbox
 # - virtualbox (default if empty): Safest choice, should work for all hosts,
 #   but poor performances.
 # - nfs: good performances, supported on Linux and Mac OS hosts only.
-# - rsync: best performances, but one-way (host > guest) only, which is
-#   not always very convenient. Require rsync on the host.
+#   This mode is usually the best trade-off between perf and usability.
+# - rsync: best performances, but one-way (host > guest) only, 
+#   which is unpractical for most projects. Require rsync on the host.
+#   WARNING: This mode is not suitable for launching a new project,
+#   as files created during provisioning would only be present on the guest.
 # @see https://www.vagrantup.com/docs/synced-folders/
 vbox_synced_folder_type: ''
 #vbox_synced_folder_type: nfs
@@ -81,11 +84,17 @@ vbox_synced_folder_type: ''
 vbox_synced_folder_options_overrides: ''
 
 # Memory and CPU to use for the app VM.
+# The more RAM, the better. Be simply aware not to excess 
+# what is available on your host.
 vbox_app_memory: 2048
+# While in theory giving access to all of your cores to the VM
+# should make it faster, in practice this is not the case.
+# From our tests, allocating  more than one CPU is effect-less at best,
+# and even degrades performances in most cases.
 vbox_app_cpus: 1
 
 # Memory and CPU to use for the db VM.
-vbox_db_memory: 1024
+vbox_db_memory: 2048
 vbox_db_cpus: 1
 
 ####### Docker specific settings.
