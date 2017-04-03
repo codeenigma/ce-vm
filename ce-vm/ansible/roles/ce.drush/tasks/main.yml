@@ -43,14 +43,10 @@
 - name: Create project drush folder.
   file:
     path: "{{ project_dir }}/drush"
-    owner: vagrant
-    group: vagrant
     state: directory
 
 - name: Generate project drushrc.php.
   template:
     src: drushrc.php.j2
     dest: "{{ project_dir }}/drush/drushrc.php"
-    owner: vagrant
-    group: vagrant
     force: no
