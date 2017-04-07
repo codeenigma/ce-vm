@@ -78,7 +78,7 @@ ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
 
 # Remote.
 ce_vm_upstream_repo = 'https://github.com/codeenigma/ce-vm.git'
-ce_vm_upstream_branch = '1.x'
+ce_vm_upstream_branch = '2.x'
 
 ################ Configuration loading.
 ################################################################################
@@ -153,6 +153,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Make sure we're up to date.
       if(parsed_conf['ce_vm_upstream_auto_pull'] === true)
         _current_dir = File.expand_path(Dir.pwd)
+        run "git -C #{_ce_upstream} fetch"
         run "git -C #{_ce_upstream} checkout #{ce_vm_upstream_branch}" 
         run "git -C #{_ce_upstream} pull origin #{ce_vm_upstream_branch}"
         # Reload config.
@@ -180,5 +181,22 @@ end
 run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
 # Gather config files to pass to Ansible.
 run_config_files = config_files_find(host_conf_files, guest_conf_files)
+# Configuration to pass to Ansible.
+ansible_extra_vars = {
+  config_files: "#{run_config_files}",
+  project_dir: "#{guest_project_dir}",
+  vm_dir: "#{vm_dir}",
+}
+
+# Ansible inline install.
+$ansible = <<SCRIPT
+echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367 && \
+apt-get update
+apt-get dist-upgrade -y
+apt-get install -y openssh-server curl sudo apt-utils ansible git
+SCRIPT
+
+
 # Call provider specific include.
 eval File.read "#{host_project_dir}/#{provisioning_dir}/Vagrantfile.#{parsed_conf['vagrant_provider']}"

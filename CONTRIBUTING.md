@@ -14,7 +14,7 @@ Keep in mind that:
 
 ## Pull requests
 
-Please make any pull requests against the major version branch (1.x currently),
+Please make any pull requests against the major version branch (2.x currently),
 not against master directly.
 The master branch is considered the *stable* branch and should only
 contain changes already merged into the major version branch

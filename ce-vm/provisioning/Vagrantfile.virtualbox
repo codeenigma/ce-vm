@@ -1,14 +1,19 @@
-# Ansible install.
-$ansible = <<SCRIPT
-echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367 && \
-apt-get update
-apt-get dist-upgrade -y
-apt-get install -y openssh-server curl sudo apt-utils ansible git
-SCRIPT
 
-# Sync options.
+################ Folder sync options.
+################################################################################
+
+# Default native options. 
 folder_sync_options = {type: "virtualbox", owner: "vagrant", group: "www-data", :mount_options => ['dmode=775,fmode=664']}
+# Rsync support.
+if(parsed_conf['vbox_synced_folder_type'] == "rsync")
+  rsync_exclude_paths = [
+    ".git/",
+    File.join("#{parsed_conf['webroot']}", 'sites', '*', 'files', '*'),
+    File.join("#{parsed_conf['webroot']}", 'var', '*'),
+  ]
+  folder_sync_options = {type: "rsync", owner: "vagrant", group: "www-data", rsync__exclude: rsync_exclude_paths}
+end
+# NFS Sharing.
 if(parsed_conf['vbox_synced_folder_type'] == "nfs")
   folder_sync_options = {:nfs => true, :mount_options => ["rw"]}
   if (RUBY_PLATFORM =~ /darwin/)
@@ -17,8 +22,13 @@ if(parsed_conf['vbox_synced_folder_type'] == "nfs")
         folder_sync_options = {:nfs => true, :mount_options => ["rw"], :linux__nfs_options => ["rw", "no_subtree_check", "all_squash"]}
   end
 end
+# Custom mount.
+if(parsed_conf['vbox_synced_folder_options_overrides'] != "")
+  folder_sync_options = parsed_conf['vbox_synced_folder_options_overrides']
+end
 
-
+################ Main configuration.
+################################################################################
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -43,10 +53,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     run_playbook_dirs.each do |ansible_folder|
         db.vm.provision 'ansible_local' do |ansible|
           ansible.playbook = "#{ansible_folder}/db.yml"
-          ansible.extra_vars = {
-            config_files: "#{run_config_files}",
-            project_dir: "#{guest_project_dir}",
-          }
+          ansible.extra_vars = ansible_extra_vars
         end
     end
     # VirtualBox settings.
@@ -75,10 +82,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     run_playbook_dirs.each do |ansible_folder|
         app.vm.provision 'ansible_local' do |ansible|
           ansible.playbook = "#{ansible_folder}/app.yml"
-          ansible.extra_vars = {
-            config_files: "#{run_config_files}",
-            project_dir: "#{guest_project_dir}",
-          }
+          ansible.extra_vars = ansible_extra_vars
         end
     end
     # VirtualBox settings.

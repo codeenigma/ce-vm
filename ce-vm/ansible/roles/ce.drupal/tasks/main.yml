@@ -8,7 +8,7 @@
   template:
     src: composer.json.j2
     dest: "{{ project_dir }}/composer.json"
-    force: no
+  when: not comp_install.stat.exists
     
 - name: Download Drupal with composer (if needed).
   command: >
@@ -40,10 +40,14 @@
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
     state: link
   when: not drupal_install.stat.exists
+  
+- name: Permissive permissions for Docker
+  command: chown -R vagrant:www-data {{ project_dir }}
+  when: vagrant_provider == 'docker'
     
 - name: Install Drupal if no settings.php is found.
   command: >
-    drush site-install -y -r "{{ project_dir }}/{{ webroot }}"
+    drush site-install -y -r "{{ project_dir }}/{{ webroot }}" --account-name=admin --account-pass=admin
   become: true
   become_user: vagrant
   when: not drupal_install.stat.exists

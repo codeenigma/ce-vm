@@ -9,52 +9,109 @@ project_name: example
 
 # PHP version. Can be one of 5.5, 5.6, 7.0.
 php_version: 5.6
+# Enable xdebug for PHP-FPM
+php_xdebug: yes
+# Enable blackfire for PHP
+php_blackfire: no
+# Agent server id and token. You typically would not set it here,
+# but use ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
+# You can find those at https://blackfire.io/account.
+php_blackfire_agent_server_id: XXXX-XXXX-XXXX-XXXX-XXX
+php_blackfire_agent_server_token: XXXXXXXXXXXXXXXXXXXXXXXXXXX
+php_blackfire_agent_client_id: XXXX-XXXX-XXXX-XXXX-XXX
+php_blackfire_agent_client_token: XXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # Database engine. Can be one of mysql, mariadb or percona-server (recommended)
 mysql_engine: percona-server
 
 # NodeJS version. Either 4.x or 6.x.
-nodejs_version: 4.x
+nodejs_version: ''
 
 # Project type, only 'drupal' is supported for now.
 project_type: drupal
 
 # Webroot, relative to project.
+# Symfony usually expect this to be "web".
 webroot: www
+
+# Mail delivery.
+# All outgoing mail is aliased to the local "vagrant" user.
+# The delivery can adopt one of 3 behaviors:
+# - local: email is kept locally on the guest vm, using the standard mbox.
+#   Use vagrant ssh and the "mail" command to read emails.
+# - discard: email is sent to /dev/null and not accessible at all.
+#   Use this if your app generates a large amount of mail you don't need,
+#   to prevent the virtual disk to grow quickly.
+# - host: emails are rerouted to the shared var/Maildir folder, as .eml files.
+#   You can then read emails on your host using the mail client of your choice.
+mail_delivery: host
 
 # If set to yes, runs the default ansible provisioning
 # before the one from this project.
 # Requires both "git" and the vagrant triggers plugin on your host.
 # It will create a clone of the repo:
-# git clone -b 1.x git@github.com:codeenigma/ce-vm.git ~/.CodeEnigma/ce-vm-upstream
+# git clone -b 2.x git@github.com:codeenigma/ce-vm.git ~/.CodeEnigma/ce-vm-upstream
 ce_vm_upstream: no
 # Whether to automatically pull changes from the upstream repo.
 ce_vm_upstream_auto_pull: yes
 
 
 # Composer token for github. You typically would not set it here,
-# but use ~/.CodeEnigma/ce-vm/config.yml instead.
+# but use ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
 composer_github_oauth_token: ''
 
 ############# Provider settings.
 
-# Provider. Only virtualbox is currently supported.
+# Provider. Either virtualbox (safest) or docker (experimental).
 vagrant_provider: virtualbox
 
 ####### VirtualBox specific settings.
 
-# Shared folder mode.
-# NFS offers better performance, but is not supported on Windows hosts.
-# In doubt, leave blank to use virtualbox, which offers poor performances,
-# but is less likely to fail.
+# Shared folder mode. Can be one of:
+# - virtualbox (default if empty): Safest choice, should work for all hosts,
+#   but poor performances.
+# - nfs: good performances, supported on Linux and Mac OS hosts only.
+#   This mode is usually the best trade-off between perf and usability.
+# - rsync: best performances, but one-way (host > guest) only, 
+#   which is unpractical for most projects. Require rsync on the host.
+#   WARNING: This mode is not suitable for launching a new project,
+#   as files created during provisioning would only be present on the guest.
+# @see https://www.vagrantup.com/docs/synced-folders/
 vbox_synced_folder_type: ''
 #vbox_synced_folder_type: nfs
 
+# Custom sharing options, enterly overrides the defaults above.
+vbox_synced_folder_options_overrides: ''
+
 # Memory and CPU to use for the app VM.
+# The more RAM, the better. Be simply aware not to excess 
+# what is available on your host.
 vbox_app_memory: 2048
+# While in theory giving access to all of your cores to the VM
+# should make it faster, in practice this is not the case.
+# From our tests, allocating  more than one CPU is effect-less at best,
+# and even degrades performances in most cases.
 vbox_app_cpus: 1
 
 # Memory and CPU to use for the db VM.
-vbox_db_memory: 1024
+vbox_db_memory: 2048
 vbox_db_cpus: 1
 
+####### Docker specific settings.
+
+# SSH port for vagrant to use. 
+# It must match what is forwarded to port 22 below.
+docker_app_ssh_port: 22202
+# Ports to forward from the host to the guest,
+# in "host:guest" format.
+# Be sure the host port is free. Typically port 80
+# on your host might be already used by an Apache
+# instance on mac OS X.
+docker_app_fwd_ports:
+ - "22202:22"
+ - "8080:80"
+
+docker_db_ssh_port: 22203
+docker_db_fwd_ports: 
+ - "22203:22"
+ - "3306:3306"

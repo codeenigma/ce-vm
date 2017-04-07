@@ -72,4 +72,10 @@ gzip_types
     image/x-icon;
 gzip_buffers 16 8k;
 gzip_min_length 512;
+proxy_buffer_size       512k;
+proxy_buffers           8 256k;
+client_body_buffer_size 512k;
+fastcgi_buffer_size     512k ;
+fastcgi_buffers         8 256k ;
+client_max_body_size    700M;
 

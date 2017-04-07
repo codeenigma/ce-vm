@@ -31,3 +31,22 @@
   become: true
   become_user: vagrant
   when: not drush_install.stat.exists
+  
+- name: Generate site aliases.
+  template:
+    src: aliases.drushrc.php.j2
+    dest: "/home/vagrant/.drush/aliases.drushrc.php"
+    owner: vagrant
+    group: vagrant
+    force: yes
+
+- name: Create project drush folder.
+  file:
+    path: "{{ project_dir }}/drush"
+    state: directory
+
+- name: Generate project drushrc.php.
+  template:
+    src: drushrc.php.j2
+    dest: "{{ project_dir }}/drush/drushrc.php"
+    force: no

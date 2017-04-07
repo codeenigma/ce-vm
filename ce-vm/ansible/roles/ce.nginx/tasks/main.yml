@@ -35,7 +35,15 @@
     group: root
     mode: 0644
     force: yes
-  
+
+- template:
+    src: wordpress.j2
+    dest: "/etc/nginx/conf.d/wordpress"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
 - file:
     path: "/etc/nginx/sites-enabled/default"
     state: absent

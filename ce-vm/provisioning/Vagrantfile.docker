@@ -1,0 +1,86 @@
+ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+
+net_name = "codeenigma-cevm"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  ################# Common config.
+  config.ssh.insert_key = false
+  config.ssh.forward_agent = true
+  # Create our network silently. @todo check if it exists first.   
+  config.trigger.before :up, :force => true, :stdout => false, :stderr => false do     
+    run "docker network create --subnet=192.168.56.0/24 --gateway=192.168.56.1 #{net_name}"
+  end
+  ################# END Common config.  
+
+  ################# Database VM.
+  config.vm.define "db-vm" do |db|
+    # Base properties.
+    db.ssh.host = '127.0.0.1'
+    db.ssh.guest_port = parsed_conf['docker_db_ssh_port']
+    db.vm.hostname = "#{vdb}"
+    # Shared folders
+    shared_volumes.each do |synced_folder|
+      db.vm.synced_folder synced_folder['source'], synced_folder['dest']
+    end
+    # Provisioning. First install ansible from repo.
+    db.vm.provision "shell", inline: $ansible
+    # Run actual playbooks.
+    run_playbook_dirs.each do |ansible_folder|
+        db.vm.provision 'ansible_local', run: "always" do |ansible|
+          ansible.playbook = "#{ansible_folder}/db.yml"
+          ansible.extra_vars = ansible_extra_vars
+        end
+    end
+    # Docker settings.
+    db.vm.provider "docker" do |d|
+      d.force_host_vm = false
+      d.image = "pmce/jessie64:latest"
+      d.name = "#{vdb}"
+      d.create_args = [
+        "--network=#{net_name}",
+        "--ip",
+        "192.168.56.3",
+      ]
+      d.ports = parsed_conf['docker_db_fwd_ports']
+      d.has_ssh = true
+    end
+  end
+  ################# END Database VM.
+
+  ################# App VM.
+  config.vm.define "app-vm", primary: true do |app|
+    # Base properties.
+    app.ssh.host = '127.0.0.1'
+    app.ssh.guest_port = parsed_conf['docker_app_ssh_port']
+    app.vm.hostname = "#{vapp}"
+    # Shared folders
+    shared_volumes.each do |synced_folder|
+      app.vm.synced_folder synced_folder['source'], synced_folder['dest']
+    end
+    # Provisioning. First install ansible from repo.
+    app.vm.provision "shell", inline: $ansible
+    # Run actual playbooks.
+    run_playbook_dirs.each do |ansible_folder|
+        app.vm.provision 'ansible_local', run: "always" do |ansible|
+          ansible.playbook = "#{ansible_folder}/app.yml"
+          ansible.extra_vars = ansible_extra_vars
+        end
+    end
+    # Docker settings.
+    app.vm.provider "docker" do |d|
+      d.force_host_vm = false
+      d.image = "pmce/jessie64:latest"
+      d.name = "#{vapp}"
+      d.create_args = [
+        "--network=#{net_name}",
+        "--ip",
+        "192.168.56.2",
+      ]
+      d.ports = parsed_conf['docker_app_fwd_ports']
+      d.has_ssh = true
+    end
+  end
+  ################# END App VM.
+
+end

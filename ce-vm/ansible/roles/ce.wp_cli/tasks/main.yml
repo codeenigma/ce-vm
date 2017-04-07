@@ -1,0 +1,26 @@
+---
+
+- name: Check if we already have a drush instance.
+  stat: path="/usr/local/bin/wp"
+  register: wpcli_install
+
+- name: Update apt cache.
+  apt: update_cache=yes cache_valid_time=86400
+  changed_when: false
+  
+- name: Ensure mysql-client is installed, wp-cli needs it.
+  apt:
+    pkg: mysql-client
+    state: latest
+
+- name: Download WP-CLI installer.
+  get_url:
+    url: https://raw.github.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: /tmp/wp.phar
+    mode: 0755
+  when: not wpcli_install.stat.exists
+
+- name: Move wp-cli into globally-accessible location.
+  command: >
+    mv /tmp/wp.phar /usr/local/bin/wp
+  when: not wpcli_install.stat.exists
