@@ -1,0 +1,17 @@
+---
+
+- name: Check if we already have a codebase.
+  stat: path="{{ project_dir }}/{{ webroot }}"
+  register: codebase_install
+  
+- name: Create webroot if needed.
+  file:
+    path: "{{ project_dir }}/{{ webroot }}"
+    state: directory
+  when: not codebase_install.stat.exists
+
+- name: Copy example index.php in place.
+  template:
+    src: index.php.j2
+    dest: "{{ project_dir }}/{{ webroot }}/index.php"
+  when: not codebase_install.stat.exists    

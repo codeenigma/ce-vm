@@ -10,7 +10,7 @@
     pkg: nginx-full
     state: latest
  
-# Vhost.
+# Vhost and default config.
 - name: Copy nginx configuration in place.
   template:
     src: vhosts.j2
@@ -21,24 +21,8 @@
     force: yes
   
 - template:
-    src: drupal.j2
-    dest: "/etc/nginx/conf.d/drupal"
-    owner: root
-    group: root
-    mode: 0644
-    force: yes
-
-- template:
-    src: symfony.j2
-    dest: "/etc/nginx/conf.d/symfony"
-    owner: root
-    group: root
-    mode: 0644
-    force: yes
-
-- template:
-    src: wordpress.j2
-    dest: "/etc/nginx/conf.d/wordpress"
+    src: "{{ project_type }}.j2"
+    dest: "/etc/nginx/conf.d/{{ project_type }}"
     owner: root
     group: root
     mode: 0644
