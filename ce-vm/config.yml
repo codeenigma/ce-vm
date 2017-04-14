@@ -1,25 +1,36 @@
 ---
 
 # Edit these settings to your needs. 
-# Keep in mind they will be shared with others working on the project.
 
-############# Project settings.
+############# Project settings. ################################################
+# These are typically shared amongst your team for a given project.
+################################################################################
+
+####### Base settings.
+
 # Project name. Only use lower alphanumeric chars, no underscore or hyphen.
 project_name: example
 
+# If set to yes, runs the default ansible provisioning
+# before the one from this project.
+# Requires both "git" and the vagrant triggers plugin on your host.
+# It will create a clone of the repo:
+# git clone -b 2.x git@github.com:codeenigma/ce-vm.git ~/.CodeEnigma/ce-vm-upstream
+ce_vm_upstream: no
+# Whether to automatically pull changes from the upstream repo.
+ce_vm_upstream_auto_pull: yes
+
+# Project type, can be either drupal, symfony, wordpress pr php_generic.
+project_type: drupal
+
+# Webroot, relative to project.
+# Symfony usually expect this to be "web".
+webroot: www
+
+####### Software settings.
+
 # PHP version. Can be one of 5.5, 5.6, 7.0.
-php_version: 5.6
-# Enable xdebug for PHP-FPM
-php_xdebug: yes
-# Enable blackfire for PHP
-php_blackfire: no
-# Agent server id and token. You typically would not set it here,
-# but use ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
-# You can find those at https://blackfire.io/account.
-php_blackfire_agent_server_id: XXXX-XXXX-XXXX-XXXX-XXX
-php_blackfire_agent_server_token: XXXXXXXXXXXXXXXXXXXXXXXXXXX
-php_blackfire_agent_client_id: XXXX-XXXX-XXXX-XXXX-XXX
-php_blackfire_agent_client_token: XXXXXXXXXXXXXXXXXXXXXXXXXXX
+php_version: 7.0
 
 # Database engine. Can be one of mysql, mariadb or percona-server (recommended)
 mysql_engine: percona-server
@@ -27,12 +38,26 @@ mysql_engine: percona-server
 # NodeJS version. Either 4.x or 6.x.
 nodejs_version: ''
 
-# Project type, only 'drupal' is supported for now.
-project_type: drupal
+# Whether to install memcached on the DB vm.
+memcached: yes
 
-# Webroot, relative to project.
-# Symfony usually expect this to be "web".
-webroot: www
+############# Development settings. ################################################
+# These can vary for each developer, and should normally be overriden
+# individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
+################################################################################
+
+# Enable xdebug for PHP-FPM
+php_xdebug: yes
+
+# Enable blackfire for PHP
+php_blackfire: no
+
+# Agent server id and token.
+# You can find those at https://blackfire.io/account.
+php_blackfire_agent_server_id: XXXX-XXXX-XXXX-XXXX-XXX
+php_blackfire_agent_server_token: XXXXXXXXXXXXXXXXXXXXXXXXXXX
+php_blackfire_agent_client_id: XXXX-XXXX-XXXX-XXXX-XXX
+php_blackfire_agent_client_token: XXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 # Mail delivery.
 # All outgoing mail is aliased to the local "vagrant" user.
@@ -46,21 +71,14 @@ webroot: www
 #   You can then read emails on your host using the mail client of your choice.
 mail_delivery: host
 
-# If set to yes, runs the default ansible provisioning
-# before the one from this project.
-# Requires both "git" and the vagrant triggers plugin on your host.
-# It will create a clone of the repo:
-# git clone -b 2.x git@github.com:codeenigma/ce-vm.git ~/.CodeEnigma/ce-vm-upstream
-ce_vm_upstream: no
-# Whether to automatically pull changes from the upstream repo.
-ce_vm_upstream_auto_pull: yes
-
-
 # Composer token for github. You typically would not set it here,
 # but use ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
 composer_github_oauth_token: ''
 
-############# Provider settings.
+############# Provider settings. ################################################
+# These can vary for each developer, and should normally be overriden
+# individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
+################################################################################
 
 # Provider. Either virtualbox (safest) or docker (experimental).
 vagrant_provider: virtualbox
@@ -115,3 +133,4 @@ docker_db_ssh_port: 22203
 docker_db_fwd_ports: 
  - "22203:22"
  - "3306:3306"
+ - "11211:11211"

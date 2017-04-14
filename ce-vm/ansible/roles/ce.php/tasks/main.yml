@@ -20,6 +20,7 @@
     - "php{{ php_version }}-xml"
     - "php{{ php_version }}-mbstring"
     - "php{{ php_version }}-memcached"
+    - "php{{ php_version }}-zip"
 
 - name: Ensure php-fpm is restarted.
   service: name=php{{ php_version }}-fpm state=restarted enabled=yes

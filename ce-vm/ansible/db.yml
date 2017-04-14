@@ -16,5 +16,6 @@
     
   roles:
     
+    - { role: ce.memcached, when: memcached }
     - { role: ce.postfix }
     - { role: ce.mysql }
