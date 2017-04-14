@@ -6,9 +6,9 @@
 #
 # To use it:
 # - Make sure it is executable:
-#     chmod +x ~/.CodeEnigma/ce-vm/ce-vm-custom/scripts/vagrant-wrapper.sh
+#     chmod +x ~/.CodeEnigma/ce-vm/ce-vm-upstream/scripts/vagrant-wrapper.sh
 # - Add it as an alias in your bashrc, zshrc, ... eg:
-#     alias vg="$HOME/.CodeEnigma/ce-vm/ce-vm-custom/scripts/vagrant-wrapper.sh"
+#     alias vg="$HOME/.CodeEnigma/ce-vm/ce-vm-upstream/scripts/vagrant-wrapper.sh"
 # 
 # You will then be able to call "vg up", "vg ssh" without being in 
 # the same directory than the Vagrantfile.
