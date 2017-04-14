@@ -20,7 +20,6 @@
     - { role: ce.nginx }
     - { role: ce.php }
     - { role: ce.composer }
-    - { role: ce.memcached }
     - { role: ce.php_codesniffer }
     - { role: ce.php_messdetector }
     - { role: ce.php_xdebug, when: php_xdebug }
@@ -33,3 +32,4 @@
     - { role: ce.symfony, when: project_type == 'symfony' }
     - { role: ce.wp_cli, when: project_type == 'wordpress' }
     - { role: ce.wordpress, when: project_type == 'wordpress' }
+    - { role: ce.php_generic, when: project_type == 'php_generic' }

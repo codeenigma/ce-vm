@@ -9,6 +9,15 @@
   apt:
     pkg: memcached
     state: latest
-
+    
+- name: Copy memcached configuration in place.
+  template:
+    src: memcached.conf.j2
+    dest: "/etc/memcached.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+    
 - name: Ensure memcached is started.
   service: name=memcached state=restarted enabled=yes
