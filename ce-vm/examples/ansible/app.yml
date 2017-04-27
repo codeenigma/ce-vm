@@ -9,7 +9,7 @@
       with_fileglob: "{{ config_files }}"
     
   roles:
-    
-    - { role: php-imagick }
+#Some example roles.    
+#    - { role: php-imagick }
 #    - { role: drush_aliases }
 #    - { role: db_init }
