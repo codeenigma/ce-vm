@@ -1,0 +1,42 @@
+{
+  "name": "drupal",
+  "description": "",
+  "type": "project",
+  "license": "GPL-2",
+  "authors": [
+    {
+      "name": "",
+      "role": ""
+    }
+  ],
+  "repositories": {
+    "drupal-org": {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  },
+  "require": {
+    "composer/installers": "1.*",
+    "drupal-composer/drupal-scaffold": "2.*",
+    "drupal/core": "8.*"
+  },
+  "replace": {
+    "drupal/drupal": "*"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "extra": {
+    "installer-paths": {
+      "{{ webroot }}/core": ["type:drupal-core"],
+      "{{ webroot }}/modules/contrib/{$name}": ["type:drupal-module"],
+      "{{ webroot }}/modules/custom/{$name}": ["type:drupal-custom-module"],
+      "{{ webroot }}/profiles/contrib/{$name}": ["type:drupal-profile"],
+      "{{ webroot }}/themes/contrib/{$name}": ["type:drupal-theme"],
+      "{{ webroot }}/themes/custom/{$name}": ["type:drupal-custom-theme"],
+      "{{ webroot }}/contrib/{$name}": ["type:drupal-drush"]
+    }
+  },
+  "config": {
+    "process-timeout": 2200
+  }
+}

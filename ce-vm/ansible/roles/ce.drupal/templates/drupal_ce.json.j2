@@ -13,12 +13,29 @@
     "drupal-org": {
       "type": "composer",
       "url": "https://packages.drupal.org/8"
+    },
+    "ce_deploy": {
+      "type": "package",
+      "package": {
+        "name": "codeenigma/ce_deploy",
+        "type": "drupal-custom-module",
+        "version": "1.0",
+        "source": {
+          "type": "git",
+          "url": "https://github.com/codeenigma/ce_deploy.git",
+          "reference": "8.x"
+        }
+      }
     }
   },
   "require": {
     "composer/installers": "1.*",
     "drupal-composer/drupal-scaffold": "2.*",
-    "drupal/core": "8.*"
+    "drupal/core": "8.*",
+    "drupal/config_ignore": "1.*",
+    "drupal/pathauto": "1.*",
+    "drupal/panels": "1.*",
+    "drupal/page_manager": "1.*",
   },
   "replace": {
     "drupal/drupal": "*"

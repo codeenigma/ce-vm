@@ -21,7 +21,12 @@ ce_vm_upstream: no
 # Whether to automatically pull changes from the upstream repo.
 ce_vm_upstream_auto_pull: yes
 
-# Project type, can be either drupal, symfony, wordpress pr php_generic.
+# Project type, can be either 
+# drupal: Vanilla d8 install
+# drupal_ce: D8 install with some modules we often use at Code Enigma
+# symfony: Vanilla Symfony 3 codebase
+# wordpress: latest Wordpress install
+# php_generic: no codebase but an empty index.php
 project_type: drupal
 
 # Webroot, relative to project.

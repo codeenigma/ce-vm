@@ -6,7 +6,7 @@
 
 - name: Generates composer.json file if none exist.
   template:
-    src: composer.json.j2
+    src: "{{ project_type }}.json.j2"
     dest: "{{ project_dir }}/composer.json"
   when: not comp_install.stat.exists
     
