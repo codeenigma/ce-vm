@@ -17,6 +17,7 @@ project_name: example
 # It will create a clone of the repo:
 # git clone -b 2.x git@github.com:codeenigma/ce-vm.git ~/.CodeEnigma/ce-vm-upstream
 ce_vm_upstream: no
+
 # Whether to automatically pull changes from the upstream repo.
 ce_vm_upstream_auto_pull: yes
 
