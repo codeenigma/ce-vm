@@ -25,10 +25,10 @@
     - { role: ce.php_xdebug, when: php_xdebug }
     - { role: ce.php_blackfire, when: php_blackfire }
     - { role: ce.nodejs, when: nodejs_version == '4.x' or nodejs_version == '6.x'}
-    - { role: ce.drush, when: project_type == 'drupal' or project_type == 'drupal_ce' }
-    - { role: ce.drupal_console, when: project_type == 'drupal' or project_type == 'drupal_ce' }
-    - { role: ce.drupal_coder, when: project_type == 'drupal' or project_type == 'drupal_ce' }
-    - { role: ce.drupal, when: project_type == 'drupal' or project_type == 'drupal_ce' }
+    - { role: ce.drush, when: project_type == 'drupal' }
+    - { role: ce.drupal_console, when: project_type == 'drupal' }
+    - { role: ce.drupal_coder, when: project_type == 'drupal' }
+    - { role: ce.drupal, when: project_type == 'drupal' }
     - { role: ce.symfony, when: project_type == 'symfony' }
     - { role: ce.wp_cli, when: project_type == 'wordpress' }
     - { role: ce.wordpress, when: project_type == 'wordpress' }

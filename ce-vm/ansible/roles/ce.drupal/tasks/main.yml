@@ -6,9 +6,15 @@
 
 - name: Generates composer.json file if none exist.
   template:
-    src: "{{ project_type }}.json.j2"
+    src: "drupal.json.j2"
     dest: "{{ project_dir }}/composer.json"
-  when: not comp_install.stat.exists
+  when: not comp_install.stat.exists and not ce_project
+  
+- name: Generates CE composer.json file if none exist.
+  template:
+    src: "drupal_ce.json.j2"
+    dest: "{{ project_dir }}/composer.json"
+  when: not comp_install.stat.exists and ce_project
     
 - name: Download Drupal with composer (if needed).
   command: >
