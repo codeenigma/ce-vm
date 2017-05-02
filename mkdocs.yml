@@ -1,0 +1,16 @@
+---
+
+site_name: ce-vm
+
+repo_url: https://github.com/codeenigma/ce-vm
+
+theme: readthedocs
+
+pages:
+  - Home: index.md
+  - Installation: installation/install.md
+  - The "App" VM: app-vm/app-vm.md
+  - The "Database" VM: db-vm/db-vm.md
+  - Components:
+    - NGINX: components/nginx.md
+    - PHP: components/php.md
