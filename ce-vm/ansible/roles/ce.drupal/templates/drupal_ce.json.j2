@@ -26,6 +26,19 @@
           "reference": "8.x"
         }
       }
+    },
+    "ce_profile": {
+      "type": "package",
+      "package": {
+        "name": "codeenigma/ce_profile",
+        "type": "drupal-custom-profile",
+        "version": "1.0",
+        "source": {
+          "type": "git",
+          "url": "https://github.com/codeenigma/ce_profile.git",
+          "reference": "8.x"
+        }
+      }
     }
   },
   "require": {
@@ -36,7 +49,9 @@
     "drupal/pathauto": "1.*",
     "drupal/panels": "4.*",
     "drupal/page_manager": "1.*",
-    "codeenigma/ce_deploy": "1.*"
+    "codeenigma/ce_deploy": "1.*",
+    "drupal/config_ignore": "1.*",
+    "drupal/config_installer": "1.*"
   },
   "replace": {
     "drupal/drupal": "*"
@@ -49,6 +64,7 @@
       "{{ webroot }}/modules/contrib/{$name}": ["type:drupal-module"],
       "{{ webroot }}/modules/custom/{$name}": ["type:drupal-custom-module"],
       "{{ webroot }}/profiles/contrib/{$name}": ["type:drupal-profile"],
+      "{{ webroot }}/profiles/custom/{$name}": ["type:drupal-custom-profile"],
       "{{ webroot }}/themes/contrib/{$name}": ["type:drupal-theme"],
       "{{ webroot }}/themes/custom/{$name}": ["type:drupal-custom-theme"],
       "{{ webroot }}/contrib/{$name}": ["type:drupal-drush"]
