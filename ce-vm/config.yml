@@ -42,6 +42,19 @@ nodejs_version: ''
 # Whether to install memcached on the DB vm.
 memcached: yes
 
+# Extra Debian packages to install on the App vm.
+app_extra_packages: ''
+#app_extra_packages:
+#  - "php{{ php_version }}-ldap"
+#  - "php{{ php_version }}-sqlite"
+#  - "ruby"
+  
+# Extra Debian packages to install on the DB vm.
+db_extra_packages: ''
+#db_extra_packages:
+#  - "sqlite"
+
+
 ############# Development settings. ################################################
 # These can vary for each developer, and should normally be overriden
 # individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
