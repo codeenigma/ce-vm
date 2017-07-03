@@ -1,8 +1,20 @@
 ---
 
+- name: remove default Code Sniffer to ensure version compatibilty.
+  command: >
+    composer global remove squizlabs/php_codesniffer
+  become: true
+  become_user: vagrant
+  
 - name: Require Drupal Coder "module".
   command: >
     composer global require drupal/coder
+  become: true
+  become_user: vagrant
+
+- name: Update composer libraries.
+  command: >
+    composer global update
   become: true
   become_user: vagrant
 
