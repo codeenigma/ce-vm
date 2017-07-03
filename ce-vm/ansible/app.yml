@@ -33,3 +33,10 @@
     - { role: ce.wp_cli, when: project_type == 'wordpress' }
     - { role: ce.wordpress, when: project_type == 'wordpress' }
     - { role: ce.php_generic, when: project_type == 'php_generic' }
+
+  tasks:
+    # Install extra packages.
+    - name: Install additional extra packages.
+      apt: "name={{ item }} state=latest"
+      with_items: "{{ app_extra_packages | list }}"
+      when: app_extra_packages | length
