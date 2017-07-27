@@ -1,17 +1,21 @@
 #!/bin/sh
 
 if [ -z "$1" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
- echo "drupal-coder <module_name> | <all> | <path>"
+ echo "drupal-coder <module_name> | <all> | <path> [--fix]"
  echo ""
  echo "Runs CodeSniffer and Mess Detector against the given target. Argument is either:"
  echo "- the name of a Drupal module to scan"
  echo "- 'all' to scan all modules under modules/custom"
  echo "- the absolute path to a file or directory to scan"
+ echo ""
+ echo "You can optionally pass an additional '--fix' arguments to automatically try to fix some errors using phpcbf"
  exit 0
 fi
 
 DRUPAL_ROOT="{{ project_dir }}/{{ webroot }}"
 
+
+# Figure out path we want to scan.
 if [ "$1" = "all" ]; then
   SNIFF_PATH="$DRUPAL_ROOT/modules/custom"
 fi
@@ -21,13 +25,31 @@ fi
 if [ -z "$SNIFF_PATH" ]; then
   cd "$DRUPAL_ROOT"
   MODULE_PATH=$(drush pmi --fields=path "$1" | cut -d " " -f7)
-  SNIFF_PATH="$DRUPAL_ROOT/$MODULE_PATH"
+  if [ ! -z "$MODULE_PATH" ]; then
+    SNIFF_PATH="$DRUPAL_ROOT/$MODULE_PATH"
+  fi
 fi
 # If we still have no valid path, exit.
 if [ ! -d "$SNIFF_PATH" ] && [ ! -f "$SNIFF_PATH" ]; then
  echo "Could not find a path matching $1"
  exit 1
 fi
+
+# Check if we should try and fix some issues.
+if [ "$2" = "--fix" ]; then
+  if [ -d "$SNIFF_PATH" ]; then
+    cd "$SNIFF_PATH"
+  fi
+  # Run commands in order.
+  COMMAND="phpcbf --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,js,css,info,txt,md $SNIFF_PATH"
+  echo ">>> Running: $COMMAND"
+  $COMMAND
+  COMMAND="phpcbf --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme,js,css,info,txt,md $SNIFF_PATH"
+  echo ">>> Running: $COMMAND"
+  $COMMAND
+  exit 0
+fi
+
 
 # Run commands in order.
 COMMAND="phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,js,css,info,txt,md $SNIFF_PATH"
