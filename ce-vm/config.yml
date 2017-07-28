@@ -54,6 +54,16 @@ db_extra_packages: ''
 #db_extra_packages:
 #  - "sqlite"
 
+# Databases to import from dumps on first provisioning.
+# Each item consists of 
+# - name of database to create
+# - source for the dump, relative to the root of the repository.
+# Set the source to an empty string if you want to just create an empty db.
+db_dumps: ''
+#db_dumps:
+#  - { name: "legacy", source: "db/legacy.sql" }
+#  - { name: "external", source: "db/external-2017.sql" }
+#  - { name: "empty_dummy", source: "" }
 
 ############# Development settings. ################################################
 # These can vary for each developer, and should normally be overriden
