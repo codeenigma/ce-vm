@@ -22,5 +22,15 @@
     - "php{{ php_version }}-memcached"
     - "php{{ php_version }}-zip"
 
+- name: Copy php.ini for php-fpm.
+  template:
+    src: php.fpm.ini.j2
+    dest: "/etc/php/{{ php_version }}/fpm/php.ini"
+
+- name: Copy php.ini for php cli.
+  template:
+    src: php.cli.ini.j2
+    dest: "/etc/php/{{ php_version }}/cli/php.ini"
+
 - name: Ensure php-fpm is restarted.
   service: name=php{{ php_version }}-fpm state=restarted enabled=yes
