@@ -19,3 +19,10 @@
     - { role: ce.memcached, when: memcached }
     - { role: ce.postfix }
     - { role: ce.mysql }
+
+  tasks:
+    # Install extra packages.
+    - name: Install additional extra packages.
+      apt: "name={{ item }} state=latest"
+      with_items: "{{ db_extra_packages | list }}"
+      when: db_extra_packages | length

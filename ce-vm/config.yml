@@ -16,7 +16,7 @@ project_name: example
 # Requires both "git" and the vagrant triggers plugin on your host.
 # It will create a clone of the repo:
 # git clone -b 2.x git@github.com:codeenigma/ce-vm.git ~/.CodeEnigma/ce-vm-upstream
-ce_vm_upstream: no
+ce_vm_upstream: yes
 
 # Whether to automatically pull changes from the upstream repo.
 ce_vm_upstream_auto_pull: yes
@@ -41,6 +41,29 @@ nodejs_version: ''
 
 # Whether to install memcached on the DB vm.
 memcached: yes
+
+# Extra Debian packages to install on the App vm.
+app_extra_packages: ''
+#app_extra_packages:
+#  - "php{{ php_version }}-ldap"
+#  - "php{{ php_version }}-sqlite"
+#  - "ruby"
+  
+# Extra Debian packages to install on the DB vm.
+db_extra_packages: ''
+#db_extra_packages:
+#  - "sqlite"
+
+# Databases to import from dumps on first provisioning.
+# Each item consists of 
+# - name of database to create
+# - source for the dump, relative to the root of the repository.
+# Set the source to an empty string if you want to just create an empty db.
+db_dumps: ''
+#db_dumps:
+#  - { name: "legacy", source: "db/legacy.sql" }
+#  - { name: "external", source: "db/external-2017.sql" }
+#  - { name: "empty_dummy", source: "" }
 
 ############# Development settings. ################################################
 # These can vary for each developer, and should normally be overriden
