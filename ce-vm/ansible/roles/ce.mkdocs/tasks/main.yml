@@ -1,0 +1,25 @@
+---
+
+- name: Update apt cache.
+  apt: update_cache=yes cache_valid_time=86400
+  changed_when: false
+  
+- name: Ensure python-pip is installed.
+  apt:
+    pkg: python-pip
+    state: latest
+
+- name: Install mkdocs via pip.
+  command: >
+    pip install mkdocs
+
+- name: Check if we already have a docs directory.
+  stat: path="{{ project_dir }}/docs"
+  register: docs_generate
+  
+- name: Generates docs skeleton if none found.
+  command: >
+    mkdocs new /vagrant
+  become: true
+  become_user: vagrant
+  when: not docs_generate.stat.exists
