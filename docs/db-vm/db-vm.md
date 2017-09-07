@@ -26,5 +26,3 @@ It bundles together:
 - Percona server (MySQL)
 - memcached
 - Postfix
-
-
