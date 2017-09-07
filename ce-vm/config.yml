@@ -43,7 +43,7 @@ nodejs_version: ''
 memcached: yes
 
 # Whether to install MkDocs documentation generator on app-vm.
-mkdocs: yes
+mkdocs: no
 
 # Extra Debian packages to install on the App vm.
 app_extra_packages: ''
