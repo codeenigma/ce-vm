@@ -160,7 +160,7 @@ ansible_extra_vars = {
 
 # Ansible inline install.
 $ansible = <<SCRIPT
-if [! -d "/home/vagrant/.CodeEnigma/ce-vm/cache/apt" ];then
+if [ ! -d "/home/vagrant/.CodeEnigma/ce-vm/cache/apt" ];then
   mkdir -p "/home/vagrant/.CodeEnigma/ce-vm/cache/apt"
   rsync -a "/var/cache/apt/" "/home/vagrant/.CodeEnigma/ce-vm/cache/apt"
 fi
