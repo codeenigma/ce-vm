@@ -35,7 +35,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Docker settings.
     db.vm.provider "docker" do |d|
       d.force_host_vm = false
-      d.image = "pmce/jessie64:latest"
+      d.image = "pmce/jessie64:3.0.0"
       d.name = "#{vdb}"
       d.create_args = [
         "--network=#{net_name}",

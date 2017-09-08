@@ -1,6 +1,6 @@
 ---
 
-# Edit these settings to your needs. 
+# Default settings.
 
 ############# Project settings. ################################################
 # These are typically shared amongst your team for a given project.
@@ -9,16 +9,9 @@
 ####### Base settings.
 
 # Project name. Only use lower alphanumeric chars, no underscore or hyphen.
-project_name: example
+project_name: default
 
-# If set to yes, runs the default ansible provisioning
-# before the one from this project.
-# Requires both "git" and the vagrant triggers plugin on your host.
-# It will create a clone of the repo:
-# git clone -b 2.x git@github.com:codeenigma/ce-vm.git ~/.CodeEnigma/ce-vm-upstream
 ce_vm_upstream: yes
-
-# Whether to automatically pull changes from the upstream repo.
 ce_vm_upstream_auto_pull: yes
 
 # Project type, can be either drupal, symfony, wordpress pr php_generic.
@@ -81,10 +74,10 @@ php_blackfire: no
 
 # Agent server id and token.
 # You can find those at https://blackfire.io/account.
-php_blackfire_agent_server_id: XXXX-XXXX-XXXX-XXXX-XXX
-php_blackfire_agent_server_token: XXXXXXXXXXXXXXXXXXXXXXXXXXX
-php_blackfire_agent_client_id: XXXX-XXXX-XXXX-XXXX-XXX
-php_blackfire_agent_client_token: XXXXXXXXXXXXXXXXXXXXXXXXXXX
+php_blackfire_agent_server_id: ''
+php_blackfire_agent_server_token: ''
+php_blackfire_agent_client_id: ''
+php_blackfire_agent_client_token: ''
 
 # Mail delivery.
 # All outgoing mail is aliased to the local "vagrant" user.

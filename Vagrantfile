@@ -60,17 +60,15 @@ end
 ################ Paths definitions.
 ################################################################################
 # Absolute paths on the host machine.
-host_project_dir = File.dirname(File.expand_path('..', __FILE__))
+host_project_dir = File.dirname(File.expand_path('..', ENV['PROJECT_VAGRANTFILE']))
 host_home_dir = File.expand_path('~')
-
 # Absolute paths on the guest machine.
 guest_project_dir = '/vagrant'
 guest_home_dir = '/home/vagrant'
 
 # Relative paths.
-vm_dir = File.basename(File.dirname(File.expand_path(__FILE__)))
+vm_dir = File.basename(File.dirname(File.expand_path(ENV['PROJECT_VAGRANTFILE'])))
 ansible_dir = 'ansible'
-provisioning_dir = "#{vm_dir}/provisioning"
 ce_local_home = '.CodeEnigma'
 ce_vm_local_home = "#{ce_local_home}/ce-vm"
 ce_vm_local_upstream_repo = "#{ce_vm_local_home}/ce-vm-upstream"
@@ -78,88 +76,61 @@ ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
 
 # Remote.
 ce_vm_upstream_repo = 'https://github.com/codeenigma/ce-vm.git'
-ce_vm_upstream_branch = '2.x'
+ce_vm_upstream_branch = '3.x'
 
 ################ Configuration loading.
 ################################################################################
 # Order of config files and ansible playbooks does matter !
 host_conf_files = [
+  File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", 'config.yml'),
   File.join("#{host_project_dir}", "#{vm_dir}", 'config.yml'),
-  File.join("#{host_home_dir}", "#{ce_vm_local_custom_repo}", 'ce-vm','config.yml'),
+  File.join("#{host_home_dir}", "#{ce_vm_local_custom_repo}", 'config.yml'),
   File.join("#{host_project_dir}", "#{vm_dir}", 'local.config.yml'),
 ]
+
 # Initial config.
 require 'yaml'
 parsed_conf = conf_init({}, host_conf_files)
 
-if(parsed_conf['ce_vm_upstream'] === true)
-  host_conf_files.unshift(File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", 'ce-vm', 'config.yml'))
-end
-
 guest_conf_files = [
+  File.join("#{guest_home_dir}", "#{ce_vm_local_upstream_repo}", 'config.yml'),
   File.join("#{guest_project_dir}", "#{vm_dir}", 'config.yml'),
-  File.join("#{guest_home_dir}", "#{ce_vm_local_custom_repo}", 'ce-vm', 'config.yml'),
+  File.join("#{guest_home_dir}", "#{ce_vm_local_custom_repo}", 'config.yml'),
   File.join("#{guest_project_dir}", "#{vm_dir}", 'local.config.yml'),
 ]
-if(parsed_conf['ce_vm_upstream'] === true)
-  guest_conf_files.unshift(File.join("#{guest_home_dir}", "#{ce_vm_local_upstream_repo}", 'ce-vm', 'config.yml'))
-end
 
 host_playbook_dirs = [
   File.join("#{host_project_dir}", "#{vm_dir}",  "#{ansible_dir}"),
-  File.join("#{host_home_dir}", "#{ce_vm_local_custom_repo}", 'ce-vm', "#{ansible_dir}"),
+  File.join("#{host_home_dir}", "#{ce_vm_local_custom_repo}", "#{ansible_dir}"),
   File.join("#{host_project_dir}", "#{vm_dir}", "local.#{ansible_dir}"),
 ]
 if(parsed_conf['ce_vm_upstream'] === true)
-  host_playbook_dirs.unshift(File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", 'ce-vm', "#{ansible_dir}"))
+  host_playbook_dirs.unshift(File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", "#{ansible_dir}"))
 end
 
 guest_playbook_dirs = [
   File.join("#{guest_project_dir}", "#{vm_dir}", "#{ansible_dir}"),
-  File.join("#{guest_home_dir}", "#{ce_vm_local_custom_repo}", 'ce-vm', "#{ansible_dir}"),
+  File.join("#{guest_home_dir}", "#{ce_vm_local_custom_repo}", "#{ansible_dir}"),
   File.join("#{guest_project_dir}", "#{vm_dir}", "local.#{ansible_dir}"),
 ]
 if(parsed_conf['ce_vm_upstream'] === true)
-  guest_playbook_dirs.unshift(File.join("#{guest_home_dir}", "#{ce_vm_local_upstream_repo}", 'ce-vm', "#{ansible_dir}"))
+  guest_playbook_dirs.unshift(File.join("#{guest_home_dir}", "#{ce_vm_local_upstream_repo}", "#{ansible_dir}"))
 end
 
 ################ Common processing.
 ################################################################################
-# Reload configuration.
-parsed_conf = conf_init({}, host_conf_files)
 
-# Clone/update repo if needed, using triggers.
-# @TODO, make all these helper functions.
+# Update repo if needed, using triggers.
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.trigger.before :up do
-    if(parsed_conf['ce_vm_upstream'] === true)
-      # Create home dirs if needed.
-      _ce_home = File.join("#{host_home_dir}", "#{ce_local_home}")
-      if(!Dir.exists?("#{_ce_home}"))
-        run "mkdir #{_ce_home}"
-      end
-      _ce_vm_home = File.join("#{host_home_dir}", "#{ce_vm_local_home}")
-      if(!Dir.exists?("#{_ce_vm_home}"))
-        run "mkdir #{_ce_vm_home}"
-      end
-      # Clone repo if needed.
+    if(parsed_conf['ce_vm_upstream_auto_pull'] === true)
       _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
-      if(!Dir.exists?("#{_ce_upstream}"))
-        run "git clone -b #{ce_vm_upstream_branch} #{ce_vm_upstream_repo} #{_ce_upstream}"
-        # Reload config.
-        parsed_conf = conf_init({}, host_conf_files)
-        run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
-      end
-      # Make sure we're up to date.
-      if(parsed_conf['ce_vm_upstream_auto_pull'] === true)
-        _current_dir = File.expand_path(Dir.pwd)
-        run "git -C #{_ce_upstream} fetch"
-        run "git -C #{_ce_upstream} checkout #{ce_vm_upstream_branch}" 
-        run "git -C #{_ce_upstream} pull origin #{ce_vm_upstream_branch}"
-        # Reload config.
-        parsed_conf = conf_init({}, host_conf_files)
-        run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
-      end
+      run "git -C #{_ce_upstream} fetch"
+      run "git -C #{_ce_upstream} checkout #{ce_vm_upstream_branch}" 
+      run "git -C #{_ce_upstream} pull origin #{ce_vm_upstream_branch}"
+      # Reload config.
+      parsed_conf = conf_init({}, host_conf_files)
+      run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
     end
   end
 end
@@ -173,9 +144,7 @@ shared_volumes = []
 shared_volumes.push({'source' => "#{host_project_dir}", 'dest' => "#{guest_project_dir}"})
 host_ce_home = File.join("#{host_home_dir}", "#{ce_vm_local_home}")
 guest_ce_home = File.join("#{guest_home_dir}", "#{ce_vm_local_home}")
-if(Dir.exists?("#{host_ce_home}"))
-  shared_volumes.push({'source' => "#{host_ce_home}", 'dest' => "#{guest_ce_home}"})
-end
+shared_volumes.push({'source' => "#{host_ce_home}", 'dest' => "#{guest_ce_home}"})
 
 # Gather playbooks.
 run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
@@ -186,17 +155,23 @@ ansible_extra_vars = {
   config_files: "#{run_config_files}",
   project_dir: "#{guest_project_dir}",
   vm_dir: "#{vm_dir}",
+  ce_vm_home: "#{guest_ce_home}",
 }
 
 # Ansible inline install.
 $ansible = <<SCRIPT
+if [! -d "/home/vagrant/.CodeEnigma/ce-vm/cache/apt" ];then
+  mkdir -p "/home/vagrant/.CodeEnigma/ce-vm/cache/apt"
+  rsync -a "/var/cache/apt/" "/home/vagrant/.CodeEnigma/ce-vm/cache/apt"
+fi
+echo "Dir{Cache /home/vagrant/.CodeEnigma/ce-vm/cache/apt}" > /etc/apt/apt.conf.d/90ce-vm-aptcache
+echo "Dir::Cache /home/vagrant/.CodeEnigma/ce-vm/cache/apt;" > /etc/apt/apt.conf.d/90ce-vm-aptcache
 echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367 && \
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
 apt-get update
 apt-get dist-upgrade -y
 apt-get install -y openssh-server curl sudo apt-utils ansible git
 SCRIPT
 
-
 # Call provider specific include.
-eval File.read "#{host_project_dir}/#{provisioning_dir}/Vagrantfile.#{parsed_conf['vagrant_provider']}"
+eval File.read File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", "Vagrantfile.#{parsed_conf['vagrant_provider']}")

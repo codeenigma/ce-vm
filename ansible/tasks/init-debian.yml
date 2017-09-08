@@ -1,5 +1,22 @@
 ---
 
+#@todo This should be a variable passed from Vagrant.
+# Left hardcoced to avoid a "major" release.
+- name: Create apt cache dir if needed.
+  file:
+    path: '{{ ce_vm_home }}/cache/apt'
+    owner: 'root'
+    group: 'root'
+    state: directory
+
+- name: Move apt cache to shared dir.
+  template:
+    src: "apt-cache.j2"
+    dest: "/etc/apt/apt.conf.d/90ce-vm-aptcache"
+    owner: 'root'
+    group: 'root'
+    force: yes
+
 - name: Update apt cache if needed.
   apt: update_cache=yes cache_valid_time=86400
 
