@@ -70,4 +70,24 @@ The Docker daemon can only be managed by the root user by default. This means yo
 
 #### Issue 2. File ownership
 
-As explained above, contrary to the non-native implementation on Mac or Windows, there is no mapping of ownership on the filesystem. A file owned by user "vagrant" (1001) or "www-data" (33) on the container will have the same numeric owner (1001 or 33 in our example) on the host machine. If your user id on the host is 1001, which is the most common situation, you should be fine. We working on a solution for other cases.
+As explained above, contrary to the non-native implementation on Mac or Windows, 
+there is no mapping of ownership on the filesystem. 
+A file owned by user "vagrant" (1001) or "www-data" (33) on the container 
+will have the same numeric owner (1001 or 33 in our example) on the host machine. 
+If your user id on the host is 1001, which is the most common situation, 
+you should be fine. We working on a solution for other cases.
+
+# ce-vm
+
+The "stack' itself will install itself when you `vagrant up` for the time.
+
+1. Generate a skeleton at http://ce-vm.codeenigma.net/ and extract it
+2. Review the generated config.yml file
+3. Fire up your first instance: `cd ce-vm && vagrant up`
+
+This will git clone the main ce-vm repo from https://github.com/codeenigma/ce-vm/ 
+as ~/.CodeEnigma/ce-vm/ce-vm-upstream on your host.
+
+**Note: there is a known issue that prevent the first ever instance you launch 
+to be properly provisioned. Re-trigger the provisioning 
+with `vagrant reload --provision`. This is not needed for subsequent instances.**
