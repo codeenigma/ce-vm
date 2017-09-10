@@ -26,3 +26,13 @@
   apt:
     pkg: "nodejs"
     state: latest
+    
+- name: Create NodeJS shared cache dir if needed.
+  file:
+    path: '{{ ce_vm_home }}/cache/nodejs'
+    state: directory
+    
+- name: Set cache location.
+  template:
+    src: npmrc.j2
+    dest: "/home/vagrant/.npmrc"
