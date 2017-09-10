@@ -37,3 +37,16 @@
     group: 'vagrant'
     force: yes
   when: composer_github_oauth_token != ''
+
+- name: Create composer shared cache dir if needed.
+  file:
+    path: '{{ ce_vm_home }}/cache/composer'
+    state: directory
+    
+- name: Symlink composer shared cache.
+  file:
+    path: '/home/vagrant/.composer/cache'
+    src: '{{ ce_vm_home }}/cache/composer'
+    owner: 'vagrant'
+    group: 'vagrant'
+    state: link

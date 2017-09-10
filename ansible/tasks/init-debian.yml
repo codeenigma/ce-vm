@@ -1,7 +1,5 @@
 ---
 
-#@todo This should be a variable passed from Vagrant.
-# Left hardcoced to avoid a "major" release.
 - name: Create apt cache dir if needed.
   file:
     path: '{{ ce_vm_home }}/cache/apt'
