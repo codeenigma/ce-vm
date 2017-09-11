@@ -27,6 +27,8 @@ Docker integration is less tested on our side, and does not bring any performanc
 
 In a nutshell: VirtualBox is the failsafe option, you should stick with it unless you are on Linux AND you are familiar with Docker filesystem mount permissions.
 
+**Note: Due to the way networking is set up, you cannot switch from one provider to the other without rebooting your host. Failing to do so will result in containers/VMS that are not reachable.**
+
 ## VirtualBox provider
 
 Make sure you have the latest version from [www.virtualbox.org](https://www.virtualbox.org).
@@ -42,9 +44,12 @@ It should work out of the box on all platforms, but you should check the file sh
 
 You will need to install the "Edge" version from [docs.docker.com](https://docs.docker.com/docker-for-mac/install/).
 
-No further configuration should be needed, besides allocating enough memory to the daemon in the Docker app preferences.
+Besides allocating enough memory to the daemon in the Docker app preferences, you will need to use an host entry, as there currently is no way to reach the internal IP from the host and only port forwarding is supported (see [docs.docker.com](https://docs.docker.com/docker-for-mac/networking/#known-limitations-use-cases-and-workarounds)).
 
-*It is in practice possible to use ce-vm with the stable Docker release by adding an entry for `127.0.0.1 app-vm.codeenigma.com` in your /etc/hosts files, but the performances are (as of this writing) really, really poor due to the bind/mount filesystem.*
+Add an entry for `127.0.0.1 app-vm.codeenigma.com` in your /etc/hosts files.
+
+*It is in practice possible to use ce-vm with the stable Docker release , but the performances are (as of this writing) really, really poor due to the bind/mount filesystem.*
+
 
 ### Windows host
 
@@ -87,7 +92,3 @@ The "stack' itself will install itself when you `vagrant up` for the time.
 
 This will git clone the main ce-vm repo from https://github.com/codeenigma/ce-vm/ 
 as ~/.CodeEnigma/ce-vm/ce-vm-upstream on your host.
-
-**Note: there is a known issue that prevent the first ever instance you launch 
-to be properly provisioned. Re-trigger the provisioning 
-with `vagrant reload --provision`. This is not needed for subsequent instances.**
