@@ -154,3 +154,11 @@ docker_db_fwd_ports:
  - "22203:22"
  - "3306:3306"
  - "11211:11211"
+
+# Vagrant user uid and group gid. 
+# You normally don't have to change this,
+# the only exception being Docker on a 
+# Linux host, where it should match your 
+# actual user uid/gid.
+docker_vagrant_user_uid: 1000
+docker_vagrant_group_gid: 1000
