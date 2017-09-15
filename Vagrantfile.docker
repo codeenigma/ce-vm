@@ -4,9 +4,25 @@ net_name = "codeenigma-cevm"
 
 # Vagrant uid change.
 $vagrant_uid = <<SCRIPT
-usermod -u #{parsed_conf['docker_vagrant_user_uid']} vagrant
-groupmod -g #{parsed_conf['docker_vagrant_group_gid']} vagrant
-chown -R vagrant:www-data /vagrant
+OWN_CHANGED=0
+if [ "$(id -u vagrant)" != "#{parsed_conf['docker_vagrant_user_uid']}" ]; then
+  usermod -u #{parsed_conf['docker_vagrant_user_uid']} vagrant
+  echo "User ID changed to #{parsed_conf['docker_vagrant_user_uid']}."
+  chown -R vagrant:www-data /vagrant
+  echo "Changed ownership of shared files accordingly."
+  OWN_CHANGED=1
+fi
+if [ "$(id -g vagrant)" != "#{parsed_conf['docker_vagrant_group_gid']}" ]; then
+  groupmod -g #{parsed_conf['docker_vagrant_group_gid']} vagrant
+  OWN_CHANGED=1
+fi
+if [ $OWN_CHANGED -eq 1 ]; then
+  echo "Interrupting the provisioning for the ownership changes to take effect."
+  echo "This will trigger a Vagrant error below, do not panic this is normal."
+  echo "Please manually relaunch the process using 'vagrant up'."
+  exit 1
+fi
+
 SCRIPT
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
