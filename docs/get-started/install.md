@@ -48,20 +48,20 @@ Besides allocating enough memory to the daemon in the Docker app preferences, yo
 
 Add an entry for `127.0.0.1 app-vm.codeenigma.com` in your /etc/hosts files.
 
-*It is in practice possible to use ce-vm with the stable Docker release , but the performances are (as of this writing) really, really poor due to the bind/mount filesystem.*
+*It is in practice possible to use ce-vm with the stable Docker release, but the performances are (as of this writing) really, really poor due to the bind/mount filesystem.*
 
 
 ### Windows host
 
 We don't have anyone using Windows internally, so this is untested, but instructions should be the same than on Mac OS. 
 
-Simply install the "Edge" version from [docs.docker.com](https://docs.docker.com/docker-for-windows/install/).
+Simply install the "Edge" version from [docs.docker.com](https://docs.docker.com/docker-for-windows/install/) and add an entry in your C:\Windows\System32\Drivers\etc\hosts file.
 
 ### Linux host
 
 Refer to [docs.docker.com](https://docs.docker.com/engine/installation/) for the daemon installation for your platform.
 
-Running Docker on a Linux host presents a significant performance boost over VirtualBox. This is due to the fact that shared folders are actually direct mount and do not need any binding. This is also the cause for the main issues you will face.
+Running Docker on a Linux host presents a significant performance boost over VirtualBox. This is in great part due to the fact that shared folders are actually direct mount and do not need any binding. This is also the cause for the main issues you will face.
 
 In practice, this means there is no user mapping on file ownership of the directories accessed by both your host and the container, so user and group will be the same for both.
 
@@ -70,8 +70,7 @@ In practice, this means there is no user mapping on file ownership of the direct
 The Docker daemon can only be managed by the root user by default. This means you either have to:
 
 - Run each and every `vagrant` command using sudo. While this work, it also mean that the ce-vm base will get installed under the root user home dir instead of yours, and that all files, including your codebase will be owned by the root user.
-- Add yourself to the "docker" group, so you can run `vagrant` commands as your standard unprivileged user (see [docs.docker.com](https://docs.docker.com/engine/installation/linux/linux-postinstall/) for details. It does partially solve the issue, but:
-  1. This poses a security risk you need to be aware of and understand. See [https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface](https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface). You can also have a look at [https://www.projectatomic.io/blog/2015/08/why-we-dont-let-non-root-users-run-docker-in-centos-fedora-or-rhel/](https://www.projectatomic.io/blog/2015/08/why-we-dont-let-non-root-users-run-docker-in-centos-fedora-or-rhel/) for alternative approaches.
+- Add yourself to the "docker" group, so you can run `vagrant` commands as your standard unprivileged user - see [docs.docker.com](https://docs.docker.com/engine/installation/linux/linux-postinstall/) for details. It does solve the issue, but this poses a security risk you need to be aware of and understand. See [https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface](https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface). You can also have a look at [https://www.projectatomic.io/blog/2015/08/why-we-dont-let-non-root-users-run-docker-in-centos-fedora-or-rhel/](https://www.projectatomic.io/blog/2015/08/why-we-dont-let-non-root-users-run-docker-in-centos-fedora-or-rhel/) for alternative approaches.
 
 #### Issue 2. File ownership
 
@@ -79,8 +78,11 @@ As explained above, contrary to the non-native implementation on Mac or Windows,
 there is no mapping of ownership on the filesystem. 
 A file owned by user "vagrant" (1000) or "www-data" (33) on the container 
 will have the same numeric owner (1000 or 33 in our example) on the host machine. 
-If your user id on the host is 1000, which is the most common situation, 
-you should be fine. We working on a solution for other cases.
+The only workaroud for now is to change the ID of the vagrant user on the guest to match your local user, which is done by setting the following variables:
+```
+docker_vagrant_user_uid: 1000
+docker_vagrant_group_gid: 1000
+```
 
 # ce-vm
 
