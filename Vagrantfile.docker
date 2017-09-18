@@ -2,6 +2,29 @@ ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
 net_name = "codeenigma-cevm"
 
+# Vagrant uid change.
+$vagrant_uid = <<SCRIPT
+OWN_CHANGED=0
+if [ "$(id -u vagrant)" != "#{parsed_conf['docker_vagrant_user_uid']}" ]; then
+  usermod -u #{parsed_conf['docker_vagrant_user_uid']} vagrant
+  echo "User ID changed to #{parsed_conf['docker_vagrant_user_uid']}."
+  chown -R vagrant:www-data /vagrant
+  echo "Changed ownership of shared files accordingly."
+  OWN_CHANGED=1
+fi
+if [ "$(id -g vagrant)" != "#{parsed_conf['docker_vagrant_group_gid']}" ]; then
+  groupmod -g #{parsed_conf['docker_vagrant_group_gid']} vagrant
+  OWN_CHANGED=1
+fi
+if [ $OWN_CHANGED -eq 1 ]; then
+  echo "Interrupting the provisioning for the ownership changes to take effect."
+  echo "This will trigger a Vagrant error below, do not panic this is normal."
+  echo "Please manually relaunch the process using 'vagrant up'."
+  exit 1
+fi
+
+SCRIPT
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -23,14 +46,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     shared_volumes.each do |synced_folder|
       db.vm.synced_folder synced_folder['source'], synced_folder['dest']
     end
+    # First ensure 'vagrant' ownership match.
+    db.vm.provision "shell", inline: $vagrant_uid
     # Provisioning. First install ansible from repo.
     db.vm.provision "shell", inline: $ansible
     # Run actual playbooks.
     run_playbook_dirs.each do |ansible_folder|
-        db.vm.provision 'ansible_local', run: "always" do |ansible|
-          ansible.playbook = "#{ansible_folder}/db.yml"
-          ansible.extra_vars = ansible_extra_vars
-        end
+      db.vm.provision 'ansible_local', run: "always" do |ansible|
+        ansible.playbook = "#{ansible_folder}/db.yml"
+        ansible.extra_vars = ansible_extra_vars
+      end
     end
     # Docker settings.
     db.vm.provider "docker" do |d|
@@ -58,6 +83,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     shared_volumes.each do |synced_folder|
       app.vm.synced_folder synced_folder['source'], synced_folder['dest']
     end
+    # First ensure 'vagrant' ownership match.
+    app.vm.provision "shell", inline: $vagrant_uid
     # Provisioning. First install ansible from repo.
     app.vm.provision "shell", inline: $ansible
     # Run actual playbooks.
