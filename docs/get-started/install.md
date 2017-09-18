@@ -77,9 +77,9 @@ The Docker daemon can only be managed by the root user by default. This means yo
 
 As explained above, contrary to the non-native implementation on Mac or Windows, 
 there is no mapping of ownership on the filesystem. 
-A file owned by user "vagrant" (1001) or "www-data" (33) on the container 
-will have the same numeric owner (1001 or 33 in our example) on the host machine. 
-If your user id on the host is 1001, which is the most common situation, 
+A file owned by user "vagrant" (1000) or "www-data" (33) on the container 
+will have the same numeric owner (1000 or 33 in our example) on the host machine. 
+If your user id on the host is 1000, which is the most common situation, 
 you should be fine. We working on a solution for other cases.
 
 # ce-vm
