@@ -1,5 +1,3 @@
-#DB VM
-
 This is the database component of the stack.
 
 ## Vagrant

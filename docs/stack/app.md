@@ -1,5 +1,3 @@
-#App VM
-
 This is the webserver component of the stack.
 
 ## Vagrant
@@ -23,8 +21,8 @@ When using Docker, it is only accessible through port forwarding, which means yo
 
 It bundles together:
 
-- [NGINX](../components/nginx.md) webserver
-- [PHP](../components/php.md)-FPM and associated utilities
+- [NGINX](components/nginx.md) webserver
+- [PHP](components/php.md)-FPM and associated utilities
     - Composer
     - PHP_CodeSniffer
     - PHP Mess Detector
