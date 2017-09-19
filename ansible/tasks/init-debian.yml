@@ -1,10 +1,10 @@
 ---
 
+- set_fact: shared_cache_dir="{{ ce_vm_home }}/cache/{{ vagrant_provider }}"
+
 - name: Create apt cache dir if needed.
   file:
-    path: '{{ ce_vm_home }}/cache/apt'
-    owner: 'root'
-    group: 'root'
+    path: '{{ shared_cache_dir }}/apt'
     state: directory
 
 - name: Move apt cache to shared dir.
