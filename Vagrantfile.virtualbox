@@ -3,7 +3,7 @@
 ################################################################################
 
 # Default native options. 
-folder_sync_options = {type: "virtualbox", owner: "vagrant", group: "www-data", :mount_options => ['dmode=775,fmode=664']}
+folder_sync_options = {type: "virtualbox", owner: "vagrant", group: "www-data", :mount_options => ['dmode=775,fmode=774']}
 # Rsync support.
 if(parsed_conf['vbox_synced_folder_type'] == "rsync")
   rsync_exclude_paths = [
