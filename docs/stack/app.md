@@ -30,5 +30,5 @@ It bundles together:
     - Blackfire (optional)
 - Node.js 4.x or 6.x (optional)
 - MkDocs documentation generator (optional)
-- Postfix mail server
+- [Postfix](components/postfix.md) mail server
 

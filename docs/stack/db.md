@@ -23,4 +23,4 @@ It bundles together:
 
 - Percona server (MySQL)
 - memcached
-- Postfix
+- [Postfix](components/postfix.md) mail server
