@@ -20,6 +20,7 @@ pages:
     - Components:
       - NGINX: stack/components/nginx.md
       - PHP: stack/components/php.md
+      - Postfix: stack/components/postfix.md
   - Topics:
       - Shared mounts: topics/shared-mounts.md
       - Security: topics/security.md
