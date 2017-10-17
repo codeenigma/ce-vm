@@ -4,6 +4,7 @@
 
 # Default native options. 
 folder_sync_options = {type: "virtualbox", owner: "vagrant", group: "www-data", :mount_options => ['dmode=775,fmode=774']}
+folder_sync_home_ce_options = {type: "virtualbox", owner: "vagrant", group: "root", :mount_options => ['dmode=775,fmode=774']}
 # Rsync support.
 if(parsed_conf['vbox_synced_folder_type'] == "rsync")
   rsync_exclude_paths = [
@@ -48,6 +49,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     shared_volumes.each do |synced_folder|
       db.vm.synced_folder synced_folder['source'], synced_folder['dest'], folder_sync_options
     end
+    db.vm.synced_folder home_ce_volume['source'], home_ce_volume['dest'], folder_sync_home_ce_options
     # Provisioning. First install ansible from repo.
     db.vm.provision "shell", inline: $ansible
     # Run actual playbooks.
@@ -78,6 +80,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     shared_volumes.each do |synced_folder|
       app.vm.synced_folder synced_folder['source'], synced_folder['dest'], folder_sync_options
     end
+    app.vm.synced_folder home_ce_volume['source'], home_ce_volume['dest'], folder_sync_home_ce_options
     # Provisioning. First install ansible from repo.
     app.vm.provision "shell", inline: $ansible
     # Run actual playbooks.

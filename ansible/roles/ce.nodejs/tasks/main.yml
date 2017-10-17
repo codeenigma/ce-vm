@@ -29,7 +29,9 @@
     
 - name: Create NodeJS shared cache dir if needed.
   file:
-    path: '{{ ce_vm_home }}/cache/nodejs'
+    path: '{{ shared_cache_dir }}/nodejs'
+    owner: 'vagrant'
+    group: 'root'
     state: directory
     
 - name: Set cache location.

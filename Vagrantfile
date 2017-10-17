@@ -144,7 +144,8 @@ shared_volumes = []
 shared_volumes.push({'source' => "#{host_project_dir}", 'dest' => "#{guest_project_dir}"})
 host_ce_home = File.join("#{host_home_dir}", "#{ce_vm_local_home}")
 guest_ce_home = File.join("#{guest_home_dir}", "#{ce_vm_local_home}")
-shared_volumes.push({'source' => "#{host_ce_home}", 'dest' => "#{guest_ce_home}"})
+# "Internal" shared volume, we'll mount it separately.
+home_ce_volume = {'source' => "#{host_ce_home}", 'dest' => "#{guest_ce_home}"}
 
 # Gather playbooks.
 run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)

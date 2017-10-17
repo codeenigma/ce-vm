@@ -40,13 +40,15 @@
 
 - name: Create composer shared cache dir if needed.
   file:
-    path: '{{ ce_vm_home }}/cache/composer'
+    path: '{{ shared_cache_dir }}/composer'
+    owner: 'vagrant'
+    group: 'root'
     state: directory
     
 - name: Symlink composer shared cache.
   file:
     path: '/home/vagrant/.composer/cache'
-    src: '{{ ce_vm_home }}/cache/composer'
+    src: '{{ shared_cache_dir }}/composer'
     owner: 'vagrant'
-    group: 'vagrant'
+    group: 'root'
     state: link

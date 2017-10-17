@@ -2,6 +2,9 @@ ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
 net_name = "codeenigma-cevm"
 
+# Shared folders have no options.
+shared_volumes.push(home_ce_volume)
+
 # Vagrant uid change.
 $vagrant_uid = <<SCRIPT
 OWN_CHANGED=0
