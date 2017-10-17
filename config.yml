@@ -38,6 +38,16 @@ memcached: yes
 # Whether to install MkDocs documentation generator on app-vm.
 mkdocs: no
 
+# Selenium version. Leave blank to skip.
+selenium_version: ''
+# Last "known good" version is 2.53.1
+#selenium_version: 2.53.1
+
+# Display manager to use with Selenium. Can be either 
+# - XVFB: light headless driver
+# - VNC: heavier, but provides visual feedback.
+selenium_display_manager: XVFB
+
 # Extra Debian packages to install on the App vm.
 app_extra_packages: ''
 #app_extra_packages:

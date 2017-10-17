@@ -1,0 +1,8 @@
+#!/bin/sh
+
+[ -x /etc/vnc/xstartup ] && exec /etc/vnc/xstartup
+[ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
+xsetroot -solid grey
+export DISPLAY=:99
+java -jar /opt/selenium-server-standalone.jar &
+x-terminal-emulator -ls -title "$VNCDESKTOP Desktop" &

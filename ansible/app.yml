@@ -34,6 +34,7 @@
     - { role: ce.wp_cli, when: project_type == 'wordpress' }
     - { role: ce.wordpress, when: project_type == 'wordpress' }
     - { role: ce.php_generic, when: project_type == 'php_generic' }
+    - { role: ce.selenium, when: selenium_version != ""}
 
   tasks:
     # Install extra packages.

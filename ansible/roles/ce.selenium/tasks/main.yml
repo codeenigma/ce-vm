@@ -1,0 +1,109 @@
+---
+
+- set_fact:
+    selenium_major_version: "{{ selenium_version | regex_replace('\\.[0-9]+$', '') }}"
+
+- name: Install Selenium dependencies.
+  apt: "name={{ item }} state=latest"
+  with_items:
+    - curl
+    - unzip
+    - default-jre
+    - firefox-esr
+
+- name: Install XVFB display manager.
+  apt: "name={{ item }} state=latest"
+  with_items:
+    - xvfb
+    - firefox-esr
+  when: selenium_display_manager == "XVFB"
+    
+- name: Install VNC display manager.
+  apt: "name={{ item }} state=latest"
+  with_items:
+    - tightvncserver
+    - xterm
+  when: selenium_display_manager == "VNC"
+  
+- name: Create Selenium download shared cache dir if needed.
+  file:
+    path: '{{ shared_cache_dir }}/selenium'
+    owner: 'vagrant'
+    group: 'root'
+    state: directory
+
+- name: Download Selenium
+  get_url:
+    url: "http://selenium-release.storage.googleapis.com/{{ selenium_major_version }}/selenium-server-standalone-{{ selenium_version }}.jar"
+    dest: "{{ shared_cache_dir }}/selenium/selenium-server-standalone-{{ selenium_version }}.jar"
+ 
+- name: Copy selenium.jar to local file system.
+  copy:
+    dest: '/opt/selenium-server-standalone.jar'
+    src: "{{ shared_cache_dir }}/selenium/selenium-server-standalone-{{ selenium_version }}.jar"
+    force: yes
+
+- name: Install systemd init.
+  template:
+    src: "selenium.service.j2"
+    dest: /etc/systemd/system/selenium.service
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create Selenium start script.
+  template:
+    src: "selenium-daemon-start-{{ selenium_display_manager }}.j2"
+    dest: /opt/selenium-daemon-start
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Create selenium stop script.
+  template:
+    src: "selenium-daemon-stop.j2"
+    dest: /opt/selenium-daemon-stop
+    owner: root
+    group: root
+    mode: 0555
+
+- name: Create home X dir if needed.
+  file:
+    path: '/home/vagrant/.vnc'
+    owner: 'vagrant'
+    group: 'vagrant'
+    state: directory
+  when: selenium_display_manager == "VNC"
+
+- name: Create X startup script.
+  template:
+    src: "xstartup.j2"
+    dest: "/home/vagrant/.vnc/xstartup"
+    owner: vagrant
+    group: vagrant
+    mode: 0755
+  when: selenium_display_manager == "VNC"
+
+- name: Generate VNC password.
+  shell: echo 'vagrant' | vncpasswd -f > /home/vagrant/.vnc/passwd
+  become: true
+  become_user: vagrant
+  when: selenium_display_manager == "VNC"
+
+- name: Fix VNC folder permissions.
+  file:
+    dest: "/home/vagrant/.vnc"
+    owner: vagrant
+    group: vagrant
+    mode: 0700
+
+- name: Fix VNC password file permissions.
+  file:
+    dest: "/home/vagrant/.vnc/passwd"
+    owner: vagrant
+    group: vagrant
+    mode: 0700
+
+- name: Ensure selenium is started and enabled to start at boot.
+  service: name=selenium state=restarted enabled=yes

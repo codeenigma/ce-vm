@@ -1,0 +1,5 @@
+#!/bin/sh
+
+/usr/bin/Xvfb -ac :99 &
+export DISPLAY=:99
+/usr/bin/java -jar /opt/selenium-server-standalone.jar &
