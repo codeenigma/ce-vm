@@ -12,23 +12,23 @@ This is also the "primary" vagrant VM, which means commands that apply to a sing
 
 ## Network
 
-It gets assigned the IP 192.168.56.2 which is accessible from your host when using VirtualBox. 
+It gets assigned the IP 192.168.56.2 which is accessible from your host when using VirtualBox or Docker on Linux. 
 A DNS entry makes app-vm.codeenigma.com and any subdomain point to it, meaning you can access it at whatever.app-vm.codeenigma.com directly. 
 
-When using Docker, it is only accessible through port forwarding, which means you need to add an host entry pointing to 127.0.0.1 to access it through a domain name.
+When using Docker on Mac/Windows, it is only accessible through port forwarding, which means you need to add an host entry pointing to 127.0.0.1 to access it through a domain name.
 
 ## Components
 
 It bundles together:
 
+- MkDocs documentation generator (optional)
 - [NGINX](components/nginx.md) webserver
+- Node.js 4.x or 6.x (optional)
 - [PHP](components/php.md)-FPM and associated utilities
     - Composer
     - PHP_CodeSniffer
     - PHP Mess Detector
     - XDebug (optional)
     - Blackfire (optional)
-- Node.js 4.x or 6.x (optional)
-- MkDocs documentation generator (optional)
 - [Postfix](components/postfix.md) mail server
-
+- [Selenium](components/selenium.md) testing framework

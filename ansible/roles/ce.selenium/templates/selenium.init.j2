@@ -1,0 +1,42 @@
+### BEGIN INIT INFO
+# Provides:          selenium
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Should-Start:      $named autofs
+# Default-Start:     3 4 5
+# Default-Stop:
+# Short-Description: Selenium server
+### END INIT INFO
+
+usage(){
+  echo "/etc/init.d/selenium start|stop|restart|status"
+}
+
+
+case "$1" in
+  start)
+        runuser -l vagrant -c "/bin/sh /opt/selenium-daemon-start"
+        ;;
+  stop)
+        /opt/selenium-daemon-stop
+        ;;
+
+  restart)
+        /opt/selenium-daemon-stop
+        sleep 1
+        /opt/selenium-daemon-start
+        ;;      
+
+  status)
+        PID=$(pgrep --full "selenium-server-standalone.jar")
+        if [ ! -z "$PID" ]; then
+         echo "Selenium server appears to be running"
+        fi
+        ;;
+  *)
+        echo "Usage: /etc/init.d/selenium {start|stop|restart|status}"
+        exit 1
+esac
+
+exit 0
+~                  

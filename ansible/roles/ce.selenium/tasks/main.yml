@@ -1,6 +1,7 @@
 ---
 
-- set_fact:
+- name: Set Selenium major version
+  set_fact:
     selenium_major_version: "{{ selenium_version | regex_replace('\\.[0-9]+$', '') }}"
 
 - name: Install Selenium dependencies.
@@ -43,13 +44,23 @@
     src: "{{ shared_cache_dir }}/selenium/selenium-server-standalone-{{ selenium_version }}.jar"
     force: yes
 
-- name: Install systemd init.
+- name: Install systemd service.
   template:
     src: "selenium.service.j2"
     dest: /etc/systemd/system/selenium.service
     owner: root
     group: root
     mode: 0755
+  when: vagrant_provider == 'virtualbox'
+  
+- name: Install init.d service.
+  template:
+    src: "selenium.init.j2"
+    dest: /etc/init.d/selenium
+    owner: root
+    group: root
+    mode: 0755
+  when: vagrant_provider == 'docker'
 
 - name: Create Selenium start script.
   template:

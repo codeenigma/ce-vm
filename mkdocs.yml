@@ -21,6 +21,7 @@ pages:
       - NGINX: stack/components/nginx.md
       - PHP: stack/components/php.md
       - Postfix: stack/components/postfix.md
+      - Selenium: stack/components/selenium.md
   - Topics:
       - Shared mounts: topics/shared-mounts.md
       - Security: topics/security.md

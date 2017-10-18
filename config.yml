@@ -38,11 +38,8 @@ memcached: yes
 # Whether to install MkDocs documentation generator on app-vm.
 mkdocs: no
 
-# Selenium version. Leave blank to skip.
-selenium_version: ''
-# Last "known good" version is 2.53.1
-#selenium_version: 2.53.1
-
+# Whether to install the Selenium test framework.
+selenium: no
 # Display manager to use with Selenium. Can be either 
 # - XVFB: light headless driver
 # - VNC: heavier, but provides visual feedback.
@@ -157,7 +154,9 @@ docker_app_ssh_port: 22202
 # instance on mac OS X.
 docker_app_fwd_ports:
  - "22202:22"
- - "8080:80"
+ - "80:80"
+ - "5999:5999"
+ - "8000:8000"
 
 docker_db_ssh_port: 22203
 docker_db_fwd_ports: 

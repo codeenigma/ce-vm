@@ -1,0 +1,4 @@
+---
+
+selenium_version: 2.53.1
+selenium_display_manager: XVFB
