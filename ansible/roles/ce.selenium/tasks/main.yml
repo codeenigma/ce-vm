@@ -108,13 +108,15 @@
     owner: vagrant
     group: vagrant
     mode: 0700
-
+  when: selenium_display_manager == "VNC"
+  
 - name: Fix VNC password file permissions.
   file:
     dest: "/home/vagrant/.vnc/passwd"
     owner: vagrant
     group: vagrant
     mode: 0700
-
+  when: selenium_display_manager == "VNC"
+  
 - name: Ensure selenium is started and enabled to start at boot.
   service: name=selenium state=restarted enabled=yes
