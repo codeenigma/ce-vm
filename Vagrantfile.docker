@@ -46,13 +46,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     db.ssh.guest_port = parsed_conf['docker_db_ssh_port']
     db.vm.hostname = "#{vdb}"
     # Shared folders
+    db.vm.synced_folder ".", "/vagrant", disabled: true
+    db_volumes = []
     shared_volumes.each do |synced_folder|
-      db.vm.synced_folder synced_folder['source'], synced_folder['dest']
+      db_volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
     end
     # First ensure 'vagrant' ownership match.
     db.vm.provision "shell", inline: $vagrant_uid
-    # Provisioning. First install ansible from repo.
-    db.vm.provision "shell", inline: $ansible
     # Run actual playbooks.
     run_playbook_dirs.each do |ansible_folder|
       db.vm.provision 'ansible_local', run: "always" do |ansible|
@@ -69,9 +69,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "--network=#{net_name}",
         "--ip",
         "192.168.56.3",
+        "--privileged=true", # Tomcat7 needs this.
       ]
       d.ports = parsed_conf['docker_db_fwd_ports']
       d.has_ssh = true
+      d.volumes = db_volumes
     end
   end
   ################# END Database VM.
@@ -83,13 +85,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.ssh.guest_port = parsed_conf['docker_app_ssh_port']
     app.vm.hostname = "#{vapp}"
     # Shared folders
+    app.vm.synced_folder ".", "/vagrant", disabled: true
+    app_volumes = []
     shared_volumes.each do |synced_folder|
-      app.vm.synced_folder synced_folder['source'], synced_folder['dest']
+      app_volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
     end
     # First ensure 'vagrant' ownership match.
     app.vm.provision "shell", inline: $vagrant_uid
-    # Provisioning. First install ansible from repo.
-    app.vm.provision "shell", inline: $ansible
     # Run actual playbooks.
     run_playbook_dirs.each do |ansible_folder|
         app.vm.provision 'ansible_local', run: "always" do |ansible|
@@ -106,9 +108,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "--network=#{net_name}",
         "--ip",
         "192.168.56.2",
+        "--privileged",
       ]
       d.ports = parsed_conf['docker_app_fwd_ports']
       d.has_ssh = true
+      d.volumes = app_volumes
     end
   end
   ################# END App VM.

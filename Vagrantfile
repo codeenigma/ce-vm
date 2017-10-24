@@ -157,22 +157,8 @@ ansible_extra_vars = {
   project_dir: "#{guest_project_dir}",
   vm_dir: "#{vm_dir}",
   ce_vm_home: "#{guest_ce_home}",
+  shared_cache_dir: "#{guest_ce_home}/cache/#{parsed_conf['vagrant_provider']}"
 }
-
-# Ansible inline install.
-$ansible = <<SCRIPT
-if [ ! -d "/home/vagrant/.CodeEnigma/ce-vm/cache/apt" ];then
-  mkdir -p "/home/vagrant/.CodeEnigma/ce-vm/cache/apt"
-  rsync -a "/var/cache/apt/" "/home/vagrant/.CodeEnigma/ce-vm/cache/apt"
-fi
-echo "Dir{Cache /home/vagrant/.CodeEnigma/ce-vm/cache/apt}" > /etc/apt/apt.conf.d/90ce-vm-aptcache
-echo "Dir::Cache /home/vagrant/.CodeEnigma/ce-vm/cache/apt;" >> /etc/apt/apt.conf.d/90ce-vm-aptcache
-echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
-apt-get update
-apt-get dist-upgrade -y
-apt-get install -y openssh-server curl sudo apt-utils ansible git
-SCRIPT
 
 # Call provider specific include.
 eval File.read File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", "Vagrantfile.#{parsed_conf['vagrant_provider']}")
