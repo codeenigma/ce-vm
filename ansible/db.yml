@@ -19,6 +19,7 @@
     - { role: ce.memcached, when: memcached }
     - { role: ce.postfix }
     - { role: ce.mysql }
+    - { role: ce.solr, when: solr }
 
   tasks:
     # Install extra packages.

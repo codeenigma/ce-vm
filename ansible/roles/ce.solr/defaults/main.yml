@@ -1,0 +1,6 @@
+---
+
+solr_version: 4.6.1
+solr_cores:
+  - default
+solr_conf_path: ''

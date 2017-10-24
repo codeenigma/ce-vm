@@ -38,6 +38,10 @@ memcached: yes
 # Whether to install MkDocs documentation generator on app-vm.
 mkdocs: no
 
+# Whether to install Apache Solr.
+solr: yes
+solr_version: 4.6.1
+  
 # Whether to install the Selenium test framework.
 selenium: no
 # Display manager to use with Selenium. Can be either 
