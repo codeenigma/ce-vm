@@ -39,7 +39,7 @@ memcached: yes
 mkdocs: no
 
 # Whether to install Apache Solr.
-solr: yes
+solr: no
 solr_version: 4.6.1
   
 # Whether to install the Selenium test framework.

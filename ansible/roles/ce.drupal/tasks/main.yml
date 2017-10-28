@@ -44,3 +44,9 @@
 - name: Permissive permissions for Docker
   command: chown -R vagrant:www-data {{ project_dir }}
   when: vagrant_provider == 'docker'
+  
+- name: Install Drupal.
+  command: drush si -y -r "{{ project_dir }}/{{ webroot }}"
+  become: true
+  become_user: www-data
+  when: not drupal_install.stat.exists

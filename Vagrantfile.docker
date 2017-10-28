@@ -2,7 +2,6 @@ ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
 net_name = "codeenigma-cevm"
 
-# Shared folders have no options.
 shared_volumes.push(home_ce_volume)
 
 # Vagrant uid change.
@@ -28,6 +27,15 @@ fi
 
 SCRIPT
 
+# Initial data sync.
+$mirror = <<SCRIPT
+echo "Initial data mirror synchronisation."
+if [ ! -d "#{guest_project_dir}" ]; then
+  mkdir "#{guest_project_dir}"
+fi
+rsync -av --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/" "#{guest_project_dir}"
+SCRIPT
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -51,6 +59,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     shared_volumes.each do |synced_folder|
       db_volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
     end
+    db_volumes.push("#{data_volume['source']}/:#{data_volume['dest']}:delegated")
+    db.vm.provision "shell", inline: $ansible
     # First ensure 'vagrant' ownership match.
     db.vm.provision "shell", inline: $vagrant_uid
     # Run actual playbooks.
@@ -89,6 +99,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app_volumes = []
     shared_volumes.each do |synced_folder|
       app_volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
+    end
+    dest = "#{data_volume['dest']}"
+    source = "#{data_volume['source']}"
+    if(parsed_conf['docker_mirror'])
+      dest = "#{guest_mirror_dir}#{dest}"
+    end
+    app_volumes.push("#{source}/:#{dest}:delegated")
+    app.vm.provision "shell", inline: $ansible
+    if(parsed_conf['docker_mirror'])
+      app.vm.provision "shell", inline: $mirror
     end
     # First ensure 'vagrant' ownership match.
     app.vm.provision "shell", inline: $vagrant_uid

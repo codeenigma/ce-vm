@@ -2,6 +2,8 @@
 ################ Folder sync options.
 ################################################################################
 
+shared_volumes.push(data_volume)
+
 # Default native options. 
 folder_sync_options = {type: "virtualbox", owner: "vagrant", group: "www-data", :mount_options => ['dmode=775,fmode=774']}
 folder_sync_home_ce_options = {type: "virtualbox", owner: "vagrant", group: "root", :mount_options => ['dmode=775,fmode=774']}
