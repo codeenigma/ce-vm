@@ -51,6 +51,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "db-vm" do |db|
     db.trigger.before :up do
       if (RUBY_PLATFORM =~ /darwin/)
+        info "Network configuration changes needed. This require administrative privileges."
         run "sudo ifconfig lo0 alias 192.168.56.3/24"
       end
     end
@@ -97,6 +98,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "app-vm", primary: true do |app|
     app.trigger.before :up do
       if (RUBY_PLATFORM =~ /darwin/)
+        info "Network configuration changes needed. This require administrative privileges."
         run "sudo ifconfig lo0 alias 192.168.56.2/24"
       end
     end

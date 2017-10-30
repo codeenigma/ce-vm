@@ -40,7 +40,6 @@ mkdocs: no
 
 # Whether to install Apache Solr.
 solr: no
-solr_version: 4.6.1
   
 # Whether to install the Selenium test framework.
 selenium: no
@@ -158,15 +157,24 @@ docker_app_ssh_port: 22202
 # instance on mac OS X.
 docker_app_fwd_ports:
  - "22202:22"
+ # Web server
  - "80:80"
+ # VNC
  - "5999:5999"
+ # Selenium
+ - "4444:4444"
+ # Mkdocs
  - "8000:8000"
 
 docker_db_ssh_port: 22203
 docker_db_fwd_ports: 
  - "22203:22"
+ # MySQL
  - "3306:3306"
+ # Memcached
  - "11211:11211"
+ # Tomcat
+ - "8080:8080"
 
 # Vagrant user uid and group gid. 
 # You normally don't have to change this,
