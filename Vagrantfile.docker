@@ -49,6 +49,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Database VM.
   config.vm.define "db-vm" do |db|
+    db.trigger.before :up do
+      if (RUBY_PLATFORM =~ /darwin/)
+        run "sudo ifconfig lo0 alias 192.168.56.3/24"
+      end
+    end
     # Base properties.
     db.ssh.host = '127.0.0.1'
     db.ssh.guest_port = parsed_conf['docker_db_ssh_port']
@@ -90,6 +95,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# App VM.
   config.vm.define "app-vm", primary: true do |app|
+    app.trigger.before :up do
+      if (RUBY_PLATFORM =~ /darwin/)
+        run "sudo ifconfig lo0 alias 192.168.56.2/24"
+      end
+    end
     # Base properties.
     app.ssh.host = '127.0.0.1'
     app.ssh.guest_port = parsed_conf['docker_app_ssh_port']
