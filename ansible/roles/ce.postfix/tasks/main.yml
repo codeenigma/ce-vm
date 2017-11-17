@@ -10,6 +10,11 @@
     pkg: postfix
     state: latest
 
+- name: Ensure procmail is installed.
+  apt:
+    pkg: procmail
+    state: latest
+
 - name: Configure postfix main.cf.
   template:
     src: main.cf.j2
