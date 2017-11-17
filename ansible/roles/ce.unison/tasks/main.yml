@@ -1,0 +1,32 @@
+---
+  
+- name: Create Unison download shared cache dir if needed.
+  file:
+    path: '{{ shared_cache_dir }}/unison'
+    state: directory
+
+- name: Download Unison
+  get_url:
+    url: "https://www.codeenigma.com/sites/default/files/unison-{{ unison_version }}"
+    dest: "{{ shared_cache_dir }}/unison/unison-{{ unison_version }}"
+
+- name: Download Unison FS Monitor
+  get_url:
+    url: "https://www.codeenigma.com/sites/default/files/unison-fsmonitor-{{ unison_version }}"
+    dest: "{{ shared_cache_dir }}/unison/unison-fsmonitor-{{ unison_version }}"
+ 
+- name: Copy Unison to local file system.
+  copy:
+    dest: '/usr/local/bin/unison'
+    src: "{{ shared_cache_dir }}/unison/unison-{{ unison_version }}"
+    mode: 0655
+
+- name: Copy Unison FS Monitor to local file system.
+  copy:
+    dest: '/usr/local/bin/unison-fsmonitor'
+    src: "{{ shared_cache_dir }}/unison/unison-fsmonitor-{{ unison_version }}"
+    mode: 0655
+
+- name: Start Unison process
+  shell: nohup /usr/local/bin/unison -batch -owner -group -ignore "Name .git" -ignore "Name .vagrant" -ignore "Name .unison.*" -prefer /.ce-vm-mirror/vagrant -repeat watch -fastercheckUNSAFE /.ce-vm-mirror/vagrant /vagrant </dev/null >/dev/null 2>&1 &
+  

@@ -26,8 +26,6 @@
 - name: Move Symfony codebase in place.
   command: >
     rsync -a --no-perms --no-owner --no-group /tmp/{{ request_time }}/ {{ project_dir }}
-  become: true
-  become_user: vagrant
   when: not symfony_base.stat.exists
   
 - name: Remove Symfony var folder.
