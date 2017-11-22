@@ -43,7 +43,7 @@
 
 - name: Change dev IP.
   command: >
-    sed -ie 's/127.0.0.1/192.168.56.1/g' "{{ project_dir }}/{{ webroot }}/app_dev.php"
+    sed -ie 's/127.0.0.1/{{ net_gateway }}/g' "{{ project_dir }}/{{ webroot }}/app_dev.php"
   when: not symfony_base.stat.exists and vagrant_provider == 'virtualbox'
   
 - name: Generate default .gitignore.

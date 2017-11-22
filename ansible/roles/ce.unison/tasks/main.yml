@@ -27,6 +27,9 @@
     src: "{{ shared_cache_dir }}/unison/unison-fsmonitor-{{ unison_version }}"
     mode: 0655
 
+- name: Initial data sync
+  shell: /usr/local/bin/unison -batch -owner -group -ignore "Name .git" -ignore "Name .vagrant" -ignore "Name .unison.*"  -prefer /.ce-vm-mirror/vagrant /.ce-vm-mirror/vagrant /vagrant </dev/null >/dev/null 2>&1 &
+
 - name: Start Unison process
-  shell: nohup /usr/local/bin/unison -batch -owner -group -ignore "Name .git" -ignore "Name .vagrant" -ignore "Name .unison.*" -prefer /.ce-vm-mirror/vagrant -repeat watch -fastercheckUNSAFE /.ce-vm-mirror/vagrant /vagrant </dev/null >/dev/null 2>&1 &
+  shell: nohup /usr/local/bin/unison -batch -owner -group -ignore "Name .git" -ignore "Name .vagrant" -ignore "Name .unison.*" -repeat watch -fastercheckUNSAFE /.ce-vm-mirror/vagrant /vagrant </dev/null >/dev/null 2>&1 &
   
