@@ -14,6 +14,19 @@
   apt_repository: repo='deb-src https://repo.percona.com/apt jessie main' state=present
   when: mysql_engine == "percona-server"
 
+- name: Add repository key for MySQL repository.
+  apt_key: keyserver=pgp.mit.edu id=A4A9406876FCBD3C456770C88C718D3B5072E1F5 state=present
+  when: mysql_engine == "mysql"
+
+- name: Add repository for MySQL.
+  apt_repository: repo='deb http://repo.mysql.com/apt/debian/ jessie mysql-5.7' state=present
+  when: mysql_engine == "mysql"
+
+- name: Add source repository for MySQL.
+  apt_repository: repo='deb-src http://repo.mysql.com/apt/debian/ jessie mysql-5.7' state=present
+  when: mysql_engine == "mysql"
+
+
 - name: Pin Percona packages.
   template:
     src: percona.pref.j2
@@ -23,6 +36,16 @@
     mode: 0644
     force: yes
   when: mysql_engine == "percona-server"
+  
+- name: Pin MySQL packages.
+  template:
+    src: mysql.pref.j2
+    dest: "/etc/apt/preferences.d/mysql.pref"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  when: mysql_engine == "mysql"
 
 - name: Update apt cache.
   apt: update_cache=yes
@@ -32,14 +55,25 @@
     pkg: "{{ mysql_engine }}-server"
     state: latest
 
-- name: Copy mysql overriding configuration in place.
+- name: Copy Percona overriding configuration in place.
   template:
-    src: dev.cnf.j2
+    src: percona_dev.cnf.j2
     dest: "/etc/mysql/conf.d/dev.cnf"
     owner: root
     group: root
     mode: 0644
     force: yes
+  when: mysql_engine == "percona-server"
+
+- name: Copy MySQL overriding configuration in place.
+  template:
+    src: mysql_dev.cnf.j2
+    dest: "/etc/mysql/mysql.conf.d/zz_dev.cnf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  when: mysql_engine == "mysql"
 
 - name: Restart mysql.
   service: name=mysql state=restarted
