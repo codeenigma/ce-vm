@@ -9,7 +9,30 @@
   apt:
     pkg: nginx-full
     state: latest
- 
+
+- name: Create SSL certificates folder
+  file:
+    path: '/etc/nginx/ssl'
+    owner: 'root'
+    group: 'root'
+    state: directory
+
+- name: Copy SSL certificate.
+  template:
+    src: ce-vm-self.crt
+    dest: "/etc/nginx/ssl/ce-vm-self.crt"
+    owner: root
+    group: root
+    mode: 0666
+
+- name: Copy SSL key.
+  template:
+    src: ce-vm-self.key
+    dest: "/etc/nginx/ssl/ce-vm-self.key"
+    owner: root
+    group: root
+    mode: 0666
+
 # Vhost and default config.
 - name: Copy nginx configuration in place.
   template:
@@ -34,3 +57,6 @@
 
 - name: Restart nginx.
   service: name=nginx state=restarted enabled=yes
+
+- name: Ensure php-fpm is restarted.
+  service: name=php{{ php_version }}-fpm state=restarted enabled=yes
