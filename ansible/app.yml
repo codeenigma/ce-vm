@@ -17,13 +17,13 @@
   roles:
     
     - { role: ce.unison, when: docker_mirror }
-    - { role: ce.nginx }
     - { role: ce.php }
     - { role: ce.composer }
     - { role: ce.php_codesniffer, when: not project_type == 'drupal' }
     - { role: ce.php_messdetector }
     - { role: ce.php_xdebug, when: php_xdebug }
     - { role: ce.php_blackfire, when: php_blackfire }
+    - { role: ce.nginx, when: webserver == 'nginx' }
     - { role: ce.mkdocs, when: mkdocs }
     - { role: ce.nodejs, when: nodejs_version == '4.x' or nodejs_version == '6.x'}
     - { role: ce.drush, when: project_type == 'drupal' }
