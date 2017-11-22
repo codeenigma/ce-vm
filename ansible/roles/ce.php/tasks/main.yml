@@ -8,20 +8,21 @@
 - name: Install PHP packages.
   apt: "name={{ item }} state=latest"
   with_items:
-    - "php{{ php_version }}-fpm"
     - "php{{ php_version }}-cli"
-    - "php{{ php_version }}-dev"
-    - "php{{ php_version }}-mysql"
-    - "php{{ php_version }}-gd"
     - "php{{ php_version }}-curl"
+    - "php{{ php_version }}-dev"
+    - "php{{ php_version }}-fpm"
+    - "php{{ php_version }}-gd"
     - "php{{ php_version }}-imap"
     - "php{{ php_version }}-json"
-    - "php{{ php_version }}-opcache"
-    - "php{{ php_version }}-xml"
     - "php{{ php_version }}-mbstring"
     - "php{{ php_version }}-memcached"
-    - "php{{ php_version }}-zip"
+    - "php{{ php_version }}-mysql"
+    - "php{{ php_version }}-opcache"
+    - "php{{ php_version }}-redis"
     - "php{{ php_version }}-soap"
+    - "php{{ php_version }}-xml"
+    - "php{{ php_version }}-zip"
 
 - name: Copy php.ini for php-fpm.
   template:
