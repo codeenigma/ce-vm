@@ -46,7 +46,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     db.vm.box_version = "3.0.0"
     db.vm.hostname = "#{vdb}"
     # Networking
-    db.vm.network :private_network, ip: "192.168.56.3"
+    db.vm.network :private_network, ip: "#{parsed_conf['net_db_ip']}"
     # Shared folders
     shared_volumes.each do |synced_folder|
       db.vm.synced_folder synced_folder['source'], synced_folder['dest'], folder_sync_options
@@ -75,7 +75,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.vm.box_version = "3.0.0"
     app.vm.hostname = "#{vapp}"
     # Networking
-    app.vm.network :private_network, ip: "192.168.56.2"
+    app.vm.network :private_network, ip: "#{parsed_conf['net_app_ip']}"
     # Shared folders
     shared_volumes.each do |synced_folder|
       app.vm.synced_folder synced_folder['source'], synced_folder['dest'], folder_sync_options
