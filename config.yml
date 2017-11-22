@@ -35,6 +35,9 @@ nodejs_version: ''
 # Whether to install memcached on the DB vm.
 memcached: yes
 
+# Whether to install Redis on the DB vm.
+redis: no
+
 # Whether to install MkDocs documentation generator on app-vm.
 mkdocs: no
 
@@ -47,6 +50,11 @@ selenium: no
 # - XVFB: light headless driver
 # - VNC: heavier, but provides visual feedback.
 selenium_display_manager: XVFB
+
+# Only Nginx is currently supported,
+# but you can disable it if you want to
+# setup the webserver by yourself.
+webserver: nginx
 
 # Extra Debian packages to install on the App vm.
 app_extra_packages: ''
@@ -159,6 +167,7 @@ docker_app_fwd_ports:
  - "22202:22"
  # Web server
  - "80:80"
+ - "443:443"
  # VNC
  - "5999:5999"
  # Selenium
@@ -183,3 +192,12 @@ docker_db_fwd_ports:
 # actual user uid/gid.
 docker_vagrant_user_uid: 1000
 docker_vagrant_group_gid: 1000
+
+
+# Networking settings.
+# You will need to change your hosts file
+# if you change from defaults.
+net_subnet: 192.168.56.0/24
+net_gateway: 192.168.56.1
+net_app_ip: 192.168.56.2
+net_db_ip: 192.168.56.3
