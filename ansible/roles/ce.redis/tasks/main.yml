@@ -1,0 +1,41 @@
+---
+# Install Redis
+
+- name: Add repository key for Dotdeb.
+  apt_key: url=https://www.dotdeb.org/dotdeb.gpg state=present
+  
+- name: Add repository for Dotdeb.
+  apt_repository: repo='deb http://packages.dotdeb.org jessie all' state=present
+  when: mysql_engine == "percona-server"
+
+- name: Add source repository for Dotdeb.
+  apt_repository: repo='deb-src http://packages.dotdeb.org jessie all' state=present
+
+- name: Pin Dotdeb packages.
+  template:
+    src: dotdeb.pref.j2
+    dest: "/etc/apt/preferences.d/dotdeb.pref"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
+- name: Update apt cache.
+  apt: update_cache=yes
+  
+- name: Ensure Redis is installed.
+  apt:
+    pkg: "redis-server"
+    state: latest
+
+#- name: Copy Redis configuration in place.
+#  template:
+#    src: dev.cnf.j2
+#    dest: "/etc/mysql/conf.d/dev.cnf"
+#    owner: root
+#    group: root
+#    mode: 0644
+#    force: yes
+
+- name: Restart mysql.
+  service: name=redis-server state=restarted

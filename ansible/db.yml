@@ -18,6 +18,7 @@
     
     - { role: ce.mysql }
     - { role: ce.memcached, when: memcached }
+    - { role: ce.redis, when: redis }
     - { role: ce.solr, when: solr }
     - { role: ce.postfix }
 
