@@ -43,7 +43,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.forward_agent = true
   # Create our network silently. @todo check if it exists first.   
   config.trigger.before :up, :force => true, :stdout => false, :stderr => false do     
-    run "docker network create --subnet=#{parsed_conf['net_subnet']} --gateway=#{parsed_conf['net_subnet']} #{net_name}"
+    run "docker network create --subnet=#{parsed_conf['net_subnet']} --gateway=#{parsed_conf['net_gateway']} #{net_name}"
   end
   ################# END Common config.  
 
