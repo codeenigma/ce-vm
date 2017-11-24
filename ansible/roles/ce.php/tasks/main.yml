@@ -33,6 +33,7 @@
   template:
     src: php.cli.ini.j2
     dest: "/etc/php/{{ php_version }}/cli/php.ini"
+    force: yes
 
 - name: Ensure php-fpm is restarted.
   service: name=php{{ php_version }}-fpm state=restarted enabled=yes
