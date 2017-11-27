@@ -201,3 +201,6 @@ net_subnet: 192.168.56.0/24
 net_gateway: 192.168.56.1
 net_app_ip: 192.168.56.2
 net_db_ip: 192.168.56.3
+
+# Experimental feature.
+docker_mirror: no
