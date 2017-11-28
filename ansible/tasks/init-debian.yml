@@ -5,6 +5,11 @@
     path: '{{ shared_cache_dir }}/apt'
     state: directory
 
+- name: Create apt archive dir if needed.
+  file:
+    path: '{{ shared_cache_dir }}/apt/archive'
+    state: directory
+
 - name: Move apt cache to shared dir.
   template:
     src: "apt-cache.j2"
