@@ -164,7 +164,6 @@ docker_app_ssh_port: 22202
 # on your host might be already used by an Apache
 # instance on mac OS X.
 docker_app_fwd_ports:
- - "22202:22"
  # Web server
  - "80:80"
  - "443:443"
@@ -177,7 +176,6 @@ docker_app_fwd_ports:
 
 docker_db_ssh_port: 22203
 docker_db_fwd_ports: 
- - "22203:22"
  # MySQL
  - "3306:3306"
  # Memcached

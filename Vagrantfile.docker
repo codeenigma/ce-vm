@@ -59,6 +59,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     db.ssh.host = '127.0.0.1'
     db.ssh.guest_port = parsed_conf['docker_db_ssh_port']
     db.vm.hostname = "#{vdb}"
+    # Disable default port forwarding, as we define a custom one.
+    db.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_db_ssh_port'], id: 'ssh'
     # Shared folders
     db.vm.synced_folder ".", "/vagrant", disabled: true
     db_volumes = []
@@ -107,6 +109,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.ssh.host = '127.0.0.1'
     app.ssh.guest_port = parsed_conf['docker_app_ssh_port']
     app.vm.hostname = "#{vapp}"
+    # Disable default port forwarding, as we define a custom one.
+    app.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_app_ssh_port'], id: 'ssh'
     # Shared folders
     app.vm.synced_folder ".", "/vagrant", disabled: true
     app_volumes = []
