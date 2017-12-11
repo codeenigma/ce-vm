@@ -202,3 +202,7 @@ net_db_ip: 192.168.56.3
 
 # Experimental feature.
 docker_mirror: no
+
+# Privileged mode for containers.
+docker_app_privileged: false
+docker_db_privileged: true

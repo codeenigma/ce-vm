@@ -88,7 +88,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "--ip",
         "#{parsed_conf['net_db_ip']}",
         "-P",
-        "--privileged=true", # Tomcat7 needs this.
+        "--privileged=#{parsed_conf['docker_db_privileged']}", # Tomcat7 needs this on Mac.
       ]
       d.ports = parsed_conf['docker_db_fwd_ports']
       d.has_ssh = true
@@ -145,7 +145,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "--network=#{net_name}",
         "--ip",
         "#{parsed_conf['net_app_ip']}",
-        "-P"
+        "-P",
+        "--privileged=#{parsed_conf['docker_app_privileged']}",
       ]
       d.ports = parsed_conf['docker_app_fwd_ports']
       d.has_ssh = true
