@@ -6,7 +6,7 @@
 - apt_repository: repo='deb https://packages.sury.org/php/ jessie main' state=present
 
 - name: Install PHP packages.
-  apt: "name={{ item }} state=latest"
+  apt: "name={{ item }} state=present"
   with_items:
     - "php{{ php_version }}-cli"
     - "php{{ php_version }}-curl"

@@ -1,19 +1,15 @@
 ---
 
-- name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
-  changed_when: false
-  
 - name: Ensure xdebug is installed.
   apt:
     pkg: php-xdebug
-    state: latest
+    state: present
 
 - name: Ensure host trace/profiling folder exists.
   file:
     path: "{{ local_var_dir }}/php-xdebug"
     state: directory
-
+  
 - name: Copy xdebug configuration in place.
   template:
     src: 30-xdebug-dev.ini.j2

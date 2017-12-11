@@ -1,14 +1,10 @@
 ---
 # (Re) install nginx
-
-- name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
-  changed_when: false
   
 - name: Ensure nginx is installed.
   apt:
     pkg: nginx-full
-    state: latest
+    state: present
 
 - name: Create SSL certificates folder
   file:

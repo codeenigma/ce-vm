@@ -1,10 +1,10 @@
 ---
   
 - name: Install Tomcat.
-  apt: "name=tomcat7 state=latest"
+  apt: "name=tomcat7 state=present"
 
 - name: Install Solr-Tomcat.
-  apt: "name=solr-tomcat state=latest"
+  apt: "name=solr-tomcat state=present"
 
 - name: Create Solr download shared cache dir if needed.
   file:

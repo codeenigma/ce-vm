@@ -18,14 +18,11 @@
     group: root
     mode: 0644
     force: yes
-
-- name: Update apt cache.
-  apt: update_cache=yes
   
 - name: Ensure node is installed.
   apt:
     pkg: "nodejs"
-    state: latest
+    state: present
     
 - name: Create NodeJS shared cache dir if needed.
   file:

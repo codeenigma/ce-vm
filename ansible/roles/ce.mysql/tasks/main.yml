@@ -46,14 +46,11 @@
     mode: 0644
     force: yes
   when: mysql_engine == "mysql"
-
-- name: Update apt cache.
-  apt: update_cache=yes
   
 - name: Ensure mysql is installed.
   apt:
     pkg: "{{ mysql_engine }}-server"
-    state: latest
+    state: present
 
 - name: Copy Percona overriding configuration in place.
   template:
@@ -92,7 +89,7 @@
 - name: Ensure python-mysqldb is installed.
   apt:
     pkg: "python-mysqldb"
-    state: latest
+    state: present
 
 - name: Create databases for dumps.
   mysql_db: state=present name="{{ item.name }}" target="{{ project_dir }}/{{ item.source }}"

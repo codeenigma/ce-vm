@@ -171,8 +171,6 @@ echo "Dir::Cache::Archives #{guest_ce_home}/cache/#{parsed_conf['vagrant_provide
 echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
 apt-get update
-apt-get dist-upgrade -y
-apt-get install -y openssh-server curl sudo apt-utils ansible git
 SCRIPT
 
 # Call provider specific include.

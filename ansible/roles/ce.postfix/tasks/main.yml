@@ -1,19 +1,15 @@
 ---
 # Install postfix
-
-- name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
-  changed_when: false
   
 - name: Ensure postfix is installed.
   apt:
     pkg: postfix
-    state: latest
+    state: present
 
 - name: Ensure procmail is installed.
   apt:
     pkg: procmail
-    state: latest
+    state: present
 
 - name: Configure postfix main.cf.
   template:

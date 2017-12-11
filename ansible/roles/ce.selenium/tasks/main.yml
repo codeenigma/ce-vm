@@ -5,7 +5,7 @@
     selenium_major_version: "{{ selenium_version | regex_replace('\\.[0-9]+$', '') }}"
 
 - name: Install Selenium dependencies.
-  apt: "name={{ item }} state=latest"
+  apt: "name={{ item }} state=present"
   with_items:
     - curl
     - unzip
@@ -13,14 +13,14 @@
     - firefox-esr
 
 - name: Install XVFB display manager.
-  apt: "name={{ item }} state=latest"
+  apt: "name={{ item }} state=present"
   with_items:
     - xvfb
     - firefox-esr
   when: selenium_display_manager == "XVFB"
     
 - name: Install VNC display manager.
-  apt: "name={{ item }} state=latest"
+  apt: "name={{ item }} state=present"
   with_items:
     - tightvncserver
     - xterm

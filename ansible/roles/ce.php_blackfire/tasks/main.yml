@@ -5,19 +5,16 @@
   
 - name: Add repository for Blackfire.
   apt_repository: repo='deb http://packages.blackfire.io/debian any main' state=present
-  
-- name: Update apt cache.
-  apt: update_cache=yes
-  
+    
 - name: Ensure Blackfire agent is installed.
   apt:
     pkg: "blackfire-agent"
-    state: latest
+    state: present
     
 - name: Ensure Blackfire probe is installed.
   apt:
     pkg: "blackfire-php"
-    state: latest
+    state: present
     
 - name: Generate agent server configuration.
   template:

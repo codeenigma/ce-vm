@@ -19,14 +19,11 @@
     group: root
     mode: 0644
     force: yes
-
-- name: Update apt cache.
-  apt: update_cache=yes
   
 - name: Ensure Redis is installed.
   apt:
     pkg: "redis-server"
-    state: latest
+    state: present
 
 #- name: Copy Redis configuration in place.
 #  template:

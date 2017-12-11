@@ -40,6 +40,6 @@
   tasks:
     # Install extra packages.
     - name: Install additional extra packages.
-      apt: "name={{ item }} state=latest"
+      apt: "name={{ item }} state=present"
       with_items: "{{ app_extra_packages | list }}"
       when: app_extra_packages | length
