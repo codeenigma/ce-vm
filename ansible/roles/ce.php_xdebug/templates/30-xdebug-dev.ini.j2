@@ -1,15 +1,16 @@
 ; Bypass @ silence
-;xdebug.scream=1
-xdebug.max_nesting_level=1024
+xdebug.scream={{ php_xdebug_scream }}
+xdebug.max_nesting_level={{ php_xdebug_max_nesting_level }}
 ; Enable remote trace
-xdebug.trace_enable_trigger=1
+xdebug.trace_enable_trigger={{ php_xdebug_trace_enable_trigger }}
 xdebug.trace_output_dir="{{ local_var_dir }}/php-xdebug"
 xdebug.trace_output_name=trace.%u
 ; Enable remote profiler
-xdebug.profiler_enable_trigger=1
+xdebug.profiler_enable_trigger={{ php_xdebug_profiler_enable_trigger }}
 xdebug.profiler_output_dir="{{ local_var_dir }}/php-xdebug"
 xdebug.profiler_output_name=profiler.%u
 ; Enable remote debugging
-xdebug.remote_port=9000
 xdebug.remote_enable=1
-xdebug.remote_connect_back=1
+xdebug.remote_port={{ php_xdebug_remote_port }}
+xdebug.remote_host={{ php_xdebug_remote_host }}
+xdebug.remote_connect_back={{ php_xdebug_remote_connect_back }}
