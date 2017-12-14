@@ -152,26 +152,23 @@ shared_volumes = [];
 run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
 # Gather config files to pass to Ansible.
 run_config_files = config_files_find(host_conf_files, guest_conf_files)
+# Pass host platform.
+host_platform="windows"
+if (RUBY_PLATFORM =~ /darwin/)
+  host_platform="mac_os"
+end
+if (RUBY_PLATFORM =~ /linux/)
+  host_platform="linux"
+end
 # Configuration to pass to Ansible.
 ansible_extra_vars = {
   config_files: "#{run_config_files}",
   project_dir: "#{guest_project_dir}",
   vm_dir: "#{vm_dir}",
   ce_vm_home: "#{guest_ce_home}",
-  shared_cache_dir: "#{guest_ce_home}/cache/#{parsed_conf['vagrant_provider']}"
+  shared_cache_dir: "#{guest_ce_home}/cache/#{parsed_conf['vagrant_provider']}",
+  host_platform: "#{host_platform}"
 }
-
-# Ansible inline install.
-$ansible = <<SCRIPT
-if [ ! -d "#{guest_ce_home}/cache/#{parsed_conf['vagrant_provider']}/apt/archives" ];then
-  mkdir -p "#{guest_ce_home}/cache/#{parsed_conf['vagrant_provider']}/apt/archives"
-fi
-echo "Dir::Cache{Archives #{guest_ce_home}/cache/#{parsed_conf['vagrant_provider']}/apt/archives}" > /etc/apt/apt.conf.d/90ce-vm-aptcache
-echo "Dir::Cache::Archives #{guest_ce_home}/cache/#{parsed_conf['vagrant_provider']}/apt/archives;" >> /etc/apt/apt.conf.d/90ce-vm-aptcache
-echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
-apt-get update
-SCRIPT
 
 # Call provider specific include.
 eval File.read File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", "Vagrantfile.#{parsed_conf['vagrant_provider']}")

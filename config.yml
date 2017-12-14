@@ -169,8 +169,6 @@ docker_app_fwd_ports:
  - "443:443"
  # VNC
  - "5999:5999"
- # Selenium
- - "4444:4444"
  # Mkdocs
  - "8000:8000"
 
@@ -178,8 +176,6 @@ docker_db_ssh_port: 22203
 docker_db_fwd_ports: 
  # MySQL
  - "3306:3306"
- # Memcached
- - "11211:11211"
  # Tomcat
  - "8080:8080"
 
@@ -203,6 +199,9 @@ net_db_ip: 192.168.56.3
 # Experimental feature.
 docker_mirror: no
 
-# Privileged mode for containers.
-docker_app_privileged: false
-docker_db_privileged: true
+# Privileged mode for containers. 
+# If left on "auto", defaults to "false",
+# unless you need Tomcat/Solr and you're on a Mac.
+# You can "force" it to either "true" or "false".
+docker_app_privileged: auto
+docker_db_privileged: auto

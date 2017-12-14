@@ -36,6 +36,16 @@ fi
 rsync -av --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/" "#{guest_project_dir}"
 SCRIPT
 
+if (parsed_conf['docker_app_privileged'] == "auto")
+  parsed_conf['docker_app_privileged'] = "false"
+end
+if (parsed_conf['docker_db_privileged'] == "auto")
+  parsed_conf['docker_db_privileged'] = "false"
+  if (RUBY_PLATFORM =~ /darwin/)
+    parsed_conf['docker_db_privileged'] = "true"
+  end
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -68,7 +78,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       db_volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
     end
     db_volumes.push("#{data_volume['source']}/:#{data_volume['dest']}:delegated")
-    db.vm.provision "shell", inline: $ansible
     # First ensure 'vagrant' ownership match.
     db.vm.provision "shell", inline: $vagrant_uid
     # Run actual playbooks.
@@ -123,7 +132,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       dest = "#{guest_mirror_dir}#{dest}"
     end
     app_volumes.push("#{source}/:#{dest}:delegated")
-    app.vm.provision "shell", inline: $ansible
     if(parsed_conf['docker_mirror'])
       app.vm.provision "shell", inline: $mirror
     end
