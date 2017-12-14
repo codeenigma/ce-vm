@@ -27,20 +27,14 @@
     src: "{{ shared_cache_dir }}/unison/unison-fsmonitor-{{ unison_version }}"
     mode: 0655
 
-- name: Set source ownership
-  command: chown -R vagrant:www-data /.ce-vm-mirror/vagrant
-
-- name: Set source permissions
-  command: chmod -R 775 /.ce-vm-mirror/vagrant
-
 - name: Set target ownership
-  command: chown -R vagrant:www-data /vagrant
+  command: chown -R www-data:vagrant /vagrant
 
 - name: Set target permissions
   command: chmod -R 775 /vagrant
 
 - name: Initial data sync
-  shell: /usr/local/bin/unison -batch -owner -group -ignore "Name .git" -ignore "Name .vagrant" -ignore "Name .unison.*"  -prefer /.ce-vm-mirror/vagrant /.ce-vm-mirror/vagrant /vagrant </dev/null >/dev/null 2>&1 &
+  shell: /usr/local/bin/unison -batch -ignore "Name .git" -ignore "Name .vagrant" -ignore "Name .unison.*" -prefer /.ce-vm-mirror/vagrant /.ce-vm-mirror/vagrant /vagrant </dev/null >/dev/null 2>&1 &
   
 - name: Start Unison process
-  shell: nohup /usr/local/bin/unison -batch -owner -group -ignore "Name .git" -ignore "Name .vagrant" -repeat watch -fastercheckUNSAFE /.ce-vm-mirror/vagrant /vagrant </dev/null >/dev/null 2>&1 &
+  shell: nohup /usr/local/bin/unison -batch -ignore "Name .git" -ignore "Name .vagrant" -repeat watch -fastercheckUNSAFE /.ce-vm-mirror/vagrant /vagrant </dev/null >/dev/null 2>&1 &
