@@ -152,7 +152,8 @@ shared_volumes = [];
 run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
 # Gather config files to pass to Ansible.
 run_config_files = config_files_find(host_conf_files, guest_conf_files)
-# Pass host platform.
+
+# Pass host platform to ansible.
 host_platform="windows"
 if (RUBY_PLATFORM =~ /darwin/)
   host_platform="mac_os"
@@ -167,7 +168,8 @@ ansible_extra_vars = {
   vm_dir: "#{vm_dir}",
   ce_vm_home: "#{guest_ce_home}",
   shared_cache_dir: "#{guest_ce_home}/cache/#{parsed_conf['vagrant_provider']}",
-  host_platform: "#{host_platform}"
+  host_platform: "#{host_platform}",
+  vagrant_provider: "#{parsed_conf['vagrant_provider']}"
 }
 
 # Call provider specific include.
