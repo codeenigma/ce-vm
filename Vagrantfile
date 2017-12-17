@@ -77,7 +77,7 @@ ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
 
 # Remote.
 ce_vm_upstream_repo = 'https://github.com/codeenigma/ce-vm.git'
-ce_vm_upstream_branch = '3.x-dev'
+ce_vm_upstream_branch = '3.x'
 
 ################ Configuration loading.
 ################################################################################
