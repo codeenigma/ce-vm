@@ -80,9 +80,6 @@
   shell: >
     mysql -u root -NBe 'GRANT ALL ON *.* TO "dev"@"%" IDENTIFIED BY "dev";'
 
-- name: Restart mysql.
-  service: name=mysql state=restarted enabled=yes
-
 - name: Ensure python-mysqldb is installed.
   apt:
     pkg: "python-mysqldb"

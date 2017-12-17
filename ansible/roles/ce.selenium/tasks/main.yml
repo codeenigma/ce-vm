@@ -118,9 +118,6 @@
     mode: 0700
   when: selenium_display_manager == "VNC"
   
-- name: Ensure selenium is started and enabled to start at boot.
-  service: name=selenium state=restarted enabled=yes
-  
 - name: Copy startup script in place.
   template:
     src: startup.sh.j2

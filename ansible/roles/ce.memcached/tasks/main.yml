@@ -23,6 +23,3 @@
     group: root
     mode: 0555
     force: yes
-    
-- name: Ensure memcached is started.
-  service: name=memcached state=restarted enabled=yes

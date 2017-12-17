@@ -34,12 +34,6 @@
     mode: 0644
     force: yes
     
-- name: Restart blackfire-agent.
-  service: name=blackfire-agent state=restarted enabled=yes
-
-- name: Ensure php-fpm is restarted.
-  service: name=php{{ php_version }}-fpm state=restarted enabled=yes
-
 - name: Copy startup script in place.
   template:
     src: startup.sh.j2

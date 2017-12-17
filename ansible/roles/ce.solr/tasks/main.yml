@@ -108,9 +108,6 @@
     state: directory
     recurse: true
 
-- name: Ensure Tomcat is started and enabled to start at boot.
-  service: name=tomcat7 state=restarted enabled=yes
-  
 - name: Copy startup script in place.
   template:
     src: startup.sh.j2

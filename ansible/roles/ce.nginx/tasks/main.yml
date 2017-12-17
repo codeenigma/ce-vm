@@ -51,12 +51,6 @@
     path: "/etc/nginx/sites-enabled/default"
     state: absent
 
-- name: Restart nginx.
-  service: name=nginx state=restarted enabled=yes
-
-- name: Ensure php-fpm is restarted.
-  service: name=php{{ php_version }}-fpm state=restarted enabled=yes
-  
 - name: Copy startup script in place.
   template:
     src: startup.sh.j2

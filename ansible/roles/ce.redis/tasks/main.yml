@@ -34,5 +34,3 @@
     mode: 0555
     force: yes
     
-- name: Restart redis.
-  service: name=redis-server state=restarted
