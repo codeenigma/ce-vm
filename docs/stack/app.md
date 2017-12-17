@@ -21,14 +21,15 @@ When using Docker on Mac/Windows, it is only accessible through port forwarding,
 
 It bundles together:
 
-- MkDocs documentation generator (optional)
 - [NGINX](components/nginx.md) webserver
-- Node.js 4.x or 6.x (optional)
 - [PHP](components/php.md)-FPM and associated utilities
     - Composer
     - PHP_CodeSniffer
     - PHP Mess Detector
-    - XDebug (optional)
-    - Blackfire (optional)
+    - Blackfire [optional]
+    - XDebug [optional]
 - [Postfix](components/postfix.md) mail server
-- [Selenium](components/selenium.md) testing framework
+- MkDocs documentation generator [optional]
+- Node.js 4.x or 6.x [optional]
+- [Selenium](components/selenium.md) testing framework [optional]
+

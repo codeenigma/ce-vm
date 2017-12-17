@@ -1,14 +1,10 @@
 ---
 # Install memcached
 
-- name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
-  changed_when: false
-  
 - name: Ensure memcached is installed.
   apt:
     pkg: memcached
-    state: latest
+    state: present
     
 - name: Copy memcached configuration in place.
   template:
@@ -18,6 +14,12 @@
     group: root
     mode: 0644
     force: yes
-    
-- name: Ensure memcached is started.
-  service: name=memcached state=restarted enabled=yes
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/memcached"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes

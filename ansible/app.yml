@@ -16,14 +16,14 @@
 
   roles:
     
-    - { role: ce.postfix }
-    - { role: ce.nginx }
+    - { role: ce.unison, when: docker_mirror }
     - { role: ce.php }
     - { role: ce.composer }
     - { role: ce.php_codesniffer, when: not project_type == 'drupal' }
     - { role: ce.php_messdetector }
     - { role: ce.php_xdebug, when: php_xdebug }
     - { role: ce.php_blackfire, when: php_blackfire }
+    - { role: ce.nginx, when: webserver == 'nginx' }
     - { role: ce.mkdocs, when: mkdocs }
     - { role: ce.nodejs, when: nodejs_version == '4.x' or nodejs_version == '6.x'}
     - { role: ce.drush, when: project_type == 'drupal' }
@@ -35,10 +35,11 @@
     - { role: ce.wordpress, when: project_type == 'wordpress' }
     - { role: ce.php_generic, when: project_type == 'php_generic' }
     - { role: ce.selenium, when: selenium }
+    - { role: ce.postfix }
 
   tasks:
     # Install extra packages.
     - name: Install additional extra packages.
-      apt: "name={{ item }} state=latest"
+      apt: "name={{ item }} state=present"
       with_items: "{{ app_extra_packages | list }}"
       when: app_extra_packages | length

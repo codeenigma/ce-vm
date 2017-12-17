@@ -1,5 +1,4 @@
 ---
 
-ce_memcached_memory: 256
+ce_memcached_memory: 512
 ce_memcached_port: 11211
-ce_memcached_ip: 192.168.56.3

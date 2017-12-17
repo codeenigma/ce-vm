@@ -5,7 +5,7 @@
     selenium_major_version: "{{ selenium_version | regex_replace('\\.[0-9]+$', '') }}"
 
 - name: Install Selenium dependencies.
-  apt: "name={{ item }} state=latest"
+  apt: "name={{ item }} state=present"
   with_items:
     - curl
     - unzip
@@ -13,14 +13,14 @@
     - firefox-esr
 
 - name: Install XVFB display manager.
-  apt: "name={{ item }} state=latest"
+  apt: "name={{ item }} state=present"
   with_items:
     - xvfb
     - firefox-esr
   when: selenium_display_manager == "XVFB"
     
 - name: Install VNC display manager.
-  apt: "name={{ item }} state=latest"
+  apt: "name={{ item }} state=present"
   with_items:
     - tightvncserver
     - xterm
@@ -118,5 +118,11 @@
     mode: 0700
   when: selenium_display_manager == "VNC"
   
-- name: Ensure selenium is started and enabled to start at boot.
-  service: name=selenium state=restarted enabled=yes
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/selenium"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes

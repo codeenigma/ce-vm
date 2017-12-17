@@ -2,6 +2,8 @@
 ################ Folder sync options.
 ################################################################################
 
+shared_volumes.push(data_volume)
+
 # Default native options. 
 folder_sync_options = {type: "virtualbox", owner: "vagrant", group: "www-data", :mount_options => ['dmode=775,fmode=774']}
 folder_sync_home_ce_options = {type: "virtualbox", owner: "vagrant", group: "root", :mount_options => ['dmode=775,fmode=774']}
@@ -41,17 +43,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "db-vm" do |db|
     # Base properties.
     db.vm.box = "pmce/jessie64"
-    db.vm.box_version = "3.0.0"
+    db.vm.box_version = "3.3.0"
     db.vm.hostname = "#{vdb}"
     # Networking
-    db.vm.network :private_network, ip: "192.168.56.3"
+    db.vm.network :private_network, ip: "#{parsed_conf['net_db_ip']}"
     # Shared folders
     shared_volumes.each do |synced_folder|
       db.vm.synced_folder synced_folder['source'], synced_folder['dest'], folder_sync_options
     end
     db.vm.synced_folder home_ce_volume['source'], home_ce_volume['dest'], folder_sync_home_ce_options
-    # Provisioning. First install ansible from repo.
-    db.vm.provision "shell", inline: $ansible
     # Run actual playbooks.
     run_playbook_dirs.each do |ansible_folder|
         db.vm.provision 'ansible_local' do |ansible|
@@ -59,6 +59,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           ansible.extra_vars = ansible_extra_vars
         end
     end
+    db.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
     # VirtualBox settings.
     db.vm.provider :virtualbox do |vb|
       vb.name = "#{vdb}"
@@ -72,17 +73,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "app-vm", primary: true do |app|
     # Base properties.
     app.vm.box = "pmce/jessie64"
-    app.vm.box_version = "3.0.0"
+    app.vm.box_version = "3.3.0"
     app.vm.hostname = "#{vapp}"
     # Networking
-    app.vm.network :private_network, ip: "192.168.56.2"
+    app.vm.network :private_network, ip: "#{parsed_conf['net_app_ip']}"
     # Shared folders
     shared_volumes.each do |synced_folder|
       app.vm.synced_folder synced_folder['source'], synced_folder['dest'], folder_sync_options
     end
     app.vm.synced_folder home_ce_volume['source'], home_ce_volume['dest'], folder_sync_home_ce_options
-    # Provisioning. First install ansible from repo.
-    app.vm.provision "shell", inline: $ansible
     # Run actual playbooks.
     run_playbook_dirs.each do |ansible_folder|
         app.vm.provision 'ansible_local' do |ansible|
@@ -90,6 +89,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           ansible.extra_vars = ansible_extra_vars
         end
     end
+    app.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
     # VirtualBox settings.
     app.vm.provider :virtualbox do |vb|
       vb.name = "#{vapp}"

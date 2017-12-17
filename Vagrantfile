@@ -65,6 +65,7 @@ host_home_dir = File.expand_path('~')
 # Absolute paths on the guest machine.
 guest_project_dir = '/vagrant'
 guest_home_dir = '/home/vagrant'
+guest_mirror_dir = '/.ce-vm-mirror'
 
 # Relative paths.
 vm_dir = File.basename(File.dirname(File.expand_path(ENV['PROJECT_VAGRANTFILE'])))
@@ -140,39 +141,36 @@ vapp = "#{parsed_conf['project_name']}"
 vdb = "#{parsed_conf['project_name']}-db"
 
 # Gather shared folders.
-shared_volumes = []
-shared_volumes.push({'source' => "#{host_project_dir}", 'dest' => "#{guest_project_dir}"})
+data_volume = {'source' => "#{host_project_dir}", 'dest' => "#{guest_project_dir}"}
 host_ce_home = File.join("#{host_home_dir}", "#{ce_vm_local_home}")
 guest_ce_home = File.join("#{guest_home_dir}", "#{ce_vm_local_home}")
-# "Internal" shared volume, we'll mount it separately.
 home_ce_volume = {'source' => "#{host_ce_home}", 'dest' => "#{guest_ce_home}"}
+#@todo, add a setting for "extra" shared volumes.
+shared_volumes = [];
 
 # Gather playbooks.
 run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
 # Gather config files to pass to Ansible.
 run_config_files = config_files_find(host_conf_files, guest_conf_files)
+
+# Pass host platform to ansible.
+host_platform="windows"
+if (RUBY_PLATFORM =~ /darwin/)
+  host_platform="mac_os"
+end
+if (RUBY_PLATFORM =~ /linux/)
+  host_platform="linux"
+end
 # Configuration to pass to Ansible.
 ansible_extra_vars = {
   config_files: "#{run_config_files}",
   project_dir: "#{guest_project_dir}",
   vm_dir: "#{vm_dir}",
   ce_vm_home: "#{guest_ce_home}",
+  shared_cache_dir: "#{guest_ce_home}/cache/#{parsed_conf['vagrant_provider']}",
+  host_platform: "#{host_platform}",
+  vagrant_provider: "#{parsed_conf['vagrant_provider']}"
 }
-
-# Ansible inline install.
-$ansible = <<SCRIPT
-if [ ! -d "/home/vagrant/.CodeEnigma/ce-vm/cache/apt" ];then
-  mkdir -p "/home/vagrant/.CodeEnigma/ce-vm/cache/apt"
-  rsync -a "/var/cache/apt/" "/home/vagrant/.CodeEnigma/ce-vm/cache/apt"
-fi
-echo "Dir{Cache /home/vagrant/.CodeEnigma/ce-vm/cache/apt}" > /etc/apt/apt.conf.d/90ce-vm-aptcache
-echo "Dir::Cache /home/vagrant/.CodeEnigma/ce-vm/cache/apt;" >> /etc/apt/apt.conf.d/90ce-vm-aptcache
-echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
-apt-get update
-apt-get dist-upgrade -y
-apt-get install -y openssh-server curl sudo apt-utils ansible git
-SCRIPT
 
 # Call provider specific include.
 eval File.read File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", "Vagrantfile.#{parsed_conf['vagrant_provider']}")

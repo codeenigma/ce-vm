@@ -3,15 +3,11 @@
 - name: Check if we already have a drush instance.
   stat: path="/usr/local/bin/drush"
   register: drush_install
-
-- name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
-  changed_when: false
   
 - name: Ensure mysql-client is installed, drush needs it.
   apt:
     pkg: mysql-client
-    state: latest
+    state: present
 
 - name: Download Drush installer.
   get_url:

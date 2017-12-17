@@ -22,5 +22,6 @@ When using Docker, it is only accessible through port forwarding, which means yo
 It bundles together:
 
 - Percona server (MySQL)
-- memcached
 - [Postfix](components/postfix.md) mail server
+- memcached [optional]
+- [Solr](components/solr.md) search platform [optional]

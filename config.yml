@@ -35,15 +35,26 @@ nodejs_version: ''
 # Whether to install memcached on the DB vm.
 memcached: yes
 
+# Whether to install Redis on the DB vm.
+redis: no
+
 # Whether to install MkDocs documentation generator on app-vm.
 mkdocs: no
 
+# Whether to install Apache Solr.
+solr: no
+  
 # Whether to install the Selenium test framework.
 selenium: no
 # Display manager to use with Selenium. Can be either 
 # - XVFB: light headless driver
 # - VNC: heavier, but provides visual feedback.
 selenium_display_manager: XVFB
+
+# Only Nginx is currently supported,
+# but you can disable it if you want to
+# setup the webserver by yourself.
+webserver: nginx
 
 # Extra Debian packages to install on the App vm.
 app_extra_packages: ''
@@ -108,7 +119,7 @@ composer_github_oauth_token: ''
 ################################################################################
 
 # Provider. Either virtualbox (safest) or docker (experimental).
-vagrant_provider: virtualbox
+vagrant_provider: docker
 
 ####### VirtualBox specific settings.
 
@@ -153,16 +164,20 @@ docker_app_ssh_port: 22202
 # on your host might be already used by an Apache
 # instance on mac OS X.
 docker_app_fwd_ports:
- - "22202:22"
+ # Web server
  - "80:80"
+ - "443:443"
+ # VNC
  - "5999:5999"
+ # Mkdocs
  - "8000:8000"
 
 docker_db_ssh_port: 22203
 docker_db_fwd_ports: 
- - "22203:22"
+ # MySQL
  - "3306:3306"
- - "11211:11211"
+ # Tomcat
+ - "8080:8080"
 
 # Vagrant user uid and group gid. 
 # You normally don't have to change this,
@@ -171,3 +186,22 @@ docker_db_fwd_ports:
 # actual user uid/gid.
 docker_vagrant_user_uid: 1000
 docker_vagrant_group_gid: 1000
+
+
+# Networking settings.
+# You will need to change your hosts file
+# if you change from defaults.
+net_subnet: 192.168.56.0/24
+net_gateway: 192.168.56.1
+net_app_ip: 192.168.56.2
+net_db_ip: 192.168.56.3
+
+# Experimental feature.
+docker_mirror: no
+
+# Privileged mode for containers. 
+# If left on "auto", defaults to "false",
+# unless you need Tomcat/Solr and you're on a Mac.
+# You can "force" it to either "true" or "false".
+docker_app_privileged: auto
+docker_db_privileged: auto

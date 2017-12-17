@@ -1,27 +1,19 @@
 location / {
-        # try to serve file directly, fallback to app.php
-        try_files $uri /app.php$is_args$args;
-    }
-# Dev only
-location ~ ^/(app_dev|config)\.php(/|$) {
-  fastcgi_pass unix:/run/php/php{{ php_version }}-fpm.sock;
-  fastcgi_split_path_info ^(.+\.php)(/.*)$;
-  include fastcgi_params;
-  fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-  fastcgi_param DOCUMENT_ROOT $realpath_root;
+    try_files $uri /app_local.php$is_args$args;
 }
-location ~ ^/app\.php(/|$) {
+# Dev only
+location ~ ^/(app_local|app|app_dev|config)\.php(/|$) {
   fastcgi_pass unix:/run/php/php{{ php_version }}-fpm.sock;
   fastcgi_split_path_info ^(.+\.php)(/.*)$;
   include fastcgi_params;
   fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
   fastcgi_param DOCUMENT_ROOT $realpath_root;
-  internal;
 }
 
 location ~ \.php$ {
   return 404;
 }
+
 gzip on;
 gzip_proxied any;
 gzip_static on;

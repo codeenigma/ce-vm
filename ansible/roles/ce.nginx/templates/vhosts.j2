@@ -5,3 +5,13 @@ server {
     root "{{ project_dir }}/{{ webroot }}";
     include "/etc/nginx/conf.d/{{ project_type }}";
 }
+
+server {
+    listen 443 ssl default_server;
+    server_name "{{ project_name }}.app-vm.codeenigma.com";
+    ssl_certificate /etc/nginx/ssl/ce-vm-self.crt;
+    ssl_certificate_key /etc/nginx/ssl/ce-vm-self.key;
+    error_log /var/log/nginx/error.log info;
+    root "{{ project_dir }}/{{ webroot }}";
+    include "/etc/nginx/conf.d/{{ project_type }}";
+}

@@ -6,20 +6,22 @@
 - apt_repository: repo='deb https://packages.sury.org/php/ jessie main' state=present
 
 - name: Install PHP packages.
-  apt: "name={{ item }} state=latest"
+  apt: "name={{ item }} state=present"
   with_items:
-    - "php{{ php_version }}-fpm"
     - "php{{ php_version }}-cli"
-    - "php{{ php_version }}-dev"
-    - "php{{ php_version }}-mysql"
-    - "php{{ php_version }}-gd"
     - "php{{ php_version }}-curl"
+    - "php{{ php_version }}-dev"
+    - "php{{ php_version }}-fpm"
+    - "php{{ php_version }}-gd"
     - "php{{ php_version }}-imap"
     - "php{{ php_version }}-json"
-    - "php{{ php_version }}-opcache"
-    - "php{{ php_version }}-xml"
     - "php{{ php_version }}-mbstring"
     - "php{{ php_version }}-memcached"
+    - "php{{ php_version }}-mysql"
+    - "php{{ php_version }}-opcache"
+    - "php{{ php_version }}-redis"
+    - "php{{ php_version }}-soap"
+    - "php{{ php_version }}-xml"
     - "php{{ php_version }}-zip"
 
 - name: Copy php.ini for php-fpm.
@@ -31,6 +33,15 @@
   template:
     src: php.cli.ini.j2
     dest: "/etc/php/{{ php_version }}/cli/php.ini"
+    force: yes
 
 - name: Ensure php-fpm is restarted.
   service: name=php{{ php_version }}-fpm state=restarted enabled=yes
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/php"
+    owner: root
+    group: root
+    mode: 0555

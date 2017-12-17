@@ -1,10 +1,13 @@
 ---
 
-- set_fact: shared_cache_dir="{{ ce_vm_home }}/cache/{{ vagrant_provider }}"
-
 - name: Create apt cache dir if needed.
   file:
     path: '{{ shared_cache_dir }}/apt'
+    state: directory
+
+- name: Create apt archive dir if needed.
+  file:
+    path: '{{ shared_cache_dir }}/apt/archives'
     state: directory
 
 - name: Move apt cache to shared dir.
@@ -15,24 +18,12 @@
     group: 'root'
     force: yes
 
-- name: Update apt cache if needed.
-  apt: update_cache=yes cache_valid_time=86400
+- name: Clean up startup scripts folder.
+  file:
+    path: '/opt/run-parts'
+    state: absent
 
-- name: Update all packages to the latest version
-  apt:
-    upgrade: dist
-    force: yes
-
-- name: Get base tools.
-  apt: "name={{ item }} state=latest"
-  with_items:
-    - apt-transport-https
-    - curl
-    - python-apt
-    - python-pycurl
-    - build-essential
-    - sudo
-    - unzip
-    - vim
-    - software-properties-common
-    - wget
+- name: (Re-)Create startup scripts folder.
+  file:
+    path: '/opt/run-parts'
+    state: directory

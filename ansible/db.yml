@@ -16,13 +16,15 @@
     
   roles:
     
-    - { role: ce.memcached, when: memcached }
-    - { role: ce.postfix }
     - { role: ce.mysql }
+    - { role: ce.memcached, when: memcached }
+    - { role: ce.redis, when: redis }
+    - { role: ce.solr, when: solr }
+    - { role: ce.postfix }
 
   tasks:
     # Install extra packages.
     - name: Install additional extra packages.
-      apt: "name={{ item }} state=latest"
+      apt: "name={{ item }} state=present"
       with_items: "{{ db_extra_packages | list }}"
       when: db_extra_packages | length

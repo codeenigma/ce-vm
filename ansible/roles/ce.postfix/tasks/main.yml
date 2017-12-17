@@ -1,14 +1,15 @@
 ---
 # Install postfix
-
-- name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
-  changed_when: false
   
 - name: Ensure postfix is installed.
   apt:
     pkg: postfix
-    state: latest
+    state: present
+
+- name: Ensure procmail is installed.
+  apt:
+    pkg: procmail
+    state: present
 
 - name: Configure postfix main.cf.
   template:
@@ -51,15 +52,11 @@
     state: directory
   when: mail_delivery == 'host'
 
-- name: Manually force postfix stop.
-  service: name=postfix state=stopped
-  when: vagrant_provider == 'docker'
-  
-- name: Force postfix pid file removal
-  file:
-    path: "/var/spool/postfix/pid/master.pid"
-    state: absent
-  when: vagrant_provider == 'docker'
-
-- name: Ensure postfix is started and enabled to start at boot.
-  service: name=postfix state=restarted enabled=yes
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/postfix"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes

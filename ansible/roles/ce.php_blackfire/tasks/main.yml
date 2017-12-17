@@ -5,19 +5,16 @@
   
 - name: Add repository for Blackfire.
   apt_repository: repo='deb http://packages.blackfire.io/debian any main' state=present
-  
-- name: Update apt cache.
-  apt: update_cache=yes
-  
+    
 - name: Ensure Blackfire agent is installed.
   apt:
     pkg: "blackfire-agent"
-    state: latest
+    state: present
     
 - name: Ensure Blackfire probe is installed.
   apt:
     pkg: "blackfire-php"
-    state: latest
+    state: present
     
 - name: Generate agent server configuration.
   template:
@@ -37,8 +34,11 @@
     mode: 0644
     force: yes
     
-- name: Restart blackfire-agent.
-  service: name=blackfire-agent state=restarted enabled=yes
-
-- name: Ensure php-fpm is restarted.
-  service: name=php{{ php_version }}-fpm state=restarted enabled=yes
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/blackfire"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes

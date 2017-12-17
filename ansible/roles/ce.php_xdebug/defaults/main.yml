@@ -1,0 +1,9 @@
+---
+
+php_xdebug_scream: 0
+php_xdebug_max_nesting_level: 1024
+php_xdebug_trace_enable_trigger: 1
+php_xdebug_profiler_enable_trigger: 1
+php_xdebug_remote_port: 9000
+php_xdebug_remote_host: auto
+php_xdebug_remote_connect_back: auto

@@ -1,19 +1,43 @@
 ---
 
-- name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=86400
-  changed_when: false
-  
 - name: Ensure xdebug is installed.
   apt:
     pkg: php-xdebug
-    state: latest
+    state: present
 
 - name: Ensure host trace/profiling folder exists.
   file:
     path: "{{ local_var_dir }}/php-xdebug"
     state: directory
 
+- name: Set remote host (Default)
+  set_fact: php_xdebug_remote_host="{{ net_gateway }}"
+  when: 
+    - php_xdebug_remote_host == 'auto'
+    - host_platform != 'mac_os'
+    - vagrant_provider != 'docker'
+
+- name: Set remote host (Docker for Mac)
+  set_fact: php_xdebug_remote_host="docker.for.mac.localhost"
+  when: 
+    - php_xdebug_remote_host == 'auto'
+    - host_platform == 'mac_os'
+    - vagrant_provider == 'docker'
+
+- name: Enable xdebug connect back (Default)
+  set_fact: php_xdebug_remote_connect_back=1
+  when:
+    - php_xdebug_remote_host == 'auto'
+    - host_platform != 'mac_os'
+    - vagrant_provider != 'docker'
+  
+- name: Disable xdebug connect back (Docker for Mac)
+  set_fact: php_xdebug_remote_connect_back=0
+  when:
+    - php_xdebug_remote_connect_back == 'auto'
+    - host_platform == 'mac_os'
+    - vagrant_provider == 'docker'
+    
 - name: Copy xdebug configuration in place.
   template:
     src: 30-xdebug-dev.ini.j2
