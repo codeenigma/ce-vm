@@ -43,7 +43,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "db-vm" do |db|
     # Base properties.
     db.vm.box = "pmce/jessie64"
-    db.vm.box_version = "3.0.0"
+    db.vm.box_version = "3.3.0"
     db.vm.hostname = "#{vdb}"
     # Networking
     db.vm.network :private_network, ip: "#{parsed_conf['net_db_ip']}"
@@ -73,7 +73,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "app-vm", primary: true do |app|
     # Base properties.
     app.vm.box = "pmce/jessie64"
-    app.vm.box_version = "3.0.0"
+    app.vm.box_version = "3.3.0"
     app.vm.hostname = "#{vapp}"
     # Networking
     app.vm.network :private_network, ip: "#{parsed_conf['net_app_ip']}"
