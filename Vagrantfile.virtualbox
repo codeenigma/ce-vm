@@ -59,6 +59,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           ansible.extra_vars = ansible_extra_vars
         end
     end
+    db.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
     # VirtualBox settings.
     db.vm.provider :virtualbox do |vb|
       vb.name = "#{vdb}"
@@ -88,6 +89,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           ansible.extra_vars = ansible_extra_vars
         end
     end
+    app.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
     # VirtualBox settings.
     app.vm.provider :virtualbox do |vb|
       vb.name = "#{vapp}"
