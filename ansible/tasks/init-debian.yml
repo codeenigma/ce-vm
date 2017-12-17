@@ -17,3 +17,13 @@
     owner: 'root'
     group: 'root'
     force: yes
+
+- name: Clean up startup scripts folder.
+  file:
+    path: '/opt/run-parts'
+    state: absent
+
+- name: (Re-)Create startup scripts folder.
+  file:
+    path: '/opt/run-parts'
+    state: directory

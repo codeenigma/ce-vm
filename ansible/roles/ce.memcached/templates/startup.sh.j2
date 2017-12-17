@@ -1,0 +1,7 @@
+#!/bin/sh
+
+/usr/sbin/service memcached stop
+if [ -f /var/run/memcached.pid ]; then
+  rm /var/run/memcached.pid
+fi
+/usr/sbin/service memcached start

@@ -14,6 +14,15 @@
     group: root
     mode: 0644
     force: yes
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/memcached"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
     
 - name: Ensure memcached is started.
   service: name=memcached state=restarted enabled=yes

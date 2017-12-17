@@ -25,14 +25,14 @@
     pkg: "redis-server"
     state: present
 
-#- name: Copy Redis configuration in place.
-#  template:
-#    src: dev.cnf.j2
-#    dest: "/etc/mysql/conf.d/dev.cnf"
-#    owner: root
-#    group: root
-#    mode: 0644
-#    force: yes
-
-- name: Restart mysql.
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/postfix"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+    
+- name: Restart redis.
   service: name=redis-server state=restarted

@@ -72,9 +72,6 @@
     force: yes
   when: mysql_engine == "mysql"
 
-- name: Restart mysql.
-  service: name=mysql state=restarted
-
 - name: Update MySQL root password.
   shell: >
     mysql -u root -NBe 'GRANT ALL ON *.* TO "root"@"%" IDENTIFIED BY "root" WITH GRANT OPTION;'
@@ -101,3 +98,12 @@
   mysql_db: state=import name="{{ item.item.name }}" target="{{ project_dir }}/{{ item.item.source }}"
   with_items: "{{ create_db_dumps.results }}"
   when: (create_db_dumps.results | length) and (item.changed == True) and (item.item.source | length)
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/mysql"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes

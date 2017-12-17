@@ -1,0 +1,7 @@
+#!/bin/sh
+
+/usr/sbin/service mysql stop
+if [ -f /run/mysqld/mysqld.pid ]; then
+  rm /run/mysqld/mysqld.pid
+fi
+/usr/sbin/service mysql start

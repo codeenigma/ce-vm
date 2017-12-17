@@ -33,7 +33,7 @@ echo "Initial data mirror synchronisation."
 if [ ! -d "#{guest_project_dir}" ]; then
   mkdir "#{guest_project_dir}"
 fi
-rsync -av --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/" "#{guest_project_dir}"
+rsync -av --chown=vagrant:vagrant --chmod=0777 --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/#{vm_dir}" "#{guest_project_dir}/"
 SCRIPT
 
 if (parsed_conf['docker_app_privileged'] == "auto")
@@ -75,22 +75,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     db.vm.synced_folder ".", "/vagrant", disabled: true
     db_volumes = []
     shared_volumes.each do |synced_folder|
-      db_volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
+      db_volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}")
     end
-    db_volumes.push("#{data_volume['source']}/:#{data_volume['dest']}:delegated")
+    db_volumes.push("#{data_volume['source']}/:#{data_volume['dest']}")
     # First ensure 'vagrant' ownership match.
     db.vm.provision "shell", inline: $vagrant_uid
     # Run actual playbooks.
     run_playbook_dirs.each do |ansible_folder|
-      db.vm.provision 'ansible_local', run: "always" do |ansible|
+      db.vm.provision 'ansible_local' do |ansible|
         ansible.playbook = "#{ansible_folder}/db.yml"
         ansible.extra_vars = ansible_extra_vars
       end
     end
+    # Run startup scripts.
+    db.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
     # Docker settings.
     db.vm.provider "docker" do |d|
       d.force_host_vm = false
-      d.image = "pmce/jessie64:3.0.0"
+      d.image = "pmce/jessie64:3.1.0"
       d.name = "#{vdb}"
       d.create_args = [
         "--network=#{net_name}",
@@ -131,7 +133,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if(parsed_conf['docker_mirror'])
       dest = "#{guest_mirror_dir}#{dest}"
     end
-    app_volumes.push("#{source}/:#{dest}:delegated")
+    app_volumes.push("#{source}/:#{dest}")
     if(parsed_conf['docker_mirror'])
       app.vm.provision "shell", inline: $mirror
     end
@@ -139,15 +141,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.vm.provision "shell", inline: $vagrant_uid
     # Run actual playbooks.
     run_playbook_dirs.each do |ansible_folder|
-        app.vm.provision 'ansible_local', run: "always" do |ansible|
+        app.vm.provision 'ansible_local' do |ansible|
           ansible.playbook = "#{ansible_folder}/app.yml"
           ansible.extra_vars = ansible_extra_vars
         end
     end
+    # Run startup scripts.
+    app.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
     # Docker settings.
     app.vm.provider "docker" do |d|
       d.force_host_vm = false
-      d.image = "pmce/jessie64:3.0.0"
+      d.image = "pmce/jessie64:3.1.0"
       d.name = "#{vapp}"
       d.create_args = [
         "--network=#{net_name}",

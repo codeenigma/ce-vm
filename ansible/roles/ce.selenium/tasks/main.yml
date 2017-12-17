@@ -120,3 +120,12 @@
   
 - name: Ensure selenium is started and enabled to start at boot.
   service: name=selenium state=restarted enabled=yes
+  
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/selenium"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes

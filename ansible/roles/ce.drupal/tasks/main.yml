@@ -41,8 +41,14 @@
     state: link
   when: not drupal_install.stat.exists
   
-- name: Permissive permissions for Docker
-  command: chown -R vagrant:www-data {{ project_dir }}
+- name: Set target ownership/permissions.
+  file: 
+    path: "/vagrant"
+    owner: vagrant
+    group: www-data
+    recurse: yes
+    mode: 0777
+    state: directory
   when: vagrant_provider == 'docker'
   
 - name: Install Drupal.
