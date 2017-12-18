@@ -71,6 +71,9 @@
     mode: 0644
     force: yes
   when: mysql_engine == "mysql"
+  
+- name: Restart mysql.
+  service: name=mysql state=restarted enabled=yes
 
 - name: Update MySQL root password.
   shell: >
@@ -79,9 +82,6 @@
 - name: create "dev" MySQL user.
   shell: >
     mysql -u root -NBe 'GRANT ALL ON *.* TO "dev"@"%" IDENTIFIED BY "dev";'
-
-- name: Restart mysql.
-  service: name=mysql state=restarted enabled=yes
 
 - name: Ensure python-mysqldb is installed.
   apt:
