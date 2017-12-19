@@ -1,7 +1,7 @@
 #!/bin/sh
 
 /usr/sbin/service postfix stop
-if [ -f /var/run/memcached.pid ]; then
+if [ -f /var/spool/postfix/pid/master.pid ]; then
   rm /var/spool/postfix/pid/master.pid
 fi
 /usr/sbin/service postfix start
