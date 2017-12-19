@@ -1,3 +1,7 @@
 #!/bin/sh
 
-/usr/sbin/service nginx restart
+/usr/sbin/service nginx stop
+if [ -f /run/nginx.pid ]; then
+  rm /run/nginx.pid
+fi
+/usr/sbin/service nginx start
