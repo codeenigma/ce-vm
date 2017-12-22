@@ -119,7 +119,7 @@ composer_github_oauth_token: ''
 ################################################################################
 
 # Provider. Either virtualbox (safest) or docker (experimental).
-vagrant_provider: docker
+vagrant_provider: virtualbox
 
 ####### VirtualBox specific settings.
 
