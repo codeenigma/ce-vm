@@ -5,14 +5,16 @@
   
   pre_tasks:
     
-    - set_fact: request_time="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"  
-    - set_fact: local_var_dir="{{ project_dir }}/{{ vm_dir }}/var/{{ inventory_hostname }}"
+    - set_fact: request_time="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+    - set_fact: local_var_dir="{{ project_dir }}/{{ vm_dir }}/var"
+    - set_fact: local_var_www_dir="{{ local_var_dir }}/www"
+    - set_fact: local_var_vm_dir="{{ local_var_dir }}/{{ inventory_hostname }}"
     
     - include_vars: "{{ item }}"
       with_fileglob: "{{ config_files }}"
     
     - name: Run init tasks
-      include: tasks/init-debian.yml
+      include: tasks/init.yml
     
   roles:
     

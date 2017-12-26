@@ -1,0 +1,13 @@
+server {
+  listen 80;
+  server_name php.app-vm.codeenigma.com;
+  root {{ local_var_www_dir }}/php;
+  error_log /var/log/nginx/ce-vm.error.log info;
+  access_log /var/log/nginx/ce-vm.access.log;
+  location / {
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
+    fastcgi_param DOCUMENT_ROOT $realpath_root;
+    fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+  }
+}

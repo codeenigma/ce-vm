@@ -1,0 +1,15 @@
+---
+
+- name: Create landing page.
+  template:
+    src: "index.html"
+    dest: "{{ ce_vm_webroot }}/index.html"
+
+- name: Copy ce-vm vhost in place.
+  template:
+    src: vhost.j2
+    dest: "/etc/nginx/sites-enabled/ce-vm.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes

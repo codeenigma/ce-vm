@@ -7,7 +7,7 @@
 
 - name: Ensure host trace/profiling folder exists.
   file:
-    path: "{{ local_var_dir }}/php-xdebug"
+    path: "{{ local_var_vm_dir }}/php-xdebug"
     state: directory
 
 - name: Set remote host (Default)

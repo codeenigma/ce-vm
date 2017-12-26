@@ -3,11 +3,11 @@ xdebug.scream={{ php_xdebug_scream }}
 xdebug.max_nesting_level={{ php_xdebug_max_nesting_level }}
 ; Enable remote trace
 xdebug.trace_enable_trigger={{ php_xdebug_trace_enable_trigger }}
-xdebug.trace_output_dir="{{ local_var_dir }}/php-xdebug"
+xdebug.trace_output_dir="{{ local_var_vm_dir }}/php-xdebug"
 xdebug.trace_output_name=trace.%u
 ; Enable remote profiler
 xdebug.profiler_enable_trigger={{ php_xdebug_profiler_enable_trigger }}
-xdebug.profiler_output_dir="{{ local_var_dir }}/php-xdebug"
+xdebug.profiler_output_dir="{{ local_var_vm_dir }}/php-xdebug"
 xdebug.profiler_output_name=profiler.%u
 ; Enable remote debugging
 xdebug.remote_enable=1

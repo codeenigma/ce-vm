@@ -1,9 +1,10 @@
 ---
 
-- name: Add repository key for PHP 5.5, 5.6, 7.0 or 7.1.
+- name: Add Sury repository key for PHP 5.5, 5.6, 7.0 or 7.1.
   apt_key: url=https://packages.sury.org/php/apt.gpg state=present
 
-- apt_repository: repo='deb https://packages.sury.org/php/ jessie main' state=present
+- name: Add Sury repository.
+  apt_repository: repo='deb https://packages.sury.org/php/ jessie main' state=present
 
 - name: Install PHP packages.
   apt: "name={{ item }} state=present"
@@ -35,8 +36,13 @@
     dest: "/etc/php/{{ php_version }}/cli/php.ini"
     force: yes
 
-- name: Ensure php-fpm is restarted.
-  service: name=php{{ php_version }}-fpm state=restarted enabled=yes
+- name: Create log directory.
+  file:
+    path: "/var/log/php"
+    owner: www-data
+    group: www-data
+    mode: 0777
+    state: directory
 
 - name: Copy startup script in place.
   template:
@@ -45,3 +51,28 @@
     owner: root
     group: root
     mode: 0555
+    
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/php.html"
+    force: yes
+    
+- name: Copy phpinfo vhost in place.
+  template:
+    src: vhost.j2
+    dest: "/etc/nginx/sites-enabled/php.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
+- name: Create PHP info webroot.
+  file:
+    dest: "{{ local_var_www_dir }}/php"
+    state: directory
+    
+- name: Create PHP info page.
+  template:
+    src: "index.php.j2"
+    dest: "{{ local_var_www_dir }}/php/index.php"
