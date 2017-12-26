@@ -2,33 +2,58 @@
 
 - name: Check if we already have a codebase.
   stat: path="{{ project_dir }}/{{ webroot }}"
-  register: comp_install
+  register: ce_drupal_codebase
+
+- name: Check if we already have a composer file.
+  stat: path="{{ project_dir }}/composer.json"
+  register: ce_drupal_composer
 
 - name: Generates composer.json file if none exist.
   template:
     src: composer.json.j2
     dest: "{{ project_dir }}/composer.json"
-  when: not comp_install.stat.exists
+  when: 
+    - not ce_drupal_codebase.stat.exists
+    - not ce_drupal_composer.stat.exists
     
-- name: Download Drupal with composer (if needed).
-  command: >
-    /usr/local/bin/composer install
-    chdir={{ project_dir }}
+- name: Require Drupal dependencies.
+  composer:
+    command: require
+    arguments: "{{ item }} --sort-packages"
+    working_dir: "{{ project_dir }}"
+  with_items:
+    - "composer/installers"
+    - "drupal-composer/drupal-scaffold"
+    - "drupal/core"
+    - "drupal/config_ignore"
+    - "drupal/config_installer"
   become: true
   become_user: vagrant
-  when: not comp_install.stat.exists
+  when: 
+  - not ce_drupal_codebase.stat.exists
+  - not ce_drupal_composer.stat.exists
+
+- name: Check if we now have a composer file.
+  stat: path="{{ project_dir }}/composer.json"
+  register: ce_drupal_composer_new
+  
+- name: Composer install Drupal.
+  composer:
+    command: install
+    working_dir: "{{ project_dir }}"
+  become: true
+  become_user: vagrant
+  when: ce_drupal_composer_new.stat.exists
   
 - name: Generate default .gitignore (if needed).
   template:
     src: gitignore.j2
     dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
-    force: no
   
 - name: Generates local.settings.php file.
   template:
     src: local.settings.php.j2
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/local.settings.php"
-    force: no
 
 - name: Check if we already have a settings.php file.
   stat: path="{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
@@ -49,7 +74,6 @@
     recurse: yes
     mode: 0777
     state: directory
-  when: vagrant_provider == 'docker'
   
 - name: Install Drupal.
   command: drush si -y -r "{{ project_dir }}/{{ webroot }}"
