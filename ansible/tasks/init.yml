@@ -1,14 +1,10 @@
 ---
 
-- name: Create apt cache dir if needed.
-  file:
-    path: '{{ shared_cache_dir }}/apt'
-    state: directory
-
 - name: Create apt archive dir if needed.
   file:
     path: '{{ shared_cache_dir }}/apt/archives'
     state: directory
+    recurse: yes
 
 - name: Move apt cache to shared dir.
   template:
@@ -17,6 +13,10 @@
     owner: 'root'
     group: 'root'
     force: yes
+
+- name: Update apt cache.
+  apt:
+    update_cache: yes
 
 - name: Clean up startup scripts folder.
   file:
@@ -27,3 +27,12 @@
   file:
     path: '/opt/run-parts'
     state: directory
+
+- name: Set ce-vm webroot.
+  set_fact: ce_vm_webroot="{{ local_var_www_dir }}/ce-vm"
+
+- name: Create ce-vm webroot and includes directory.
+  file:
+    path: "{{ ce_vm_webroot }}/includes"
+    state: directory
+    recurse: yes
