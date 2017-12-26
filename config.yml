@@ -155,6 +155,14 @@ vbox_db_cpus: 1
 
 ####### Docker specific settings.
 
+# Networking settings.
+# You will need to change your hosts file
+# if you change from defaults.
+net_subnet: 192.168.56.0/24
+net_gateway: 192.168.56.1
+net_app_ip: 192.168.56.2
+net_db_ip: 192.168.56.3
+
 # SSH port for vagrant to use. 
 # It must match what is forwarded to port 22 below.
 docker_app_ssh_port: 22202
@@ -165,19 +173,21 @@ docker_app_ssh_port: 22202
 # instance on mac OS X.
 docker_app_fwd_ports:
  # Web server
- - "80:80"
- - "443:443"
+ - "{{ net_app_ip }}:{{ docker_app_ssh_port }}:22"
+ - "{{ net_app_ip }}:80:80"
+ - "{{ net_app_ip }}:443:443"
  # VNC
- - "5999:5999"
+ - "{{ net_app_ip }}:5999:5999"
  # Mkdocs
- - "8000:8000"
+ - "{{ net_app_ip }}:8000:8000"
 
 docker_db_ssh_port: 22203
-docker_db_fwd_ports: 
+docker_db_fwd_ports:
+ - "{{ net_db_ip }}:{{ docker_db_ssh_port }}:22"
  # MySQL
- - "3306:3306"
+ - "{{ net_db_ip }}:3306:3306"
  # Tomcat
- - "8080:8080"
+ - "{{ net_db_ip }}:8080:8080"
 
 # Vagrant user uid and group gid. 
 # You normally don't have to change this,
@@ -186,15 +196,6 @@ docker_db_fwd_ports:
 # actual user uid/gid.
 docker_vagrant_user_uid: 1000
 docker_vagrant_group_gid: 1000
-
-
-# Networking settings.
-# You will need to change your hosts file
-# if you change from defaults.
-net_subnet: 192.168.56.0/24
-net_gateway: 192.168.56.1
-net_app_ip: 192.168.56.2
-net_db_ip: 192.168.56.3
 
 # Experimental feature.
 docker_mirror: no
