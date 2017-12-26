@@ -62,11 +62,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     db.trigger.before :up do
       if (RUBY_PLATFORM =~ /darwin/)
         info "Network configuration changes needed. This require administrative privileges."
-        run "sudo ifconfig lo0 alias #{parsed_conf['net_db_ip']}/24"
+        run "sudo ifconfig lo0 alias #{parsed_conf['net_db_ip']}/32"
+      end
+    end
+    db.trigger.after :halt do
+      if (RUBY_PLATFORM =~ /darwin/)
+        info "Reset network configuration changes. This require administrative privileges."
+        run "sudo ifconfig lo0 alias delete #{parsed_conf['net_db_ip']}"
       end
     end
     # Base properties.
-    db.ssh.host = '127.0.0.1'
+    db.ssh.host = parsed_conf['net_db_ip']
     db.ssh.guest_port = parsed_conf['docker_db_ssh_port']
     db.vm.hostname = "#{vdb}"
     # Disable default port forwarding, as we define a custom one.
@@ -113,11 +119,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.trigger.before :up do
       if (RUBY_PLATFORM =~ /darwin/)
         info "Network configuration changes needed. This require administrative privileges."
-        run "sudo ifconfig lo0 alias #{parsed_conf['net_app_ip']}/24"
+        run "sudo ifconfig lo0 alias #{parsed_conf['net_app_ip']}/32"
+      end
+    end
+    app.trigger.after :halt do
+      if (RUBY_PLATFORM =~ /darwin/)
+        info "Reset network configuration changes. This require administrative privileges."
+        run "sudo ifconfig lo0 alias delete #{parsed_conf['net_app_ip']}"
       end
     end
     # Base properties.
-    app.ssh.host = '127.0.0.1'
+    app.ssh.host = parsed_conf['net_app_ip']
     app.ssh.guest_port = parsed_conf['docker_app_ssh_port']
     app.vm.hostname = "#{vapp}"
     # Disable default port forwarding, as we define a custom one.
