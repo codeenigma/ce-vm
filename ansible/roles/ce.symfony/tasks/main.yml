@@ -41,10 +41,11 @@
     state: link
   when: not symfony_base.stat.exists
 
+# @TODO Create a "local" environment.
 - name: Change dev IP.
   command: >
     sed -ie 's/127.0.0.1/{{ net_gateway }}/g' "{{ project_dir }}/{{ webroot }}/app_dev.php"
-  when: not symfony_base.stat.exists and vagrant_provider == 'virtualbox'
+  when: not symfony_base.stat.exists
   
 - name: Generate default .gitignore.
   template:

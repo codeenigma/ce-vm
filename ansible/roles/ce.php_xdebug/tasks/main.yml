@@ -15,28 +15,24 @@
   when: 
     - php_xdebug_remote_host == 'auto'
     - host_platform != 'mac_os'
-    - vagrant_provider != 'docker'
 
 - name: Set remote host (Docker for Mac)
   set_fact: php_xdebug_remote_host="docker.for.mac.localhost"
   when: 
     - php_xdebug_remote_host == 'auto'
     - host_platform == 'mac_os'
-    - vagrant_provider == 'docker'
 
 - name: Enable xdebug connect back (Default)
   set_fact: php_xdebug_remote_connect_back=1
   when:
     - php_xdebug_remote_host == 'auto'
     - host_platform != 'mac_os'
-    - vagrant_provider != 'docker'
   
 - name: Disable xdebug connect back (Docker for Mac)
   set_fact: php_xdebug_remote_connect_back=0
   when:
     - php_xdebug_remote_connect_back == 'auto'
     - host_platform == 'mac_os'
-    - vagrant_provider == 'docker'
     
 - name: Copy xdebug configuration in place.
   template:
