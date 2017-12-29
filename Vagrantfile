@@ -3,7 +3,11 @@
 
 VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
+# We need the database to be always setup first,
+# so can't process provisioning in parallel.
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+
+require 'yaml'
 
 ################ Helper functions. (credits to https://github.com/geerlingguy/drupal-vm)
 ################################################################################
@@ -78,9 +82,9 @@ ce_vm_local_home = "#{ce_local_home}/ce-vm"
 ce_vm_local_upstream_repo = "#{ce_vm_local_home}/ce-vm-upstream"
 ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
 
-# Remote.
-ce_vm_upstream_repo = 'https://github.com/codeenigma/ce-vm.git'
-ce_vm_upstream_branch = '3.x'
+# Remote. Branch is set by the project's Vagrantfile.
+ce_vm_upstream_repo = ENV['CE_VM_UPSTREAM_REPO']
+ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
 
 ################ Configuration loading.
 ################################################################################
@@ -92,8 +96,7 @@ host_conf_files = [
   File.join("#{host_project_dir}", "#{vm_dir}", 'local.config.yml'),
 ]
 
-# Initial config.
-require 'yaml'
+# Initial config. This is reloaded later.
 parsed_conf = conf_init({}, host_conf_files)
 
 guest_conf_files = [
@@ -121,23 +124,23 @@ if(parsed_conf['ce_vm_upstream'] === true)
   guest_playbook_dirs.unshift(File.join("#{guest_home_dir}", "#{ce_vm_local_upstream_repo}", "#{ansible_dir}"))
 end
 
+################ Branch setup.
+################################################################################
+# Update repo if needed, and ensure we're on the right branch.
+_ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
+if(parsed_conf['ce_vm_upstream_auto_pull'] === true)
+  Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "fetch")
+  Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
+  Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "pull", "origin", "#{ce_vm_upstream_branch}")
+end
+# Reload config on the matching branch.
+Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
+parsed_conf = conf_init({}, host_conf_files)
+run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
+
+
 ################ Common processing.
 ################################################################################
-
-# Update repo if needed, using triggers.
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.trigger.before :up do
-    if(parsed_conf['ce_vm_upstream_auto_pull'] === true)
-      _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
-      run "git -C #{_ce_upstream} fetch"
-      run "git -C #{_ce_upstream} checkout #{ce_vm_upstream_branch}" 
-      run "git -C #{_ce_upstream} pull origin #{ce_vm_upstream_branch}"
-      # Reload config.
-      parsed_conf = conf_init({}, host_conf_files)
-      run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
-    end
-  end
-end
 
 # VM names.
 vapp = "#{parsed_conf['project_name']}"
