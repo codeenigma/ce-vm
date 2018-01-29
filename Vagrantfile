@@ -78,8 +78,12 @@ ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
 # Remote. Normally passed by the project's Vagrantfile.
 # Default to 3.x for backward compatibilty, as this feature
 # will actually be introduced in 4.x.
-ENV['CE_VM_UPSTREAM_REPO'] = 'https://github.com/codeenigma/ce-vm.git' unless defined? ENV['CE_VM_UPSTREAM_REPO']
-ENV['CE_VM_UPSTREAM_BRANCH'] = '3.x' unless defined? ENV['CE_VM_UPSTREAM_BRANCH']
+if ENV['CE_VM_UPSTREAM_REPO'].nil?
+  ENV['CE_VM_UPSTREAM_REPO'] = 'https://github.com/codeenigma/ce-vm.git'
+end
+if ENV['CE_VM_UPSTREAM_BRANCH'].nil?
+  ENV['CE_VM_UPSTREAM_BRANCH'] = '3.x'
+end
 ce_vm_upstream_repo = ENV['CE_VM_UPSTREAM_REPO']
 ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
 
