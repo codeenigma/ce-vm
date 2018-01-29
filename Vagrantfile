@@ -225,10 +225,7 @@ if (parsed_conf['docker_app_privileged'] == "auto")
   parsed_conf['docker_app_privileged'] = "false"
 end
 if (parsed_conf['docker_db_privileged'] == "auto")
-  parsed_conf['docker_db_privileged'] = "false"
-  if (RUBY_PLATFORM =~ /darwin/)
-    parsed_conf['docker_db_privileged'] = "true"
-  end
+  parsed_conf['docker_db_privileged'] = "true"
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
