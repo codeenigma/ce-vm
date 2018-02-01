@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+Vagrant.require_version ">= 1.9.1", "<= 2.0.1"
+
 VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
 # We need the database to be always setup first,
@@ -9,9 +11,9 @@ ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
 require 'yaml'
 
-################ Helper functions. (credits to https://github.com/geerlingguy/drupal-vm)
+################ Helper functions.
 ################################################################################
-# Utility function.
+# Utility function (taken from https://github.com/geerlingguy/drupal-vm).
 def walk(obj, &fn)
   if obj.is_a?(Array)
     obj.map { |value| walk(value, &fn) }
@@ -22,7 +24,7 @@ def walk(obj, &fn)
   end
 end
 
-# Replace jinja variables.
+# Replace jinja variables (taken from https://github.com/geerlingguy/drupal-vm).
 def parse(conf)
   walk(conf) do |value|
     while value.is_a?(String) && value.match(/{{ .* }}/)
@@ -32,7 +34,7 @@ def parse(conf)
   end
 end
 
-# Load configuration.
+# Load configuration (taken from https://github.com/geerlingguy/drupal-vm ?).
 def conf_init(parsed_conf, conf_files)
   conf_files.each do |config_file|
     if File.exist?("#{config_file}")
@@ -64,6 +66,25 @@ def config_files_find(host_files, run_files)
   return filtered
 end
 
+# Create/Ensure Docker Network exists.
+def ensure_network(gateway, subnet, name)
+  existing_net = Vagrant::Util::Subprocess.new('docker', 'network', 'inspect', '--format={{range .IPAM.Config}}{{.Subnet}}{{end}}',  "#{name}").execute.stdout
+  existing_gw = Vagrant::Util::Subprocess.new('docker', 'network', 'inspect', '--format={{range .IPAM.Config}}{{.Gateway}}{{end}}',  "#{name}").execute.stdout
+  existing_net.strip!
+  existing_gw.strip!
+  if (subnet != existing_net || gateway != existing_gw)
+    unless (existing_net.empty?)
+      Vagrant::Util::Subprocess.new('docker', 'network', 'rm', "#{name}").execute
+    end
+    Vagrant::Util::Subprocess.new('docker', 'network', 'create', "--subnet=#{subnet}", "--gateway=#{gateway}", "#{name}").execute
+  end
+end
+
+# Create/Ensure loopback interface exists (Mac OS X).
+def ensure_lo_alias(ip)
+  Vagrant::Util::Subprocess.execute("sudo", "ifconfig", "lo0", "alias", "#{ip}/32")
+end
+
 ################ Paths definitions.
 ################################################################################
 # Absolute paths on the host machine.
@@ -83,7 +104,7 @@ ce_vm_local_upstream_repo = "#{ce_vm_local_home}/ce-vm-upstream"
 ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
 
 # Remote. Normally passed by the project's Vagrantfile.
-# Default to 3.x for backward compatibiltu, as this feature
+# Default to 3.x for backward compatibilty, as this feature
 # was introduced in 4.x.
 if ENV['CE_VM_UPSTREAM_REPO'].nil?
   ENV['CE_VM_UPSTREAM_REPO'] = 'https://github.com/codeenigma/ce-vm.git'
@@ -228,31 +249,26 @@ if (parsed_conf['docker_db_privileged'] == "auto")
   parsed_conf['docker_db_privileged'] = "true"
 end
 
+# On UP operation, create our network if needed.
+if (ARGV.include? 'up')
+  ensure_network(parsed_conf['net_gateway'], parsed_conf['net_subnet'], net_name)
+  # Mac OS X, we need interface aliases.
+  if(host_platform == "mac_os") && (ARGV.include? 'up')
+    puts "Network configuration changes needed. This require administrative privileges."
+    ensure_lo_alias(parsed_conf['net_db_ip'])
+    ensure_lo_alias(parsed_conf['net_app_ip'])
+  end
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
   config.ssh.insert_key = false
   config.ssh.forward_agent = true
-  # Create our network silently. @todo check if it exists first.   
-  config.trigger.before :up, :force => true, :stdout => false, :stderr => false do     
-    run "docker network create --subnet=#{parsed_conf['net_subnet']} --gateway=#{parsed_conf['net_gateway']} #{net_name}"
-  end
   ################# END Common config.  
 
   ################# Database VM.
   config.vm.define "db-vm" do |db|
-    db.trigger.before :up do
-      if (RUBY_PLATFORM =~ /darwin/)
-        info "Network configuration changes needed. This require administrative privileges."
-        run "sudo ifconfig lo0 alias #{parsed_conf['net_db_ip']}/32"
-      end
-    end
-    db.trigger.after :halt do
-      if (RUBY_PLATFORM =~ /darwin/)
-        info "Reset network configuration changes. This require administrative privileges."
-        run "sudo ifconfig lo0 alias delete #{parsed_conf['net_db_ip']}"
-      end
-    end
     # Base properties.
     db.ssh.host = parsed_conf['net_db_ip']
     db.ssh.guest_port = parsed_conf['docker_db_ssh_port']
@@ -298,18 +314,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# App VM.
   config.vm.define "app-vm", primary: true do |app|
-    app.trigger.before :up do
-      if (RUBY_PLATFORM =~ /darwin/)
-        info "Network configuration changes needed. This require administrative privileges."
-        run "sudo ifconfig lo0 alias #{parsed_conf['net_app_ip']}/32"
-      end
-    end
-    app.trigger.after :halt do
-      if (RUBY_PLATFORM =~ /darwin/)
-        info "Reset network configuration changes. This require administrative privileges."
-        run "sudo ifconfig lo0 alias delete #{parsed_conf['net_app_ip']}"
-      end
-    end
     # Base properties.
     app.ssh.host = parsed_conf['net_app_ip']
     app.ssh.guest_port = parsed_conf['docker_app_ssh_port']
