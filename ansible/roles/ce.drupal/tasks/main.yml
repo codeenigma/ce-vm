@@ -12,6 +12,7 @@
   template:
     src: composer.json.j2
     dest: "{{ project_dir }}/composer.json"
+    owner: vagrant
   when: 
     - not ce_drupal_codebase.stat.exists
     - not ce_drupal_composer.stat.exists
@@ -64,8 +65,12 @@
     src: "./local.settings.php"
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
     state: link
-  when: not drupal_install.stat.exists
+  when: not drupal_install.stat.exists 
   
+- name: Install Drupal.
+  command: drush si -y -r "{{ project_dir }}/{{ webroot }}"
+  when: not drupal_install.stat.exists
+
 - name: Set target ownership/permissions.
   file: 
     path: "/vagrant"
@@ -74,9 +79,3 @@
     recurse: yes
     mode: 0777
     state: directory
-  
-- name: Install Drupal.
-  command: drush si -y -r "{{ project_dir }}/{{ webroot }}"
-  become: true
-  become_user: www-data
-  when: not drupal_install.stat.exists
