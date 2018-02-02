@@ -71,6 +71,10 @@
   command: drush si -y -r "{{ project_dir }}/{{ webroot }}"
   when: not drupal_install.stat.exists
 
+- name: Clear Drupal caches.
+  command: drush cr -y -r "{{ project_dir }}/{{ webroot }}"
+  when: not ce_drupal_codebase.stat.exists
+
 - name: Set target ownership/permissions.
   file: 
     path: "/vagrant"
