@@ -51,7 +51,7 @@
     src: gitignore.j2
     dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
   
-- name: Generates local.settings.php file.
+- name: Generates local.ettings.php file.
   template:
     src: local.settings.php.j2
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/local.settings.php"
