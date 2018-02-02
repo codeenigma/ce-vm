@@ -133,24 +133,30 @@ docker_app_ssh_port: 22202
 # in "host:guest" format.
 # Be sure the host port is free. Typically port 80
 # on your host might be already used by an Apache
-# instance on mac OS X.
-docker_app_fwd_ports:
- # Web server
- - "{{ net_app_ip }}:{{ docker_app_ssh_port }}:22"
- - "{{ net_app_ip }}:80:80"
- - "{{ net_app_ip }}:443:443"
- # VNC
- - "{{ net_app_ip }}:5999:5999"
- # Mkdocs
- - "{{ net_app_ip }}:8000:8000"
+# instance.
+# Leave it to auto and we will try to use
+# the most suitable solution based on your OS.
+docker_app_fwd_ports: auto
+# docker_app_fwd_ports:
+#  # SSH
+#  - "{{ net_app_ip }}:{{ docker_app_ssh_port }}:22"
+#  # Web server
+#  - "{{ net_app_ip }}:80:80"
+#  - "{{ net_app_ip }}:443:443"
+#  # VNC
+#  - "{{ net_app_ip }}:5999:5999"
+#  # Mkdocs
+#  - "{{ net_app_ip }}:8000:8000"
 
 docker_db_ssh_port: 22203
-docker_db_fwd_ports:
- - "{{ net_db_ip }}:{{ docker_db_ssh_port }}:22"
- # MySQL
- - "{{ net_db_ip }}:3306:3306"
- # Tomcat
- - "{{ net_db_ip }}:8080:8080"
+docker_db_fwd_ports: auto
+# docker_db_fwd_ports:
+# # SSH
+#  - "{{ net_db_ip }}:{{ docker_db_ssh_port }}:22"
+#  # MySQL
+#  - "{{ net_db_ip }}:3306:3306"
+#  # Tomcat
+#  - "{{ net_db_ip }}:8080:8080"
 
 # Vagrant user uid and group gid. 
 # You normally don't have to change this,

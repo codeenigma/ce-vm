@@ -242,11 +242,34 @@ fi
 rsync -av --chown=vagrant:vagrant --chmod=0777 --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/#{vm_dir}" "#{guest_project_dir}/"
 SCRIPT
 
+# Platform-specific adjustments.
 if (parsed_conf['docker_app_privileged'] == "auto")
   parsed_conf['docker_app_privileged'] = "false"
 end
 if (parsed_conf['docker_db_privileged'] == "auto")
   parsed_conf['docker_db_privileged'] = "true"
+end
+if (parsed_conf['docker_db_fwd_ports'] == "auto")
+  parsed_conf['docker_db_fwd_ports'] = [];
+  if(host_platform == "mac_os")
+    parsed_conf['docker_db_fwd_ports'] = [
+      "#{parsed_conf['net_db_ip']}:#{parsed_conf['docker_db_ssh_port']}:22",
+      "#{parsed_conf['net_db_ip']}:3306:3306",
+      "#{parsed_conf['net_db_ip']}:8080:8080"
+    ];
+  end
+end
+if (parsed_conf['docker_app_fwd_ports'] == "auto")
+  parsed_conf['docker_app_fwd_ports'] = [];
+  if(host_platform == "mac_os")
+    parsed_conf['docker_app_fwd_ports'] = [
+      "#{parsed_conf['net_app_ip']}:#{parsed_conf['docker_app_ssh_port']}:22",
+      "#{parsed_conf['net_app_ip']}:80:80",
+      "#{parsed_conf['net_app_ip']}:443:443",
+      "#{parsed_conf['net_app_ip']}:5999:5999",
+      "#{parsed_conf['net_app_ip']}:8000:8000"
+    ];
+  end
 end
 
 # On UP operation, create our network if needed.
@@ -271,7 +294,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "db-vm" do |db|
     # Base properties.
     db.ssh.host = parsed_conf['net_db_ip']
-    db.ssh.guest_port = parsed_conf['docker_db_ssh_port']
+    db.ssh.port = parsed_conf['docker_db_ssh_port']
     db.vm.hostname = "#{vdb}"
     # Disable default port forwarding, as we define a custom one.
     db.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_db_ssh_port'], id: 'ssh'
@@ -316,7 +339,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "app-vm", primary: true do |app|
     # Base properties.
     app.ssh.host = parsed_conf['net_app_ip']
-    app.ssh.guest_port = parsed_conf['docker_app_ssh_port']
+    app.ssh.port = parsed_conf['docker_app_ssh_port']
     app.vm.hostname = "#{vapp}"
     # Disable default port forwarding, as we define a custom one.
     app.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_app_ssh_port'], id: 'ssh'
