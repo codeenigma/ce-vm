@@ -249,6 +249,18 @@ end
 if (parsed_conf['docker_db_privileged'] == "auto")
   parsed_conf['docker_db_privileged'] = "true"
 end
+if (parsed_conf['docker_db_ssh_port'] == "auto")
+  parsed_conf['docker_db_ssh_port'] = 22
+  if(host_platform == "mac_os")
+    parsed_conf['docker_db_ssh_port'] = 22203
+  end
+end
+if (parsed_conf['docker_app_ssh_port'] == "auto")
+  parsed_conf['docker_app_ssh_port'] = 22
+  if(host_platform == "mac_os")
+    parsed_conf['docker_app_ssh_port'] = 22202
+  end
+end
 if (parsed_conf['docker_db_fwd_ports'] == "auto")
   parsed_conf['docker_db_fwd_ports'] = [];
   if(host_platform == "mac_os")
@@ -269,18 +281,6 @@ if (parsed_conf['docker_app_fwd_ports'] == "auto")
       "#{parsed_conf['net_app_ip']}:5999:5999",
       "#{parsed_conf['net_app_ip']}:8000:8000"
     ];
-  end
-end
-if (parsed_conf['docker_db_ssh_port'] == "auto")
-  parsed_conf['docker_db_ssh_port'] = 22
-  if(host_platform == "mac_os")
-    parsed_conf['docker_db_ssh_port'] = 22203
-  end
-end
-if (parsed_conf['docker_app_ssh_port'] == "auto")
-  parsed_conf['docker_app_ssh_port'] = 22
-  if(host_platform == "mac_os")
-    parsed_conf['docker_app_ssh_port'] = 22202
   end
 end
 
