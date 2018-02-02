@@ -271,6 +271,18 @@ if (parsed_conf['docker_app_fwd_ports'] == "auto")
     ];
   end
 end
+if (parsed_conf['docker_db_ssh_port'] == "auto")
+  parsed_conf['docker_db_ssh_port'] = 22
+  if(host_platform == "mac_os")
+    parsed_conf['docker_db_ssh_port'] = 22203
+  end
+end
+if (parsed_conf['docker_app_ssh_port'] == "auto")
+  parsed_conf['docker_app_ssh_port'] = 22
+  if(host_platform == "mac_os")
+    parsed_conf['docker_app_ssh_port'] = 22202
+  end
+end
 
 # On UP operation, create our network if needed.
 if (ARGV.include? 'up')
@@ -296,8 +308,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     db.ssh.host = parsed_conf['net_db_ip']
     db.ssh.port = parsed_conf['docker_db_ssh_port']
     db.vm.hostname = "#{vdb}"
-    # Disable default port forwarding, as we define a custom one.
-    db.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_db_ssh_port'], id: 'ssh'
+    if(parsed_conf['docker_db_ssh_port'] != 22)
+      # Disable default port forwarding, as we define a custom one.
+      db.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_db_ssh_port'], id: 'ssh'
+    end
     # Shared folders
     db.vm.synced_folder ".", "/vagrant", disabled: true
     db_volumes = []
@@ -341,8 +355,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.ssh.host = parsed_conf['net_app_ip']
     app.ssh.port = parsed_conf['docker_app_ssh_port']
     app.vm.hostname = "#{vapp}"
-    # Disable default port forwarding, as we define a custom one.
-    app.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_app_ssh_port'], id: 'ssh'
+    if(parsed_conf['docker_app_ssh_port'] != 22)
+      # Disable default port forwarding, as we define a custom one.
+      app.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_app_ssh_port'], id: 'ssh'
+    end
     # Shared folders
     app.vm.synced_folder ".", "/vagrant", disabled: true
     app_volumes = []

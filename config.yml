@@ -125,10 +125,15 @@ net_subnet: 192.168.56.0/24
 net_gateway: 192.168.56.1
 net_app_ip: 192.168.56.2
 net_db_ip: 192.168.56.3
-
+# Port forwarding and SSH.
+# We do our best to try and use the suitable settings
+# based on your host OS. However, some more advanced
+# setup or port conflicts might require you to manually
+# edit those.
 # SSH port for vagrant to use. 
 # It must match what is forwarded to port 22 below.
-docker_app_ssh_port: 22202
+docker_app_ssh_port: auto
+#docker_app_ssh_port: 22202
 # Ports to forward from the host to the guest,
 # in "host:guest" format.
 # Be sure the host port is free. Typically port 80
@@ -148,7 +153,8 @@ docker_app_fwd_ports: auto
 #  # Mkdocs
 #  - "{{ net_app_ip }}:8000:8000"
 
-docker_db_ssh_port: 22203
+docker_db_ssh_port: auto
+#docker_db_ssh_port: 22203
 docker_db_fwd_ports: auto
 # docker_db_fwd_ports:
 # # SSH
@@ -166,7 +172,7 @@ docker_db_fwd_ports: auto
 docker_vagrant_user_uid: 1000
 docker_vagrant_group_gid: 1000
 
-# Experimental feature.
+# Replace the native Volume mount with a Unison based synchronisation.
 docker_mirror: no
 
 # Privileged mode for containers. 
