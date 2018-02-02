@@ -129,7 +129,7 @@ net_db_ip: 192.168.56.3
 # We do our best to try and use the suitable settings
 # based on your host OS. However, some more advanced
 # setup or port conflicts might require you to manually
-# edit those.
+# edit those. 
 # SSH port for vagrant to use. 
 # It must match what is forwarded to port 22 below.
 docker_app_ssh_port: auto
