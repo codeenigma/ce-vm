@@ -14,7 +14,7 @@
       with_fileglob: "{{ config_files }}"
     
     - name: Run init tasks
-      include: tasks/init.yml
+      import_tasks: tasks/init.yml
 
   roles:
     
