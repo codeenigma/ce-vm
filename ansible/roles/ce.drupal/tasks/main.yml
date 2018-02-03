@@ -51,10 +51,10 @@
     src: gitignore.j2
     dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
   
-- name: Generates local.ettings.php file.
+- name: Generates ce-vm.settings.php file.
   template:
-    src: local.settings.php.j2
-    dest: "{{ project_dir }}/{{ webroot }}/sites/default/local.settings.php"
+    src: ce-vm.settings.php.j2
+    dest: "{{ project_dir }}/{{ webroot }}/sites/default/ce-vm.settings.php"
 
 - name: Check if we already have a settings.php file.
   stat: path="{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
@@ -62,7 +62,7 @@
   
 - name: Symlink settings.php if needed.
   file:
-    src: "./local.settings.php"
+    src: "./ce-vm.settings.php"
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
     state: link
   when: not drupal_install.stat.exists 
