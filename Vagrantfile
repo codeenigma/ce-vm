@@ -5,6 +5,8 @@ Vagrant.require_version ">= 1.9.1", "<= 2.0.1"
 
 VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
+# Prevent Vagrant from looking for VBox.
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
 # We need the database to be always setup first,
 # so can't process provisioning in parallel.
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
@@ -68,6 +70,7 @@ end
 
 # Create/Ensure Docker Network exists.
 def ensure_network(gateway, subnet, name)
+  puts "Ensure Docker network #{name} exists on #{subnet}."
   existing_net = Vagrant::Util::Subprocess.new('docker', 'network', 'inspect', '--format={{range .IPAM.Config}}{{.Subnet}}{{end}}',  "#{name}").execute.stdout
   existing_gw = Vagrant::Util::Subprocess.new('docker', 'network', 'inspect', '--format={{range .IPAM.Config}}{{.Gateway}}{{end}}',  "#{name}").execute.stdout
   existing_net.strip!
@@ -83,6 +86,7 @@ end
 # Create/Ensure loopback interface exists (Mac OS X).
 def ensure_lo_alias(ip)
   Vagrant::Util::Subprocess.execute("sudo", "ifconfig", "lo0", "alias", "#{ip}/32")
+  puts "Ensure loopback interface alias exists for #{ip}."
 end
 
 ################ Paths definitions.
@@ -157,10 +161,13 @@ end
 ################################################################################
 # Update repo if needed, and ensure we're on the right branch.
 _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
-if(parsed_conf['ce_vm_upstream_auto_pull'] === true)
-  Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "fetch")
-  Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
-  Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "pull", "origin", "#{ce_vm_upstream_branch}")
+if (ARGV.include? 'up') || (ARGV.include? 'halt')
+  if(parsed_conf['ce_vm_upstream_auto_pull'] === true)
+    puts "Ensure ce-vm is up-to-date."
+    Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "fetch")
+    Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
+    Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "pull", "origin", "#{ce_vm_upstream_branch}")
+  end
 end
 # Reload config on the matching branch.
 Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
