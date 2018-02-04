@@ -3,7 +3,7 @@
 VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
 
-Vagrant.require_version "= 1.9.1"
+Vagrant.require_version "<= 1.9.1"
 
 ################ Helper functions. (credits to https://github.com/geerlingguy/drupal-vm)
 ################################################################################
