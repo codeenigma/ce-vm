@@ -1,8 +1,6 @@
-# Project virtual machines for local web development
+# Docker based local web development stack
 
-Spins up a dev environment using Ansible - ala [DrupalVM](https://www.drupalvm.com).
-It will fire two VMs, an "app" server with nginx/php and a "db" server for the database.
-This is because we find the performance is significantly better with a pair of VMs.
+Spins up a dev environment using Docker containers managed by Vagrant and configured with Ansible.
 
 ## Quick start
 
