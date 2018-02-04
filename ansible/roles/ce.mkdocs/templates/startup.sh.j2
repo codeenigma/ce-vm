@@ -1,0 +1,3 @@
+#!/bin/sh
+cd {{ project_dir }}
+su vagrant -c "flock /tmp/mkdocs.lock mkdocs serve -a{{ mkdocs_listen_ip }}:{{ mkdocs_listen_port }} &"
