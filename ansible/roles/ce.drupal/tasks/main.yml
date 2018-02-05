@@ -50,7 +50,8 @@
   template:
     src: gitignore.j2
     dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
-  
+    force: no
+    
 - name: Generates ce-vm.settings.php file.
   template:
     src: ce-vm.settings.php.j2
