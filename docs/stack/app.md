@@ -1,4 +1,4 @@
-This is the webserver component of the stack.
+This is the main component of the stack, combining the php cli, the webserver, etc.
 
 ## Vagrant
 
@@ -12,10 +12,7 @@ This is also the "primary" vagrant VM, which means commands that apply to a sing
 
 ## Network
 
-It gets assigned the IP 192.168.56.2 which is accessible from your host when using VirtualBox or Docker on Linux. 
-A DNS entry makes app-vm.codeenigma.com and any subdomain point to it, meaning you can access it at whatever.app-vm.codeenigma.com directly. 
-
-When using Docker on Mac/Windows, it is only accessible through port forwarding, which means you need to add an host entry pointing to 127.0.0.1 to access it through a domain name.
+It gets assigned the IP 192.168.56.2 and a DNS entry makes *.app-vm.codeenigma.com and point to it. You can access it at whatever.app-vm.codeenigma.com directly.
 
 ## Components
 

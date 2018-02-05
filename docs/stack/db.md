@@ -12,10 +12,7 @@ See [vagrantup.com](https://www.vagrantup.com/docs/multi-machine/#controlling-mu
 
 ## Network
 
-It gets assigned the IP 192.168.56.3 which is accessible from your host when using VirtualBox. 
-A DNS entry makes db-vm.codeenigma.com and any subdomain point to it, meaning you can access it at whatever.db-vm.codeenigma.com directly. 
-
-When using Docker, it is only accessible through port forwarding, which means you need to add an host entry pointing to 127.0.0.1 to access it through a domain name.
+It gets assigned the IP 192.168.56.2 and a DNS entry makes *.app-vm.codeenigma.com and point to it. You can access it at whatever.app-vm.codeenigma.com directly.
 
 ## Components
 

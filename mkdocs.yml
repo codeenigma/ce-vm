@@ -7,13 +7,13 @@ repo_url: https://github.com/codeenigma/ce-vm
 theme: readthedocs
 
 pages:
-  - Home: index.md
-  - Get started:
+  - About: index.md
+  - Getting started:
     - Installation: get-started/install.md
     - Usage: get-started/usage.md
-  - Customization:
+  - Customisation:
     - Configuration: config/config.md
-    - Ansible: config/ansible.md
+    - Ansible customization: config/ansible.md
   - Stack details:
     - The "App" instance: stack/app.md
     - The "Database" instance: stack/db.md
@@ -23,6 +23,9 @@ pages:
       - Postfix: stack/components/postfix.md
       - Selenium: stack/components/selenium.md
       - Solr: stack/components/selenium.md
+  - Tips & recipes:
+      - Wrapper scripts: tips/scripts.yml
+      - SSH: tips/scripts.yml
   - Topics:
       - Shared mounts: topics/shared-mounts.md
       - Security: topics/security.md
