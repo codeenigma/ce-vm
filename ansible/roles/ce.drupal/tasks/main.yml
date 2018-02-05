@@ -51,12 +51,17 @@
     src: gitignore.j2
     dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
     force: no
-    
+
+- name: Check if we already have a ce-vm.settings.php file.
+  stat: path="{{ project_dir }}/{{ webroot }}/sites/default/ce-vm.settings.php"
+  register: ce_vm_settings_php
+
 - name: Generates ce-vm.settings.php file.
   template:
     src: ce-vm.settings.php.j2
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/ce-vm.settings.php"
     force: no
+  when: not ce_vm_settings_php.stat.exists 
 
 - name: Check if we already have a settings.php file.
   stat: path="{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
