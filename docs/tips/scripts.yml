@@ -25,7 +25,7 @@ Before you can use this script, you will need to have used ce-vm at least once. 
 1. Add yourself to the "docker" group: `sudo gpasswd -a "$USER" "docker"`
 2. Logout and login from your session (rebooting is the safest)
 3. Test you can interact with the docker daemon without sudo: "docker ps -a"
-4. Follow the instructions as per the [get started guide](get-started/usage.md): `cd myproject/ce-vm && vagrant up`
+4. Follow the instructions as per the [get started guide](/get-started/usage.md): `cd myproject/ce-vm && vagrant up`
 
 You can then follow the instuctions in [vagrant-docker-sudo.sh](https://github.com/codeenigma/ce-vm/blob/master/scripts/vagrant-docker-sudo.sh) to add an alias to your bashrc/zshrc.
 

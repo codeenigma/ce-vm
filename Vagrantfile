@@ -254,7 +254,10 @@ if (parsed_conf['docker_app_privileged'] == "auto")
   parsed_conf['docker_app_privileged'] = "false"
 end
 if (parsed_conf['docker_db_privileged'] == "auto")
-  parsed_conf['docker_db_privileged'] = "true"
+  parsed_conf['docker_db_privileged'] = "false"
+  if(host_platform == "mac_os")
+    parsed_conf['docker_db_privileged'] = "true"
+  end
 end
 if (parsed_conf['docker_db_ssh_port'] == "auto")
   parsed_conf['docker_db_ssh_port'] = 22
@@ -348,6 +351,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "#{parsed_conf['net_db_ip']}",
         "-P",
         "--privileged=#{parsed_conf['docker_db_privileged']}", # Tomcat7 needs this on Mac.
+        #"--cap-add SYS_PTRACE"
       ]
       d.ports = parsed_conf['docker_db_fwd_ports']
       d.has_ssh = true

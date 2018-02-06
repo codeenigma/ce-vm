@@ -1,0 +1,40 @@
+
+## SSH connection from within the app-vm container.
+
+Once you've opened an SSH session to the main container, it can sometime be handy to be able to make ssh connections
+to external servers, for example to be able to do things like  `drush sql-sync @stage $vm`.
+
+This is a 2 step process.
+
+#### 1. Username
+
+This first think you need is to make sure your username matches what is expected 
+server-side, and not the default "vagrant" user.
+To ensure consistency, the best way is to create a custom ansible role in 
+your ~/.CodeEnigma/ce-vm/ce-vm-custom folder so that it applies to all of your projects.
+Refer to ["Ansible customisation"](config/) for details, but in a nutshell: 
+
+- copy the ce-vm/examples/ce-vm-custom folder that comes with the template you have generated at [http://ce-vm.codeenigma.net](http://ce-vm.codeenigma.net) to ~/.CodeEnigma/ce-vm/ce-vm-custom (if you don't have one already).
+- edit ~/.CodeEnigma/ce-vm/ce-vm-custom/app.yml and uncomment the custom.ssh role line
+- edit the example template in the matching role (~/.CodeEnigma/ce-vm/ce-vm-custom/ansible/roles/custom.ssh/templates/config.j2) to your needs
+
+The example looks like this, and you will of course need to replace hosts and username with your own:
+
+````
+
+Host *.codeenigma.net
+User dummy
+
+Host *.codeenigma.com
+User dummy
+
+````
+
+You can then apply your changes with `vagrant provision` for existing projects (new projects will pick it up automatically), and this will be copied on the guest as ~/.ssh/config.
+
+#### 2. SSH Agent forwarding
+
+Next thing you need is to tell your ssh-agent to forward your key to the guest container. 
+This is currently still a manual step you need to perform before `vagrant ssh`'ing into the app-vm.
+
+It usually is as simple as `ssh-add`, or `ssh-add ~/.ssh/my-key.rsa` if you have several keys and you want to pick one in particular.
