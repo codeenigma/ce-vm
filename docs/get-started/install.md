@@ -47,17 +47,6 @@ The Docker daemon can only be managed by the root user by default. As with any o
 - Add yourself to the "docker" group, so you can run `vagrant` commands as your standard unprivileged user - see [docs.docker.com](https://docs.docker.com/engine/installation/linux/linux-postinstall/) for details. It does solve the issue, but this poses a security risk you need to be aware of and understand. See [here for details](https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface). Most users tend to just "live with it" as it is the most convenient solution.
 - Use the wrapper script that is included with ce-vm. It takes an hybrid approach of temporarily adding your user to the docker group for the duration of the `vagrant` command, then remove it straight after it has run. See the [tips](/tips/scripts/#vagrant-docker-sudo.sh) section for usage.
 
-#### Issue 2. File ownership
-
-As explained above, contrary to the non-native implementation on Mac or Windows, 
-there is no mapping of ownership on the filesystem. 
-A file owned by user "vagrant" (1000) or "www-data" (33) on the container 
-will have the same numeric owner (1000 or 33 in our example) on the host machine. 
-The only workaroud for now is to change the ID of the vagrant user on the guest to match your local user, which is done by setting the following variables:
-```
-docker_vagrant_user_uid: 1000
-docker_vagrant_group_gid: 1000
-```
 
 ## ce-vm
 
