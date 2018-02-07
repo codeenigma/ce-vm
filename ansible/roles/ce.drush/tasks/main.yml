@@ -11,7 +11,7 @@
 
 - name: Download Drush installer.
   get_url:
-    url: https://s3.amazonaws.com/files.drush.org/drush.phar
+    url: https://github.com/drush-ops/drush/releases/download/8.1.16/drush.phar
     dest: /tmp/drush.phar
     mode: 0755
   when: not drush_install.stat.exists
