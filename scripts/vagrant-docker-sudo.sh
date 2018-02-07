@@ -26,8 +26,8 @@ if [ -z "$OWN" ]; then
 fi
 OWN_DIR=$( cd "$( dirname "$OWN" )" && pwd -P)
 CURRENT_CALL_DIR=$(pwd -P)
-VAGRANT_WRAPPER_CMD="/bin/sh $OWN_DIR/vagrant-wrapper.sh"
+VAGRANT_WRAPPER_CMD="/bin/sh $OWN_DIR/vagrant-wrapper.sh $@"
 ORIG_USER="$USER"
 sudo gpasswd -a "$ORIG_USER" "docker"
-sudo su - -l "$ORIG_USER" -c "cd $CURRENT_CALL_DIR && $VAGRANT_WRAPPER_CMD $@" 
+sudo su - -l "$ORIG_USER" -c "cd $CURRENT_CALL_DIR && $VAGRANT_WRAPPER_CMD" 
 sudo gpasswd -d "$ORIG_USER" "docker"
