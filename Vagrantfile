@@ -351,7 +351,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "#{parsed_conf['net_db_ip']}",
         "-P",
         "--privileged=#{parsed_conf['docker_db_privileged']}", # Tomcat7 needs this on Mac.
-        #"--cap-add SYS_PTRACE"
+        "--cap-add=SYS_PTRACE"
       ]
       d.ports = parsed_conf['docker_db_fwd_ports']
       d.has_ssh = true
