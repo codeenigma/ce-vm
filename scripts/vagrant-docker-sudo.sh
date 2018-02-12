@@ -16,6 +16,11 @@ if [ "$(id -u)" -lt "1" ]; then
    exit 1
 fi
 
+ORIG_USER="$USER"
+
+# Ensure group always get removed.
+trap "sudo gpasswd -d $ORIG_USER 'docker'" EXIT
+
 # Get own path.
 OWN=$(readlink "$0");
 if [ -z "$OWN" ]; then
@@ -24,7 +29,5 @@ fi
 OWN_DIR=$( cd "$( dirname "$OWN" )" && pwd -P)
 CURRENT_CALL_DIR=$(pwd -P)
 VAGRANT_WRAPPER_CMD="/bin/sh $OWN_DIR/vagrant-wrapper.sh $@"
-ORIG_USER="$USER"
 sudo gpasswd -a "$ORIG_USER" "docker"
 sudo su - -l "$ORIG_USER" -c "cd $CURRENT_CALL_DIR && $VAGRANT_WRAPPER_CMD" 
-sudo gpasswd -d "$ORIG_USER" "docker"
