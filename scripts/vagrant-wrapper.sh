@@ -4,11 +4,8 @@
 # project from within any subdirectory.
 # This assumes your parent folder is a git repository.
 #
-# To use it:
-# - Make sure it is executable:
-#     chmod +x ~/.CodeEnigma/ce-vm/ce-vm-upstream/scripts/vagrant-wrapper.sh
-# - Add it as an alias in your bashrc, zshrc, ... eg:
-#     alias vg="$HOME/.CodeEnigma/ce-vm/ce-vm-upstream/scripts/vagrant-wrapper.sh"
+# To use it, add it as an alias in your bashrc, zshrc, ... eg:
+# alias vg="/bin/sh $HOME/.CodeEnigma/ce-vm/ce-vm-upstream/scripts/vagrant-wrapper.sh"
 # 
 # You will then be able to call "vg up", "vg ssh" without being in 
 # the same directory than the Vagrantfile.

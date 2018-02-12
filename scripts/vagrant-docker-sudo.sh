@@ -3,11 +3,8 @@
 # Wrapper script (Linux host only). Allows Vagrant to issue Docker commands
 # without having to permanently add your user to the "docker" group.
 #
-# To use it:
-# - Make sure it is executable:
-#     chmod +x ~/.CodeEnigma/ce-vm/ce-vm-upstream/scripts/vagrant-docker-sudo.sh
-# - Add it as an alias in your bashrc, zshrc, ... eg:
-#     alias vg="$HOME/.CodeEnigma/ce-vm/ce-vm-upstream/scripts/vagrant-docker-sudo.sh"
+# To use it it as an alias in your bashrc, zshrc, ... eg:
+# alias vg="/bin/sh $HOME/.CodeEnigma/ce-vm/ce-vm-upstream/scripts/vagrant-docker-sudo.sh"
 # 
 # You will then be able to call "vg up", "vg ssh" as your normal user.
 # Note that you will still be prompted for your 'sudoer' password, this is
