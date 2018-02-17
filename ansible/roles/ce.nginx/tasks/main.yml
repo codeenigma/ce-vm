@@ -1,6 +1,21 @@
 ---
 # (Re) install nginx
-  
+
+- name: Add DotDeb repository key for NGINX.
+  apt_key: url=http://www.dotdeb.org/dotdeb.gpg state=present
+
+- name: Add DotDeb repository.
+  apt_repository: repo='deb http://packages.dotdeb.org jessie all' state=present
+
+- name: Pin Nginx packages.
+  template:
+    src: dotdeb.pref.j2
+    dest: "/etc/apt/preferences.d/dotdeb.pref"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
 - name: Ensure nginx is installed.
   apt:
     pkg: nginx

@@ -47,11 +47,13 @@ def conf_init(parsed_conf, conf_files)
 end
 
 # Gather potential playbook locations.
-def playbooks_find(host_dirs, run_dirs)
+def playbooks_find(host_dirs, run_dirs, filename)
   filtered = [];
   host_dirs.each.with_index do |h_dir, key|
     if(Dir.exists?(h_dir))
-      filtered.push(run_dirs[key])
+      if(File.exist?(File.join(h_dir, filename)))
+        filtered.push(File.join(run_dirs[key], filename))
+      end
     end
   end
   return filtered
@@ -172,15 +174,9 @@ end
 # Reload config on the matching branch.
 Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
 parsed_conf = conf_init({}, host_conf_files)
-run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
-
 
 ################ Common processing.
 ################################################################################
-
-# VM names.
-vapp = "#{parsed_conf['project_name']}"
-vdb = "#{parsed_conf['project_name']}-db"
 
 # Gather shared folders.
 data_volume = {'source' => "#{host_project_dir}", 'dest' => "#{guest_project_dir}"}
@@ -190,8 +186,6 @@ home_ce_volume = {'source' => "#{host_ce_home}", 'dest' => "#{guest_ce_home}"}
 #@todo, add a setting for "extra" shared volumes.
 shared_volumes = [];
 
-# Gather playbooks.
-run_playbook_dirs = playbooks_find(host_playbook_dirs, guest_playbook_dirs)
 # Gather config files to pass to Ansible.
 run_config_files = config_files_find(host_conf_files, guest_conf_files)
 
@@ -271,6 +265,18 @@ if (parsed_conf['docker_app_ssh_port'] == "auto")
     parsed_conf['docker_app_ssh_port'] = 22202
   end
 end
+if (parsed_conf['docker_proto_ssh_port'] == "auto")
+  parsed_conf['docker_proto_ssh_port'] = 22
+  if(host_platform == "mac_os")
+    parsed_conf['docker_proto_ssh_port'] = 22204
+  end
+end
+if (parsed_conf['docker_log_ssh_port'] == "auto")
+  parsed_conf['docker_log_ssh_port'] = 22
+  if(host_platform == "mac_os")
+    parsed_conf['docker_log_ssh_port'] = 22204
+  end
+end
 if (parsed_conf['docker_db_fwd_ports'] == "auto")
   parsed_conf['docker_db_fwd_ports'] = [];
   if(host_platform == "mac_os")
@@ -293,6 +299,24 @@ if (parsed_conf['docker_app_fwd_ports'] == "auto")
     ];
   end
 end
+if (parsed_conf['docker_proto_fwd_ports'] == "auto")
+  parsed_conf['docker_proto_fwd_ports'] = [];
+  if(host_platform == "mac_os")
+    parsed_conf['docker_proto_fwd_ports'] = [
+      "#{parsed_conf['net_proto_ip']}:#{parsed_conf['docker_proto_ssh_port']}:22",
+      "#{parsed_conf['net_proto_ip']}:80:80"
+    ];
+  end
+end
+if (parsed_conf['docker_log_fwd_ports'] == "auto")
+  parsed_conf['docker_log_fwd_ports'] = [];
+  if(host_platform == "mac_os")
+    parsed_conf['docker_log_fwd_ports'] = [
+      "#{parsed_conf['net_log_ip']}:#{parsed_conf['docker_log_ssh_port']}:22",
+      "#{parsed_conf['net_log_ip']}:80:80"
+    ];
+  end
+end
 
 # On UP operation, create our network if needed.
 if (ARGV.include? 'up')
@@ -300,10 +324,10 @@ if (ARGV.include? 'up')
   # Mac OS X, we need interface aliases.
   if(host_platform == "mac_os") && (ARGV.include? 'up')
     puts "Network configuration changes needed. This require administrative privileges."
-    ensure_lo_alias(parsed_conf['net_db_ip'])
-    ensure_lo_alias(parsed_conf['net_app_ip'])
   end
 end
+
+services = ['log', 'db', 'app']
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
@@ -312,107 +336,65 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.ssh.forward_agent = true
   ################# END Common config.  
 
-  ################# Database VM.
-  config.vm.define "db-vm" do |db|
-    # Base properties.
-    db.ssh.host = parsed_conf['net_db_ip']
-    db.ssh.port = parsed_conf['docker_db_ssh_port']
-    db.vm.hostname = "#{vdb}"
-    if(parsed_conf['docker_db_ssh_port'] != 22)
-      # Disable default port forwarding, as we define a custom one.
-      db.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_db_ssh_port'], id: 'ssh'
+  # Iterate over services.
+  services.each do |service|
+    is_primary = false
+    if (service === 'app')
+      is_primary = true
     end
-    # Shared folders
-    db.vm.synced_folder ".", "/vagrant", disabled: true
-    db_volumes = []
-    shared_volumes.each do |synced_folder|
-      db_volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}")
+    name = "#{parsed_conf['project_name']}-#{service}"
+    # Gather playbooks.
+    run_playbooks = playbooks_find(host_playbook_dirs, guest_playbook_dirs, "#{service}.yml")
+    # Mac OS X, we need interface aliases.
+    if(host_platform == "mac_os") && (ARGV.include? 'up')
+      ensure_lo_alias(parsed_conf["net_#{service}_ip"])
     end
-    db_volumes.push("#{data_volume['source']}/:#{data_volume['dest']}")
-    # First ensure 'vagrant' ownership match.
-    db.vm.provision "shell", inline: $vagrant_uid
-    # Run actual playbooks.
-    run_playbook_dirs.each do |ansible_folder|
-      db.vm.provision 'ansible_local' do |ansible|
-        ansible.playbook = "#{ansible_folder}/db.yml"
-        ansible.extra_vars = ansible_extra_vars
+    ################# Indivual container.
+    config.vm.define "#{service}-vm", primary: is_primary do |container|
+      # Base properties.
+      container.ssh.host = parsed_conf["net_#{service}_ip"]
+      container.ssh.port = parsed_conf["docker_#{service}_ssh_port"]
+      container.vm.hostname = "#{name}"
+      if(parsed_conf["docker_#{service}_ssh_port"] != 22)
+        # Disable default port forwarding, as we define a custom one.
+        container.vm.network :forwarded_port, guest: 22, host: parsed_conf["docker_#{service}_ssh_port"], id: 'ssh'
       end
-    end
-    # Run startup scripts.
-    db.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
-    # Docker settings.
-    db.vm.provider "docker" do |d|
-      d.force_host_vm = false
-      d.image = "pmce/jessie64:4.0.0"
-      d.name = "#{vdb}"
-      d.create_args = [
-        "--network=#{net_name}",
-        "--ip",
-        "#{parsed_conf['net_db_ip']}",
-        "-P",
-        "--privileged=#{parsed_conf['docker_db_privileged']}", # Tomcat7 needs this on Mac.
-        "--cap-add=SYS_PTRACE"
-      ]
-      d.ports = parsed_conf['docker_db_fwd_ports']
-      d.has_ssh = true
-      d.volumes = db_volumes
-    end
-  end
-  ################# END Database VM.
-
-  ################# App VM.
-  config.vm.define "app-vm", primary: true do |app|
-    # Base properties.
-    app.ssh.host = parsed_conf['net_app_ip']
-    app.ssh.port = parsed_conf['docker_app_ssh_port']
-    app.vm.hostname = "#{vapp}"
-    if(parsed_conf['docker_app_ssh_port'] != 22)
-      # Disable default port forwarding, as we define a custom one.
-      app.vm.network :forwarded_port, guest: 22, host: parsed_conf['docker_app_ssh_port'], id: 'ssh'
-    end
-    # Shared folders
-    app.vm.synced_folder ".", "/vagrant", disabled: true
-    app_volumes = []
-    shared_volumes.each do |synced_folder|
-      app_volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
-    end
-    dest = "#{data_volume['dest']}"
-    source = "#{data_volume['source']}"
-    if(parsed_conf['docker_mirror'])
-      dest = "#{guest_mirror_dir}#{dest}"
-    end
-    app_volumes.push("#{source}/:#{dest}")
-    if(parsed_conf['docker_mirror'])
-      app.vm.provision "shell", inline: $mirror
-    end
-    # First ensure 'vagrant' ownership match.
-    app.vm.provision "shell", inline: $vagrant_uid
-    # Run actual playbooks.
-    run_playbook_dirs.each do |ansible_folder|
-        app.vm.provision 'ansible_local' do |ansible|
-          ansible.playbook = "#{ansible_folder}/app.yml"
+      # Shared folders
+      container.vm.synced_folder ".", "/vagrant", disabled: true
+      volumes = []
+      shared_volumes.each do |synced_folder|
+        volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}")
+      end
+      volumes.push("#{data_volume['source']}/:#{data_volume['dest']}")
+      # First ensure 'vagrant' ownership match.
+      container.vm.provision "shell", inline: $vagrant_uid
+      # Run actual playbooks.
+      run_playbooks.each do |ansible_playbook_file|
+        container.vm.provision 'ansible_local' do |ansible|
+          ansible.playbook = ansible_playbook_file
           ansible.extra_vars = ansible_extra_vars
         end
+      end
+      # Run startup scripts.
+      container.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
+      # Docker settings.
+      container.vm.provider "docker" do |d|
+        d.force_host_vm = false
+        d.image = "pmce/jessie64:4.0.0"
+        d.name = "#{name}"
+        d.create_args = [
+          "--network=#{net_name}",
+          "--ip",
+          "#{parsed_conf["net_#{service}_ip"]}",
+          "-P",
+          "--privileged=#{parsed_conf["docker_#{service}_privileged"]}", # Tomcat7 needs this on Mac.
+          "--cap-add=SYS_PTRACE"
+        ]
+        d.ports = parsed_conf["docker_#{service}_fwd_ports"]
+        d.has_ssh = true
+        d.volumes = volumes
+      end
     end
-    # Run startup scripts.
-    app.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
-    # Docker settings.
-    app.vm.provider "docker" do |d|
-      d.force_host_vm = false
-      d.image = "pmce/jessie64:4.0.0"
-      d.name = "#{vapp}"
-      d.create_args = [
-        "--network=#{net_name}",
-        "--ip",
-        "#{parsed_conf['net_app_ip']}",
-        "-P",
-        "--privileged=#{parsed_conf['docker_app_privileged']}",
-      ]
-      d.ports = parsed_conf['docker_app_fwd_ports']
-      d.has_ssh = true
-      d.volumes = app_volumes
-    end
+  ################# END Individual container.
   end
-  ################# END App VM.
-
 end

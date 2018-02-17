@@ -15,19 +15,10 @@
     
     - name: Run init tasks
       import_tasks: tasks/init.yml
-    
+    # Force NodeJS version.
+    - set_fact: nodejs_version="8.x"
+
   roles:
-
-    - { role: ce.rsyslog_client }
-    - { role: ce.mysql }
-    - { role: ce.memcached }
-    - { role: ce.redis }
-    - { role: ce.solr }
-    - { role: ce.postfix }
-
-  tasks:
-    # Install extra packages.
-    - name: Install additional extra packages.
-      apt: "name={{ item }} state=present"
-      with_items: "{{ db_extra_packages | list }}"
-      when: db_extra_packages | length
+    
+    - { role: ce.rsyslog_server }
+    - { role: ce.frontail }

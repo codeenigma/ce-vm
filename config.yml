@@ -125,6 +125,8 @@ net_subnet: 192.168.56.0/24
 net_gateway: 192.168.56.1
 net_app_ip: 192.168.56.2
 net_db_ip: 192.168.56.3
+net_proto_ip: 192.168.56.4
+net_log_ip: 192.168.56.5
 # Port forwarding and SSH.
 # We do our best to try and use the suitable settings
 # based on your host OS. However, some more advanced
@@ -164,6 +166,25 @@ docker_db_fwd_ports: auto
 #  # Tomcat
 #  - "{{ net_db_ip }}:8080:8080"
 
+docker_proto_ssh_port: auto
+#docker_proto_ssh_port: 22204
+docker_proto_fwd_ports: auto
+# docker_proto_fwd_ports:
+# # SSH
+#  - "{{ net_proto_ip }}:{{ docker_proto_ssh_port }}:22"
+#  # Server
+#  - "{{ net_proto_ip }}:80:80"
+
+docker_log_ssh_port: auto
+#docker_log_ssh_port: 22205
+docker_log_fwd_ports: auto
+# docker_log_fwd_ports:
+# # SSH
+#  - "{{ net_log_ip }}:{{ docker_log_ssh_port }}:22"
+#  # Server
+#  - "{{ net_log_ip }}:80:80"
+
+
 # Vagrant user uid and group gid. 
 # You normally don't have to change this,
 # the only exception being Docker on a 
@@ -179,5 +200,7 @@ docker_mirror: no
 # If left on "auto", defaults to "false",
 # unless you need Tomcat/Solr and you're on a Mac.
 # You can "force" it to either "true" or "false".
-docker_app_privileged: auto
-docker_db_privileged: auto
+docker_app_privileged: false
+docker_db_privileged: false
+docker_proto_privileged: false
+docker_log_privileged: false

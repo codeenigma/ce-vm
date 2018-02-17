@@ -1,0 +1,10 @@
+---
+
+- name: Copy rsyslog configuration in place.
+  template:
+    src: rsyslog.conf.j2
+    dest: "/etc/rsyslog.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes

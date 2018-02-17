@@ -1,0 +1,3 @@
+#!/bin/sh
+
+nohup flock /tmp/frontail.lock /usr/bin/frontail -d -p 80 --ui-highlight --pid-path /tmp/frontail.pid /var/log/syslog
