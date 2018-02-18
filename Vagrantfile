@@ -345,9 +345,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       container.vm.synced_folder ".", "/vagrant", disabled: true
       volumes = []
       shared_volumes.each do |synced_folder|
-        volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}")
+        volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
       end
-      volumes.push("#{data_volume['source']}/:#{data_volume['dest']}")
+      volumes.push("#{data_volume['source']}/:#{data_volume['dest']}:delegated")
       # First ensure 'vagrant' ownership match.
       container.vm.provision "shell", inline: $vagrant_uid
       # Run actual playbooks.

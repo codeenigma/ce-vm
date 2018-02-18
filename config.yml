@@ -113,10 +113,10 @@ composer_github_oauth_token: ''
 ################################################################################
 
 # Apt shared cache. This stores apt archives in a common mounted volume,
-# similar to the 'vagrant-cachier' plugin.
+# similar to what the 'vagrant-cachier' plugin does.
 # It does save a bit of download time for provisioning on slow network
-# connections. In most cases, it will actually slow things down due to I/0.
-use_apt_cache: no
+# connections.
+use_apt_cache: yes
 
 # Networking settings.
 # You will need to change your hosts file
