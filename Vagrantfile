@@ -296,7 +296,7 @@ if (ARGV.include? 'up')
 end
 
 services = ['log', 'db', 'app']
-ssh_port = 22202
+ssh_ports = {'log' => 22205,'db' => 22203, 'app'=> 22202}
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -315,7 +315,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if (parsed_conf["docker_#{service}_ssh_port"] === "auto")
       parsed_conf["docker_#{service}_ssh_port"] = 22
       if(host_platform == "mac_os")
-        parsed_conf["docker_#{service}_ssh_port"] = ssh_port
+        parsed_conf["docker_#{service}_ssh_port"] = ssh_ports[service]
       end
     end
     # Privileged mode.
