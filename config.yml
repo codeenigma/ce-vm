@@ -118,6 +118,13 @@ composer_github_oauth_token: ''
 # individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
 ################################################################################
 
+# Apt shared cache. This stores apt archives in a common mounted volume,
+# similar to the 'vagrant-cachier' plugin.
+# It does save a bit of download time for provisioning on slow network
+# connections. With high bandwidth, the slower I/O generally makes it
+# non efficient.
+use_apt_cache: no
+
 # Networking settings.
 # You will need to change your hosts file
 # if you change from defaults.

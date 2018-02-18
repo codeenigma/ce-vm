@@ -5,6 +5,7 @@
     path: '{{ shared_cache_dir }}/apt/archives'
     state: directory
     recurse: yes
+  when: use_apt_cache
 
 - name: Move apt cache to shared dir.
   template:
@@ -13,6 +14,7 @@
     owner: 'root'
     group: 'root'
     force: yes
+  when: use_apt_cache
 
 - name: Update apt cache.
   apt:
