@@ -62,7 +62,8 @@
     mode: 0644
     force: yes
 
-- file:
+- name: Ensure default nginx catch-all is not present
+  file:
     path: "/etc/nginx/sites-enabled/default"
     state: absent
 

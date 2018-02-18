@@ -22,7 +22,7 @@
     - { role: ce.mysql }
     - { role: ce.memcached }
     - { role: ce.redis }
-    - { role: ce.solr }
+    - { role: ce.solr, when: solr}
     - { role: ce.postfix }
 
   tasks:

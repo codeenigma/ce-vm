@@ -21,6 +21,7 @@
     - { role: ce.rsyslog_client }
     - { role: ce.unison, when: docker_mirror }
     - { role: ce.ce_vm }
+    - { role: ce.nginx }
     - { role: ce.postfix }
     - { role: ce.mkdocs, when: mkdocs }
     - { role: ce.nodejs, when: nodejs_version == '4.x' or nodejs_version == '6.x'}

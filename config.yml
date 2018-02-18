@@ -32,12 +32,6 @@ mysql_engine: percona-server
 # NodeJS version. Either 4.x or 6.x.
 nodejs_version: ''
 
-# Whether to install memcached on the DB vm.
-memcached: yes
-
-# Whether to install Redis on the DB vm.
-redis: no
-
 # Whether to install MkDocs documentation generator on app-vm.
 mkdocs: no
 
@@ -121,8 +115,7 @@ composer_github_oauth_token: ''
 # Apt shared cache. This stores apt archives in a common mounted volume,
 # similar to the 'vagrant-cachier' plugin.
 # It does save a bit of download time for provisioning on slow network
-# connections. With high bandwidth, the slower I/O generally makes it
-# non efficient.
+# connections. In most cases, it will actually slow things down due to I/0.
 use_apt_cache: no
 
 # Networking settings.
