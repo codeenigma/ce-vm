@@ -6,6 +6,15 @@
 - name: Add Sury repository.
   apt_repository: repo='deb https://packages.sury.org/php/ jessie main' state=present
 
+- name: Pin Sury packages.
+  template:
+    src: sury.pref.j2
+    dest: "/etc/apt/preferences.d/sury.pref"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
 - name: Install PHP packages.
   apt: "name={{ item }} state=present"
   with_items:
@@ -24,6 +33,15 @@
     - "php{{ php_version }}-soap"
     - "php{{ php_version }}-xml"
     - "php{{ php_version }}-zip"
+
+- name: Set php version (phar)
+  command: "update-alternatives --set phar /usr/bin/phar{{ php_version }}"
+
+- name: Set php version (phar.phar)
+  command: "update-alternatives --set phar.phar /usr/bin/phar.phar{{ php_version }}"
+
+- name: Set php version (php)
+  command: "update-alternatives --set php /usr/bin/php{{ php_version }}"
 
 - name: Copy php.ini for php-fpm.
   template:
