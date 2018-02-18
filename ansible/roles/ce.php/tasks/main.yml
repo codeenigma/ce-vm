@@ -28,11 +28,11 @@
     - "php{{ php_version }}-mbstring"
     - "php{{ php_version }}-mysql"
     - "php{{ php_version }}-opcache"
-    - "php{{ php_version }}-redis"
     - "php{{ php_version }}-soap"
     - "php{{ php_version }}-xml"
     - "php{{ php_version }}-zip"
     - "php-memcached"
+    - "php-redis"
 
 - name: Set php version (phar)
   command: "update-alternatives --set phar /usr/bin/phar{{ php_version }}"
