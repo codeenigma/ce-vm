@@ -353,7 +353,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         dest = "#{guest_mirror_dir}#{dest}"
         container.vm.provision "shell", inline: $mirror
       end
-      app_volumes.push("#{source}/:#{dest}:delegated")
+      volumes.push("#{source}/:#{dest}:delegated")
 
       volumes.push("#{data_volume['source']}/:#{data_volume['dest']}:delegated")
       # First ensure 'vagrant' ownership match.
