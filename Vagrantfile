@@ -380,7 +380,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Docker settings.
       container.vm.provider "docker" do |d|
         d.force_host_vm = false
-        d.image = "pmce/jessie64:4.0.0"
+        d.image = "pmce/ce-vm-#{service}:4.1.0"
         d.name = "#{name}"
         d.create_args = [
           "--network=#{net_name}",
