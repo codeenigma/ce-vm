@@ -347,6 +347,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       shared_volumes.each do |synced_folder|
         volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
       end
+      dest = "#{data_volume['dest']}"
+      source = "#{data_volume['source']}"
+      if(parsed_conf['docker_mirror'])
+        dest = "#{guest_mirror_dir}#{dest}"
+        container.vm.provision "shell", inline: $mirror
+      end
+      app_volumes.push("#{source}/:#{dest}:delegated")
+      
       volumes.push("#{data_volume['source']}/:#{data_volume['dest']}:delegated")
       # First ensure 'vagrant' ownership match.
       container.vm.provision "shell", inline: $vagrant_uid
