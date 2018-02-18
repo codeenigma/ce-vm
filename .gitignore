@@ -3,3 +3,4 @@ nbproject
 ce-vm
 .vscode
 www
+ansible/filter_plugins/wrap.pyc
