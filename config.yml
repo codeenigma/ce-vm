@@ -156,7 +156,7 @@ docker_app_fwd_ports: auto
 #  - "{{ net_app_ip }}:8000:8000"
 
 docker_db_ssh_port: auto
-#docker_db_ssh_port: 22203
+# docker_db_ssh_port: 22203
 docker_db_fwd_ports: auto
 # docker_db_fwd_ports:
 # # SSH
@@ -200,7 +200,7 @@ docker_mirror: no
 # If left on "auto", defaults to "false",
 # unless you need Tomcat/Solr and you're on a Mac.
 # You can "force" it to either "true" or "false".
-docker_app_privileged: false
-docker_db_privileged: false
-docker_proto_privileged: false
-docker_log_privileged: false
+docker_app_privileged: auto
+docker_db_privileged: auto
+docker_proto_privileged: auto
+docker_log_privileged: auto

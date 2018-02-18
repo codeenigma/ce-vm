@@ -243,40 +243,8 @@ fi
 rsync -av --chown=vagrant:vagrant --chmod=0777 --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/#{vm_dir}" "#{guest_project_dir}/"
 SCRIPT
 
-# Platform-specific adjustments.
-if (parsed_conf['docker_app_privileged'] == "auto")
-  parsed_conf['docker_app_privileged'] = "false"
-end
-if (parsed_conf['docker_db_privileged'] == "auto")
-  parsed_conf['docker_db_privileged'] = "false"
-  if(host_platform == "mac_os")
-    parsed_conf['docker_db_privileged'] = "true"
-  end
-end
-if (parsed_conf['docker_db_ssh_port'] == "auto")
-  parsed_conf['docker_db_ssh_port'] = 22
-  if(host_platform == "mac_os")
-    parsed_conf['docker_db_ssh_port'] = 22203
-  end
-end
-if (parsed_conf['docker_app_ssh_port'] == "auto")
-  parsed_conf['docker_app_ssh_port'] = 22
-  if(host_platform == "mac_os")
-    parsed_conf['docker_app_ssh_port'] = 22202
-  end
-end
-if (parsed_conf['docker_proto_ssh_port'] == "auto")
-  parsed_conf['docker_proto_ssh_port'] = 22
-  if(host_platform == "mac_os")
-    parsed_conf['docker_proto_ssh_port'] = 22204
-  end
-end
-if (parsed_conf['docker_log_ssh_port'] == "auto")
-  parsed_conf['docker_log_ssh_port'] = 22
-  if(host_platform == "mac_os")
-    parsed_conf['docker_log_ssh_port'] = 22204
-  end
-end
+# Platform-specific adjustments. 
+# This ugly pile of crap is going to DIE soon !!!
 if (parsed_conf['docker_db_fwd_ports'] == "auto")
   parsed_conf['docker_db_fwd_ports'] = [];
   if(host_platform == "mac_os")
@@ -328,7 +296,7 @@ if (ARGV.include? 'up')
 end
 
 services = ['log', 'db', 'app']
-
+ssh_port = 22202
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -343,6 +311,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       is_primary = true
     end
     name = "#{parsed_conf['project_name']}-#{service}"
+    # SSH port forwarding.
+    if (parsed_conf["docker_#{service}_ssh_port"] === "auto")
+      parsed_conf["docker_#{service}_ssh_port"] = 22
+      if(host_platform == "mac_os")
+        parsed_conf["docker_#{service}_ssh_port"] = ssh_port
+      end
+    end
+    # Privileged mode.
+    if (parsed_conf["docker_#{service}_privileged"] == "auto")
+      parsed_conf["docker_#{service}_privileged"] = false
+      if(host_platform == "mac_os") && (service == "db")
+        parsed_conf["docker_#{service}_privileged"] = true
+      end
+    end
     # Gather playbooks.
     run_playbooks = playbooks_find(host_playbook_dirs, guest_playbook_dirs, "#{service}.yml")
     # Mac OS X, we need interface aliases.
@@ -395,6 +377,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         d.volumes = volumes
       end
     end
-  ################# END Individual container.
   end
+  ################# END Individual container.
 end
