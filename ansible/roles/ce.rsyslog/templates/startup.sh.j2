@@ -1,7 +1,7 @@
 #!/bin/sh
 
 /usr/sbin/service rsyslog stop
-if [ -f var/run/rsyslogd.pid ]; then
-  rm var/run/rsyslogd.pid
+if [ -f /var/run/rsyslogd.pid ]; then
+  rm /var/run/rsyslogd.pid
 fi
 /usr/sbin/service rsyslog start
