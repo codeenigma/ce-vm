@@ -354,8 +354,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         container.vm.provision "shell", inline: $mirror
       end
       volumes.push("#{source}/:#{dest}:delegated")
-
-      volumes.push("#{data_volume['source']}/:#{data_volume['dest']}:delegated")
       # First ensure 'vagrant' ownership match.
       container.vm.provision "shell", inline: $vagrant_uid
       # Run actual playbooks.
