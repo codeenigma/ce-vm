@@ -336,6 +336,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Base properties.
       container.ssh.host = parsed_conf["net_#{service}_ip"]
       container.ssh.port = parsed_conf["docker_#{service}_ssh_port"]
+      container.ssh.guest_port = 22
       container.vm.hostname = "#{name}"
       if(parsed_conf["docker_#{service}_ssh_port"] != 22)
         # Disable default port forwarding, as we define a custom one.
