@@ -249,7 +249,6 @@ if (parsed_conf['docker_db_fwd_ports'] == "auto")
   parsed_conf['docker_db_fwd_ports'] = [];
   if(host_platform == "mac_os")
     parsed_conf['docker_db_fwd_ports'] = [
-      "#{parsed_conf['net_db_ip']}:#{parsed_conf['docker_db_ssh_port']}:22",
       "#{parsed_conf['net_db_ip']}:3306:3306",
       "#{parsed_conf['net_db_ip']}:8080:8080"
     ];
@@ -259,7 +258,6 @@ if (parsed_conf['docker_app_fwd_ports'] == "auto")
   parsed_conf['docker_app_fwd_ports'] = [];
   if(host_platform == "mac_os")
     parsed_conf['docker_app_fwd_ports'] = [
-      "#{parsed_conf['net_app_ip']}:#{parsed_conf['docker_app_ssh_port']}:22",
       "#{parsed_conf['net_app_ip']}:80:80",
       "#{parsed_conf['net_app_ip']}:443:443",
       "#{parsed_conf['net_app_ip']}:5999:5999",
@@ -271,7 +269,6 @@ if (parsed_conf['docker_proto_fwd_ports'] == "auto")
   parsed_conf['docker_proto_fwd_ports'] = [];
   if(host_platform == "mac_os")
     parsed_conf['docker_proto_fwd_ports'] = [
-      "#{parsed_conf['net_proto_ip']}:#{parsed_conf['docker_proto_ssh_port']}:22",
       "#{parsed_conf['net_proto_ip']}:80:80"
     ];
   end
@@ -280,7 +277,6 @@ if (parsed_conf['docker_log_fwd_ports'] == "auto")
   parsed_conf['docker_log_fwd_ports'] = [];
   if(host_platform == "mac_os")
     parsed_conf['docker_log_fwd_ports'] = [
-      "#{parsed_conf['net_log_ip']}:#{parsed_conf['docker_log_ssh_port']}:22",
       "#{parsed_conf['net_log_ip']}:80:80"
     ];
   end
@@ -338,8 +334,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       container.ssh.port = parsed_conf["docker_#{service}_ssh_port"]
       container.vm.hostname = "#{name}"
       if(parsed_conf["docker_#{service}_ssh_port"] != 22)
-        # Disable default port forwarding, as we define a custom one.
-        container.vm.network :forwarded_port, guest: 22, host: parsed_conf["docker_#{service}_ssh_port"], id: 'ssh'
+        # Disable automatic port forwarding, we need a set one for docker.
+        container.vm.network :forwarded_port, guest: 22, host: parsed_conf["docker_#{service}_ssh_port"], host_ip: parsed_conf["net_#{service}_ip"], id: 'ssh'
       end
       # Shared folders
       container.vm.synced_folder ".", "/vagrant", disabled: true
@@ -354,8 +350,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         container.vm.provision "shell", inline: $mirror
       end
       volumes.push("#{source}/:#{dest}:delegated")
-
-      volumes.push("#{data_volume['source']}/:#{data_volume['dest']}:delegated")
       # First ensure 'vagrant' ownership match.
       container.vm.provision "shell", inline: $vagrant_uid
       # Run actual playbooks.
