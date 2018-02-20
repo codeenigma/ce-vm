@@ -36,7 +36,7 @@ override locally, but only for a given project. It should be git ignored and not
 
 ## Role variables
 In addition to the variables from the mail config.yml file, a few Ansible roles (php, memcached, ...) use 
-additional variables. Look for "default" folders in the codebase, eg. for [php](https://github.com/codeenigma/ce-vm/blob/master/ansible/roles/ce.php/defaults/main.yml)
+additional variables. Look for "default" folders in the codebase, eg. for [php](https://github.com/codeenigma/ce-vm/blob/master/ansible/roles/ce.php-fpm/defaults/main.yml)
 You can override any of these variables in any of the config.yml file described above.
 
 ## Further customization

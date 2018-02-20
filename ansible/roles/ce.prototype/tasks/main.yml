@@ -1,0 +1,13 @@
+---
+
+- name: Check if we already have a codebase.
+  stat: path="{{ project_dir }}/{{ prototype_folder }}"
+  register: prototype_codebase
+
+ - name: Install dependencies.
+   command: npm install
+   chdir: "{{ project_dir }}/{{ prototype_folder }}"
+   become: true
+   become_user: vagrant
+   when: prototype_codebase.stat.exists
+

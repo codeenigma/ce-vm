@@ -1,7 +1,7 @@
 ---
 
 dependencies:
-  - { role: ce.php }
+  - { role: ce.php-fpm }
   - { role: ce.composer }
   - { role: ce.drush }
   - { role: ce.drupal_coder }

@@ -1,0 +1,22 @@
+---
+
+# Settings for fpm.
+php_fpm_engine: On
+php_fpm_short_open_tag: Off
+php_fpm_expose_php: On
+php_fpm_max_execution_time: 120
+php_fpm_max_input_time: 60
+php_fpm_max_input_nesting_level: 64
+php_fpm_max_input_vars: 1000
+php_fpm_memory_limit: 256M
+php_fpm_error_reporting: E_ALL
+php_fpm_display_errors: On
+php_fpm_display_startup_errors: On
+php_fpm_log_errors_max_len: 1024
+php_fpm_ignore_repeated_errors: Off
+php_fpm_ignore_repeated_source: Off
+php_fpm_html_errors: On
+php_fpm_post_max_size: 200M
+php_fpm_upload_max_filesize: 200M
+php_fpm_max_file_uploads: 20
+php_fpm_date_timezone: "Europe/London"

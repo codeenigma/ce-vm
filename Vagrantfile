@@ -269,7 +269,7 @@ if (parsed_conf['docker_proto_fwd_ports'] == "auto")
   parsed_conf['docker_proto_fwd_ports'] = [];
   if(host_platform == "mac_os")
     parsed_conf['docker_proto_fwd_ports'] = [
-      "#{parsed_conf['net_proto_ip']}:80:80"
+      "#{parsed_conf['net_proto_ip']}:80:8080"
     ];
   end
 end
@@ -281,7 +281,6 @@ if (parsed_conf['docker_log_fwd_ports'] == "auto")
     ];
   end
 end
-
 # On UP operation, create our network if needed.
 if (ARGV.include? 'up')
   ensure_network(parsed_conf['net_gateway'], parsed_conf['net_subnet'], net_name)
@@ -292,7 +291,11 @@ if (ARGV.include? 'up')
 end
 
 services = ['log', 'db', 'app']
-ssh_ports = {'log' => 22205,'db' => 22203, 'app'=> 22202}
+if (parsed_conf['prototype_folder'])
+  services.push('proto')
+end
+
+ssh_ports = {'log' => 22205,'db' => 22203, 'app'=> 22202, 'proto' => 2204}
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -364,7 +367,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Docker settings.
       container.vm.provider "docker" do |d|
         d.force_host_vm = false
-        d.image = "pmce/ce-vm-#{service}:4.1.0"
+        d.image = "pmce/ce-vm-#{service}:4.1.1"
         d.name = "#{name}"
         d.create_args = [
           "--network=#{net_name}",

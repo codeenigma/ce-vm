@@ -1,0 +1,6 @@
+---
+
+dependencies:
+  - { role: ce.php-cli }
+  - { role: ce.composer }
+  - { role: ce.nodejs }

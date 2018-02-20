@@ -1,0 +1,25 @@
+---
+
+- hosts: all
+  become: yes
+  
+  pre_tasks:
+    
+    - set_fact: request_time="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+    - set_fact: local_var_dir="{{ project_dir }}/{{ vm_dir }}/var"
+    - set_fact: local_var_www_dir="{{ local_var_dir }}/www"
+    - set_fact: local_var_vm_dir="{{ local_var_dir }}/{{ inventory_hostname }}"
+    
+    - include_vars: "{{ item }}"
+      with_fileglob: "{{ config_files }}"
+    
+    - name: Run init tasks
+      import_tasks: tasks/init.yml
+    # Force NodeJS and php version.
+    - set_fact: nodejs_version="4.x"
+    - set_fact: php_version="7.0"
+
+  roles:
+    
+    - { role: ce.rsyslog_client }
+    - { role: ce.prototype }
