@@ -4,10 +4,11 @@
   stat: path="{{ project_dir }}/{{ prototype_folder }}"
   register: prototype_codebase
 
- - name: Install dependencies.
-   command: npm install
+- name: Install dependencies.
+  command: npm install
+  args:
     chdir: "{{ project_dir }}/{{ prototype_folder }}"
-   become: true
-   become_user: vagrant
-   when: prototype_codebase.stat.exists
+  become: true
+  become_user: vagrant
+  when: prototype_codebase.stat.exists
 
