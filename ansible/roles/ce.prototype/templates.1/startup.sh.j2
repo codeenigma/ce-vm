@@ -1,7 +1,0 @@
-#!/bin/sh
-
-/usr/sbin/service php{{ php_version }}-fpm stop
-if [ -f /run/php/php{{ php_version }}-fpm.pid ]; then
-  rm /run/php/php{{ php_version }}-fpm.pid
-fi
-/usr/sbin/service php{{ php_version }}-fpm start

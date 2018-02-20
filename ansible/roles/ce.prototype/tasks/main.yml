@@ -6,7 +6,7 @@
 
  - name: Install dependencies.
    command: npm install
-   chdir: "{{ project_dir }}/{{ prototype_folder }}"
+    chdir: "{{ project_dir }}/{{ prototype_folder }}"
    become: true
    become_user: vagrant
    when: prototype_codebase.stat.exists
