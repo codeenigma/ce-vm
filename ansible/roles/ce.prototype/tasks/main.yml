@@ -12,3 +12,16 @@
   become_user: vagrant
   when: prototype_codebase.stat.exists
 
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/prototype"
+    owner: root
+    group: root
+    mode: 0555
+    
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/prototype.html"
+    force: yes
