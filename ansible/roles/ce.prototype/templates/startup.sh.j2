@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd /vagrant/{{ prototype_folder }}
-su vagrant -c 'nohup npm run serve &'
+su vagrant -c 'nohup /usr/bin/npm run start >/dev/null 2>&1 &'
