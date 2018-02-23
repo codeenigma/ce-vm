@@ -269,7 +269,7 @@ if (parsed_conf['docker_proto_fwd_ports'] == "auto")
   parsed_conf['docker_proto_fwd_ports'] = [];
   if(host_platform == "mac_os")
     parsed_conf['docker_proto_fwd_ports'] = [
-      "#{parsed_conf['net_proto_ip']}:80:8080"
+      "#{parsed_conf['net_proto_ip']}:80:8080",
       "#{parsed_conf['net_proto_ip']}:8000:8000"
     ];
   end
