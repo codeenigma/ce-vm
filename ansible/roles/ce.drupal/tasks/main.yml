@@ -31,8 +31,8 @@
   become: true
   become_user: vagrant
   when: 
-  - not ce_drupal_codebase.stat.exists
-  - not ce_drupal_composer.stat.exists
+    - not ce_drupal_codebase.stat.exists
+    - not ce_drupal_composer.stat.exists
 
 - name: Check if we now have a composer file.
   stat: path="{{ project_dir }}/composer.json"
@@ -44,7 +44,9 @@
     working_dir: "{{ project_dir }}"
   become: true
   become_user: vagrant
-  when: ce_drupal_composer_new.stat.exists
+  when: 
+    - ce_drupal_composer_new.stat.exists
+    - not ce_drupal_composer.stat.exists
   
 - name: Generate default .gitignore (if needed).
   template:
