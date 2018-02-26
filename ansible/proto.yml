@@ -16,7 +16,7 @@
     - name: Run init tasks
       import_tasks: tasks/init.yml
     # Force NodeJS and php version.
-    - set_fact: nodejs_version="4.x"
+    - set_fact: nodejs_version="8.x"
     - set_fact: php_version="7.0"
 
   roles:
