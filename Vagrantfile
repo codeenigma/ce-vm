@@ -1,8 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.require_version ">= 1.9.1", "<= 2.0.1"
-
 VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
 # Prevent Vagrant from looking for VBox.
