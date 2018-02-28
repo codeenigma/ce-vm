@@ -3,7 +3,7 @@
 
 # Add Percona repo if needed.
 - name: Add repository key for Percona repository.
-  apt_key: keyserver=keys.gnupg.net id=8507EFA5 state=present
+  apt_key: keyserver=keyserver.ubuntu.com id=8507EFA5 state=present
   when: mysql_engine == "percona-server"
   
 - name: Add repository for Percona.
