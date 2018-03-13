@@ -10,7 +10,7 @@
 - name: Add source repository for NodeJS.
   apt_repository: repo='deb-src https://deb.nodesource.com/node_{{ nodejs_version }} jessie main' state=present
   
-- name: Pin Node packages.
+- name: Pin NodeJS packages.
   template:
     src: nodesource.pref.j2
     dest: "/etc/apt/preferences.d/nodesource.pref"
@@ -19,10 +19,21 @@
     mode: 0644
     force: yes
   
-- name: Ensure node is installed.
+- name: Ensure NodeJS is installed.
   apt:
     pkg: "nodejs"
     state: present
+
+- name: Add repository key for Yarn repository.
+  apt_key: url=https://dl.yarnpkg.com/debian/pubkey.gpg state=present
+  
+- name: Add repository for Yarn.
+  apt_repository: repo='deb https://dl.yarnpkg.com/debian/ stable main' state=present
+  
+- name: Ensure Yarn is installed.
+  apt:
+    pkg: "yarn"
+    state: present    
     
 - name: Create NodeJS shared cache dir if needed.
   file:
@@ -31,7 +42,19 @@
     group: 'root'
     state: directory
     
-- name: Set cache location.
+- name: Set NodeJS cache location.
   template:
     src: npmrc.j2
     dest: "/home/vagrant/.npmrc"
+
+- name: Create Yarn shared cache dir if needed.
+  file:
+    path: '{{ shared_cache_dir }}/yarn'
+    owner: 'vagrant'
+    group: 'root'
+    state: directory
+    
+- name: Set Yarn cache location.
+  template:
+    src: yarnrc.j2
+    dest: "/home/vagrant/.yarnrc"

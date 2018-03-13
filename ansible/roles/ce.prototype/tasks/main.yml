@@ -5,7 +5,7 @@
   register: prototype_codebase
 
 - name: Install dependencies.
-  command: npm install
+  command: yarn install
   args:
     chdir: "{{ project_dir }}/{{ prototype_folder }}"
   become: true

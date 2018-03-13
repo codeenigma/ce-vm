@@ -22,4 +22,5 @@
   roles:
     
     - { role: ce.rsyslog_client }
+    - { role: ce.unison, when: docker_mirror }
     - { role: ce.prototype }
