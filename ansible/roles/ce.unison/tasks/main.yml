@@ -30,9 +30,6 @@
 - name: Prepare ignore list.
   set_fact: unison_ignore_string={{ unison_ignore | wrap | join(" -ignore ") }}
 
-- name: Initial data sync
-  shell: flock /tmp/unison.lock /usr/local/bin/unison -batch -owner -group -ignore {{ unison_ignore_string }} -prefer /.ce-vm-mirror/vagrant /.ce-vm-mirror/vagrant /vagrant
-
 - name: Set target ownership/permissions.
   file: 
     path: "/vagrant"
@@ -41,6 +38,15 @@
     recurse: yes
     mode: 0777
     state: directory
+
+- name: Copy run script in place.
+  template:
+    src: unison.sh.j2
+    dest: "/opt/unison.sh"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
 
 - name: Copy startup script in place.
   template:

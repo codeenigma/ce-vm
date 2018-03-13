@@ -8,6 +8,3 @@ unison_version: 2.48.4
 unison_ignore:
   - "Name .git"
   - "Name .vagrant"
-  - "Name cache"
-  - "Name node_modules"
-  

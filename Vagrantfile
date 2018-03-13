@@ -5,7 +5,7 @@ VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
 # Prevent Vagrant from looking for VBox.
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
-# We need the database to be always setup first,
+# We need the 'app' to be always setup last,
 # so can't process provisioning in parallel.
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
@@ -238,7 +238,7 @@ echo "Initial data mirror synchronisation."
 if [ ! -d "#{guest_project_dir}" ]; then
   mkdir "#{guest_project_dir}"
 fi
-rsync -av --chown=vagrant:vagrant --chmod=0777 --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/#{vm_dir}" "#{guest_project_dir}/"
+rsync -av --chown=vagrant:vagrant --chmod=0777 --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/" "#{guest_project_dir}"
 SCRIPT
 
 # Platform-specific adjustments. 
@@ -347,7 +347,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
       dest = "#{data_volume['dest']}"
       source = "#{data_volume['source']}"
-      if (parsed_conf['docker_mirror']) && (service === 'app')
+      if (parsed_conf['docker_mirror']) && (['app', 'proto'].include? service)
         dest = "#{guest_mirror_dir}#{dest}"
         container.vm.provision "shell", inline: $mirror
       end
@@ -359,6 +359,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         container.vm.provision 'ansible_local' do |ansible|
           ansible.playbook = ansible_playbook_file
           ansible.extra_vars = ansible_extra_vars
+          ansible.compatibility_mode = '2.0'
         end
       end
       # Run startup scripts.

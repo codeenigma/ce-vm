@@ -1,3 +1,3 @@
 #!/bin/sh
 
-nohup flock /tmp/unison.lock /usr/local/bin/unison -owner -group -batch -ignore {{ unison_ignore_string }} -repeat watch -fastercheckUNSAFE /.ce-vm-mirror/vagrant /vagrant </dev/null >/dev/null 2>&1 &
+nohup /opt/unison.sh </dev/null >/dev/null 2>&1 &
