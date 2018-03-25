@@ -1,5 +1,5 @@
 ---
-# Install rsylog
+# Install rsyslog
 
 - name: Ensure rsyslog is installed.
   apt:

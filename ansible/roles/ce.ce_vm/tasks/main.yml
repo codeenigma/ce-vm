@@ -2,8 +2,8 @@
 
 - name: Create landing page.
   template:
-    src: "index.html"
-    dest: "{{ ce_vm_webroot }}/index.html"
+    src: "index.php"
+    dest: "{{ ce_vm_webroot }}/index.php"
 
 - name: Copy ce-vm vhost in place.
   template:

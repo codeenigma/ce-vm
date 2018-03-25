@@ -1,19 +1,13 @@
-proxy_cache_path {{ shared_cache_dir }}/ce-vm levels=1:2 keys_zone=ce-vm:10m max_size=1g inactive=10d;
 server {
   listen 80 default_server;
   server_name _;
   root {{ ce_vm_webroot }};
   error_log /var/log/nginx/ce-vm.error.log info;
   access_log /var/log/nginx/ce-vm.access.log;
-  location /assets {
-    proxy_cache ce-vm;
-    proxy_cache_valid 30d;
-    proxy_set_header Host ce-vm.codeenigma.net;
-    proxy_set_header X-Forwarded-For $remote_addr;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_pass http://ce-vm.codeenigma.net;
-  }
-  location /includes {
-    autoindex on;
+  location / {
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $realpath_root/index.php;
+    fastcgi_param DOCUMENT_ROOT $realpath_root;
+    fastcgi_pass unix:/run/php/php{{ php_version }}-fpm.sock;
   }
 }

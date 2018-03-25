@@ -1,42 +1,15 @@
 ---
 # Install mysql
 
-# Add Percona repo if needed.
-- name: Add repository key for Percona repository.
-  apt_key: keyserver=keyserver.ubuntu.com id=8507EFA5 state=present
-  when: mysql_engine == "percona-server"
-  
-- name: Add repository for Percona.
-  apt_repository: repo='deb https://repo.percona.com/apt jessie main' state=present
-  when: mysql_engine == "percona-server"
-
-- name: Add source repository for Percona.
-  apt_repository: repo='deb-src https://repo.percona.com/apt jessie main' state=present
-  when: mysql_engine == "percona-server"
-
 - name: Add repository key for MySQL repository.
   apt_key: keyserver=pgp.mit.edu id=A4A9406876FCBD3C456770C88C718D3B5072E1F5 state=present
-  when: mysql_engine == "mysql"
 
 - name: Add repository for MySQL.
   apt_repository: repo='deb http://repo.mysql.com/apt/debian/ jessie mysql-5.7' state=present
-  when: mysql_engine == "mysql"
 
 - name: Add source repository for MySQL.
   apt_repository: repo='deb-src http://repo.mysql.com/apt/debian/ jessie mysql-5.7' state=present
-  when: mysql_engine == "mysql"
 
-
-- name: Pin Percona packages.
-  template:
-    src: percona.pref.j2
-    dest: "/etc/apt/preferences.d/percona.pref"
-    owner: root
-    group: root
-    mode: 0644
-    force: yes
-  when: mysql_engine == "percona-server"
-  
 - name: Pin MySQL packages.
   template:
     src: mysql.pref.j2
@@ -45,22 +18,11 @@
     group: root
     mode: 0644
     force: yes
-  when: mysql_engine == "mysql"
   
 - name: Ensure mysql is installed.
   apt:
-    pkg: "{{ mysql_engine }}-server"
+    pkg: "mysql-server"
     state: present
-
-- name: Copy Percona overriding configuration in place.
-  template:
-    src: percona_dev.cnf.j2
-    dest: "/etc/mysql/conf.d/dev.cnf"
-    owner: root
-    group: root
-    mode: 0644
-    force: yes
-  when: mysql_engine == "percona-server"
 
 - name: Copy MySQL overriding configuration in place.
   template:
@@ -70,10 +32,31 @@
     group: root
     mode: 0644
     force: yes
-  when: mysql_engine == "mysql"
-  
+
 - name: Restart mysql.
-  service: name=mysql state=restarted enabled=yes
+  service: name=mysql state=stopped enabled=yes
+
+- name: Ensure mysql can write data.
+  file:
+    path: /var/lib/mysql
+    owner: mysql
+    group: mysql
+    recurse: yes
+
+- name: Ensure mysql can write PID/lock.
+  file:
+    path: /var/run/mysqld
+    owner: mysql
+    group: mysql
+    mode: 0777
+    recurse: yes
+
+- name: Workaround Docker overlayFS issue.
+  shell: >
+    find /var/lib/mysql -type f -exec touch {} \;
+
+- name: Restart mysql.
+  service: name=mysql state=started enabled=yes
 
 - name: Update MySQL root password.
   shell: >
@@ -81,7 +64,7 @@
 
 - name: create "dev" MySQL user.
   shell: >
-    mysql -u root -NBe 'GRANT ALL ON *.* TO "dev"@"%" IDENTIFIED BY "dev";'
+    mysql -u root -NBe 'GRANT ALL ON *.* TO "dev"@"%" IDENTIFIED BY "dev" WITH GRANT OPTION;'
 
 - name: Ensure python-mysqldb is installed.
   apt:
@@ -106,4 +89,10 @@
     owner: root
     group: root
     mode: 0555
+    force: yes
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/mysql.html"
     force: yes

@@ -23,3 +23,9 @@
     group: root
     mode: 0555
     force: yes
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/memcached.html"
+    force: yes

@@ -1,5 +1,12 @@
 ---
 
+- set_fact: request_time="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+- set_fact: local_var_dir="{{ project_dir }}/{{ vm_dir }}/var"
+- set_fact: local_var_www_dir="{{ local_var_dir }}/www"
+- set_fact: local_var_vm_dir="{{ local_var_dir }}/{{ inventory_hostname }}"
+- include_vars: "{{ item }}"
+  with_fileglob: "{{ config_files }}"
+
 - name: Create apt archive dir if needed.
   file:
     path: '{{ shared_cache_dir }}/apt/archives'

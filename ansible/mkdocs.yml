@@ -7,13 +7,13 @@
     
     - name: Run init tasks
       import_tasks: tasks/init.yml
-
-  roles:
     
-    - { role: ce.rsyslog_server }
-    - { role: ce.frontail }
+  roles:
+
+    - { role: ce.rsyslog_client }
+    - { role: ce.mkdocs }
     - { role: ce.postfix }
-  
+
   tasks:
     # Install extra packages.
     - name: Install additional extra packages.
