@@ -1,8 +1,5 @@
 ---
   
-- name: Install Tomcat.
-  apt: "name=tomcat7 state=present"
-
 - name: Install Solr-Tomcat.
   apt: "name=solr-tomcat state=present"
 
@@ -103,8 +100,8 @@
 - name: Ensure Solr directory is writable by Tomcat.
   file:
     path: '/opt/solr-{{ solr_version }}/multicore'
-    owner: tomcat7
-    group: tomcat7
+    owner: tomcat8
+    group: tomcat8
     state: directory
     recurse: true
 

@@ -36,7 +36,7 @@ net_ip: 192.168.56.4
 # Leave it to auto and we will try to use
 # the most suitable solution based on your OS.
 net_fwd_ports_mac_os:
-  - "{{ net_ip }}:{{mkdocs_listen_port}}:{{mkdocs_listen_port}}"
+  - "{{ net_ip }}:{{ mkdocs_listen_port }}:{{ mkdocs_listen_port }}"
 #net_fwd_ports_linux:
 #  - 3306:3307
 #net_fwd_ports_windows:

@@ -1,4 +1,4 @@
 ---
 
-ce_memcached_memory: 512
-ce_memcached_port: 11211
+memcached_memory: 512
+memcached_port: 11211
