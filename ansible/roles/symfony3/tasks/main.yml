@@ -1,0 +1,49 @@
+---
+
+- name: Check if we already have a codebase.
+  stat: path="{{ project_dir }}/{{ webroot }}"
+  register: symfony_base
+    
+- name: Create Symfony codebase if needed.
+  command: >
+    symfony new {{ request_time }} 3.4
+    chdir=/tmp
+  become: true
+  become_user: vagrant
+  when: not symfony_base.stat.exists
+
+- name: Move Symfony codebase in place.
+  command: >
+    rsync -a --no-perms --no-owner --no-group /tmp/{{ request_time }}/ {{ project_dir }}
+  when: not symfony_base.stat.exists
+  
+- name: Remove Symfony var folder.
+  file: 
+    path: "{{ project_dir }}/var"
+    state: absent
+  when: not symfony_base.stat.exists
+  
+- name: Create a var symlink to /tmp.
+  file: 
+    dest: "{{ project_dir }}/var"
+    src: "/tmp"
+    state: link
+  when: not symfony_base.stat.exists
+
+- name: Generate a 'local' app kernel index.
+  template:
+    src: app_local.php.j2
+    dest: "{{ project_dir }}/{{ webroot }}/app_local.php"
+  when: not symfony_base.stat.exists
+
+- name: Generate a 'local' config.
+  copy:
+    src: "{{ project_dir }}/app/config/config_dev.yml"
+    dest: "{{ project_dir }}/app/config/config_local.yml"
+  when: not symfony_base.stat.exists
+  
+- name: Generate default .gitignore.
+  template:
+    src: gitignore.j2
+    dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
+  when: not symfony_base.stat.exists

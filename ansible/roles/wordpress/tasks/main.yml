@@ -13,7 +13,7 @@
   
 - name: Generates wp-config.php file.
   command: >
-    /usr/local/bin/wp core config --dbname=wp --dbuser=dev --dbpass=dev --dbhost={{ net_db_ip }} --path="{{ project_dir }}/{{ webroot }}"
+    /usr/local/bin/wp core config --dbname=wp --dbuser=dev --dbpass=dev --dbhost="{{ project_name }}-mysql" --path="{{ project_dir }}/{{ webroot }}"
   become: true
   become_user: vagrant
   when: not wp_install.stat.exists

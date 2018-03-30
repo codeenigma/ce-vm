@@ -15,6 +15,7 @@
     - { role: nodejs, nodejs_version: 8.x}
     - { role: yarn }
     - { role: drupal, when: project_type == 'drupal' }
-    # - { role: symfony, when: project_type == 'symfony' }
-    # - { role: wordpress, when: project_type == 'wordpress' }
-    # - { role: ce.php_generic, when: project_type == 'php_generic' }
+    - { role: symfony3, when: project_type == 'symfony3' }
+    - { role: symfony4, when: project_type == 'symfony4' }
+    - { role: wordpress, when: project_type == 'wordpress' }
+    - { role: custom, when: project_type == 'custom' }
