@@ -1,0 +1,20 @@
+---
+
+- hosts: all
+  become: yes
+  
+  pre_tasks:
+    
+    - name: Run init tasks
+      import_tasks: tasks/init.yml
+
+  roles:
+    
+    - { role: rsyslog_client }
+    - { role: postfix }
+    - { role: nodejs, nodejs_version: 8.x}
+    - { role: yarn }
+    - { role: drupal, when: project_type == 'drupal' }
+    # - { role: symfony, when: project_type == 'symfony' }
+    # - { role: wordpress, when: project_type == 'wordpress' }
+    # - { role: ce.php_generic, when: project_type == 'php_generic' }

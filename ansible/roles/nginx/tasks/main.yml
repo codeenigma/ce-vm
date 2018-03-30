@@ -1,0 +1,39 @@
+---
+
+- name: Copy project vhost in place.
+  template:
+    src: vhosts.j2
+    dest: "/etc/nginx/sites-enabled/{{ project_name }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
+- name: Copy project type-specific configuration in place.  
+  template:
+    src: "{{ project_type }}.j2"
+    dest: "/etc/nginx/conf.d/{{ project_type }}"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
+- name: Ensure default nginx catch-all is not present
+  file:
+    path: "/etc/nginx/sites-enabled/default"
+    state: absent
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/nginx.html"
+    force: yes
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/nginx"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes

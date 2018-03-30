@@ -118,6 +118,7 @@ if ENV['CE_VM_UPSTREAM_BRANCH'].nil?
 end
 ce_vm_upstream_repo = ENV['CE_VM_UPSTREAM_REPO']
 ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
+ce_vm_version = '5.0.0'
 
 ################ Configuration loading.
 ################################################################################
@@ -155,7 +156,7 @@ parsed_conf = conf_init(host_conf_files)
 # Update repo if needed, and ensure we're on the right branch.
 _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
 if (ARGV.include? 'up') || (ARGV.include? 'halt')
-  if(parsed_conf['ce_vm_upstream_auto_pull'] === true)
+  if(parsed_conf['ce_vm_auto_update'] === true)
     puts "Ensure ce-vm is up-to-date."
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "fetch")
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
@@ -239,14 +240,13 @@ if (ARGV.include? 'up')
   end
 end
 
-# Gather enabled services.
-services = ['log']
+# Gather enabled services, and pull images if needed.
+services = ['log', 'cevm']
 parsed_conf['services'].each do |enabled|
-  unless(['log', 'app'].include? enabled)
+  unless(['log', 'cevm'].include? enabled)
     services.push(enabled)
   end
 end
-services.push('app')
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
@@ -258,8 +258,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Iterate over services.
   services.each do |service|
     # Reload config for the given service.
-    host_service_conf_files = build_file_list(host_conf_dirs, ['config.yml', "config_#{service}.yml"])
-    guest_service_conf_files = build_file_list(guest_conf_dirs, ['config.yml', "config_#{service}.yml"])
+    host_service_conf_files = build_file_list(host_conf_dirs, ['config.yml', "service.#{service}.yml"])
+    guest_service_conf_files = build_file_list(guest_conf_dirs, ['config.yml', "service.#{service}.yml"])
     run_service_conf_files = filter_file_list(host_service_conf_files, guest_service_conf_files)
     service_conf = conf_init(host_service_conf_files)
     # Gather existing playbooks.
@@ -330,7 +330,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           end
         end
         d.force_host_vm = false
-        d.image = "pmce/ce-vm-#{service}:5.0.0"
+        d.image = "pmce/ce-vm-#{service}:#{ce_vm_version}"
         d.name = "#{name}"
         d.has_ssh = true
         d.volumes = volumes

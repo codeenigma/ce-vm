@@ -1,9 +1,12 @@
 ---
 
-# Default settings.
-
 ############# Project settings. ################################################
-# These are typically shared amongst your team for a given project.
+# These are typically shared amongst your team for a given project,
+# and should be committed in git alongside your project.
+# 
+# See http://ce-vm.readthedocs.io/en/latest/config/config/ on possible config
+# files location and variable precedence.
+# 
 ################################################################################
 
 ####### Base settings.
@@ -11,40 +14,47 @@
 # Project name. Only use lower alphanumeric chars, no underscore or hyphen.
 project_name: default
 
-ce_vm_upstream_auto_pull: yes
-
 # Project type, can be either drupal, symfony, wordpress pr php_generic.
 project_type: drupal
 
-# Webroot, relative to project.
-# Symfony usually expect this to be "web".
+# Webroot, relative to project folder.
 webroot: www
 
-# Services.
+####### Services/containers.
 services:
-  - app
-  - log
+  - fpm
   - memcached
   - mkdocs
   - mysql
+  - nginx
   - solr
+  - cli
 
-#  - mkdocs
+####### Networking.
 
-# Whether to install Apache Solr.
-solr: no
-  
-# Whether to install the Selenium test framework.
-selenium: no
-# Display manager to use with Selenium. Can be either 
-# - XVFB: light headless driver
-# - VNC: heavier, but provides visual feedback.
-selenium_display_manager: XVFB
+# You will need to change your hosts file if you change from defaults.
+net_base: 192.168.56
+net_subnet: "{{ net_base }}.0/24"
+net_gateway: "{{ net_base }}.1"
+
+####### Common settings.
+
+# Extra Debian packages to install.
+apt_extra_packages: ''
+#apt_extra_packages:
+#  - "ruby"
+#  - "mysql-client"
+
+php_version: 7.1
 
 ############# Development settings. ################################################
 # These can vary for each developer, and should normally be overriden
 # individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
 ################################################################################
+
+# Turn automatic update of the core stack ON/OFF.
+# Useful for offline use.
+ce_vm_auto_update: yes
 
 # Enable xdebug for PHP-FPM
 php_xdebug: yes
@@ -74,23 +84,6 @@ mail_delivery: host
 # Composer token for github. You typically would not set it here,
 # but use ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
 composer_github_oauth_token: ''
-
-############# Docker settings. ################################################
-# These can vary for each developer, and should normally be overriden
-# individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
-################################################################################
-
-# Apt shared cache. This stores apt archives in a common mounted volume,
-# similar to what the 'vagrant-cachier' plugin does.
-# It does save a bit of download time for provisioning on slow network
-# connections.
-use_apt_cache: yes
-
-# Networking settings.
-# You will need to change your hosts file
-# if you change from defaults.
-net_subnet: 192.168.56.0/24
-net_gateway: 192.168.56.1
 
 # Vagrant user uid and group gid. 
 # You normally don't have to change this,

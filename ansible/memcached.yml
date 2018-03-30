@@ -10,13 +10,5 @@
     
   roles:
 
-    - { role: ce.rsyslog_client }
-    - { role: ce.memcached }
-    - { role: ce.postfix }
-
-  tasks:
-    # Install extra packages.
-    - name: Install additional extra packages.
-      apt: "name={{ item }} state=present"
-      with_items: "{{ apt_extra_packages | list }}"
-      when: apt_extra_packages | length
+    - { role: rsyslog_client }
+    - { role: memcached }

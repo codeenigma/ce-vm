@@ -1,0 +1,8 @@
+---
+
+# Ignore patterns.
+# @see http://www.cis.upenn.edu/~bcpierce/unison/download/releases/stable/unison-manual.html#ignore
+# At least one item is expected, the list can't be empty.
+unison_ignore:
+  - "Name .git"
+  - "Name .vagrant"

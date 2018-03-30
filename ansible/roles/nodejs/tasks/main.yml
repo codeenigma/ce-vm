@@ -1,0 +1,13 @@
+---
+
+- name: Create NodeJS shared cache dir if needed.
+  file:
+    path: '{{ shared_cache_dir }}/nodejs'
+    owner: 'vagrant'
+    group: 'root'
+    state: directory
+    
+- name: Set NodeJS cache location.
+  template:
+    src: npmrc.j2
+    dest: "/home/vagrant/.npmrc"

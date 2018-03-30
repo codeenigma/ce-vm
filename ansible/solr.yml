@@ -9,6 +9,6 @@
       import_tasks: tasks/init.yml
     
   roles:
-
+  
     - { role: rsyslog_client }
-    - { role: mysql }
+    - { role: solr }

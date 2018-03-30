@@ -1,4 +1,0 @@
----
-
-dependencies:
-  - { role: ce.nodejs, nodejs_version: 8.x }

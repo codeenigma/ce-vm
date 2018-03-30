@@ -1,0 +1,61 @@
+---
+
+- name: Copy MySQL overriding configuration in place.
+  template:
+    src: mysql_dev.cnf.j2
+    dest: "/etc/mysql/mysql.conf.d/zz_dev.cnf"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+
+- name: Restart mysql.
+  service: name=mysql state=stopped enabled=yes
+
+- name: Ensure mysql can write data.
+  file:
+    path: /var/lib/mysql
+    owner: mysql
+    group: mysql
+    recurse: yes
+
+- name: Ensure mysql can write PID/lock.
+  file:
+    path: /var/run/mysqld
+    owner: mysql
+    group: mysql
+    mode: 0777
+    recurse: yes
+
+- name: Workaround Docker overlayFS issue.
+  shell: >
+    find /var/lib/mysql -type f -exec touch {} \;
+
+- name: Restart mysql.
+  service: name=mysql state=started enabled=yes
+
+- name: Create databases for dumps.
+  mysql_db: state=present name="{{ item.name }}" target="{{ project_dir }}/{{ item.source }}"
+  with_items: "{{ db_dumps }}"
+  register: create_db_dumps
+  when: db_dumps | length
+
+- name: Import database dumps.
+  mysql_db: state=import name="{{ item.item.name }}" target="{{ project_dir }}/{{ item.item.source }}"
+  with_items: "{{ create_db_dumps.results }}"
+  when: (create_db_dumps.results | length) and (item.changed == True) and (item.item.source | length)
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/mysql"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/mysql.html"
+    force: yes

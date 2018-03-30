@@ -11,4 +11,5 @@
   roles:
 
     - { role: rsyslog_client }
-    - { role: mysql }
+    - { role: php-fpm }
+    - { role: postfix }

@@ -1,0 +1,5 @@
+<Context path="/solr" docBase="/opt/solr-{{ solr_version }}/dist/solr-{{ solr_version }}.war" privileged="true" crossContext="true">
+  <Resources allowLinking="true"/>
+
+  <Environment name="solr/home" type="java.lang.String" value="/opt/solr-{{ solr_version }}/multicore" override="true" />
+</Context>
