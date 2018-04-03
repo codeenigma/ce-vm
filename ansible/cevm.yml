@@ -12,4 +12,4 @@
 
     - { role: php-cli, php_version: 7.1 }
     - { role: cevm }
-    - { role: unison, when: docker_mirror }
+    - { role: nfs_server }

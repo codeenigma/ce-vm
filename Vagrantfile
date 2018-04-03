@@ -176,7 +176,10 @@ host_ce_home = File.join("#{host_home_dir}", "#{ce_vm_local_home}")
 guest_ce_home = File.join("#{guest_home_dir}", "#{ce_vm_local_home}")
 home_ce_volume = {'source' => "#{host_ce_home}", 'dest' => "#{guest_ce_home}"}
 #@todo, add a setting for "extra" shared volumes.
-shared_volumes = [];
+shared_volumes = [
+  home_ce_volume,
+  data_volume,
+];
 
 # Pass host platform to ansible.
 host_platform="windows"
@@ -196,8 +199,6 @@ ansible_extra_vars = {
 }
 
 net_name = "codeenigma-cevm"
-
-shared_volumes.push(home_ce_volume)
 
 # Vagrant uid change.
 $vagrant_uid = <<SCRIPT
@@ -248,6 +249,40 @@ parsed_conf['services'].each do |enabled|
   end
 end
 
+if (parsed_conf['volume_type'] === 'nfaieas')
+  fstab = '';
+  # NFS containers.
+  Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    shared_volumes.each.with_index do |synced_folder, key|
+      volumes = []
+      service = "nfs-#{key}"
+      name = "#{parsed_conf['project_name']}-#{service}"
+      config.vm.define "#{service}" do |container|
+        dest = "#{synced_folder['dest']}"
+        source = "#{synced_folder['source']}"
+        volumes.push("#{source}:#{dest}")
+        image = "itsthenetwork/nfs-server-alpine:latest"
+        container.vm.hostname = "#{name}"
+        container.vm.synced_folder ".", "/vagrant", disabled: true
+        container.vm.provider "docker" do |d|
+          docker_args = [
+          "--network=#{net_name}",
+          "--privileged",
+          "-e",
+          "SHARED_DIRECTORY=#{dest}",
+          ]
+          d.force_host_vm = false
+          d.image = image
+          d.name = "#{name}"
+          d.has_ssh = false
+          d.volumes = volumes
+          d.create_args = docker_args
+        end
+      end
+    end
+  end
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -286,18 +321,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Shared folders
       container.vm.synced_folder ".", "/vagrant", disabled: true
       volumes = []
-      shared_volumes.each do |synced_folder|
-        volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
+      shared_volumes.each.with_index do |synced_folder|
+        dest = "#{synced_folder['dest']}"
+        source = "#{synced_folder['source']}"
+        unless (service_conf['volume_type'] === 'nfs') && (service != 'cevm')
+          volumes.push("#{source}/:#{dest}:delegated")
+        end
       end
-      dest = "#{data_volume['dest']}"
-      source = "#{data_volume['source']}"
-      if (parsed_conf['docker_mirror']) && (['app', 'proto'].include? service)
-        dest = "#{guest_mirror_dir}#{dest}"
-        container.vm.provision "shell", inline: $mirror
-      end
-      volumes.push("#{source}/:#{dest}:delegated")
-      # First ensure 'vagrant' ownership match.
-      container.vm.provision "shell", inline: $vagrant_uid
       # Run actual playbooks.
       run_service_playbooks.each do |ansible_playbook_file|
         container.vm.provision 'ansible_local' do |ansible|
@@ -309,13 +339,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             ce_vm_home: "#{guest_ce_home}",
             shared_cache_dir: "#{guest_ce_home}/cache",
             host_platform: "#{host_platform}",
+            shared_volumes: shared_volumes,
           }
           ansible.playbook = ansible_playbook_file
           ansible.extra_vars = ansible_extra_vars
 #          ansible.compatibility_mode = '2.0'
         end
       end
-      # Run startup scripts.
+      # Run startup scripts, post provisioning.
       container.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
       # Docker settings.
       container.vm.provider "docker" do |d|
@@ -323,6 +354,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--network=#{net_name}",
           "--ip",
           "#{service_conf["net_ip"]}",
+          "--privileged",
         ]
         image = "pmce/ce-vm-#{service}:#{ce_vm_version}"
         if(service === "cli")

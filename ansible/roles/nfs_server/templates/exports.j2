@@ -1,0 +1,3 @@
+{% for item in shared_volumes %}
+{{ item['dest'] }} *(rw,fsid={{ loop.index }},async,no_subtree_check,no_auth_nlm,insecure,no_root_squash)
+{% endfor %}

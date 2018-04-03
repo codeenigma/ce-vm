@@ -1,6 +1,6 @@
 server {
     listen 80 default_server;
-    server_name "{{ project_name }}.app-vm.codeenigma.com";
+    server_name "{{ project_name }}.{{ domain }}";
     error_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }} info;
     access_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }};
     root "{{ project_dir }}/{{ webroot }}";
@@ -9,7 +9,7 @@ server {
 
 server {
     listen 443 ssl default_server;
-    server_name "{{ project_name }}.app-vm.codeenigma.com";
+    server_name "{{ project_name }}.{{ domain }}";
     ssl_certificate /etc/nginx/ssl/ce-vm-self.crt;
     ssl_certificate_key /etc/nginx/ssl/ce-vm-self.key;
     error_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }} info;

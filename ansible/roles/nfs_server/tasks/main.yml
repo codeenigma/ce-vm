@@ -1,0 +1,16 @@
+---
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/nfs"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Copy NFS exports.
+  template:
+    src: "exports.j2"
+    dest: "/etc/exports"
+    force: yes

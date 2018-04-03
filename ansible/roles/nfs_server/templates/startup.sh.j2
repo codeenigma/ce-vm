@@ -1,0 +1,10 @@
+#!/bin/sh
+
+/usr/sbin/service nfs-kernel-server stop
+/usr/sbin/service rpcbind stop
+/usr/sbin/service nfs-common stop
+
+/usr/sbin/service rpcbind start
+/usr/sbin/service nfs-common start
+/usr/sbin/service nfs-kernel-server start
+

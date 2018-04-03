@@ -9,6 +9,6 @@
       import_tasks: tasks/init.yml
     
   roles:
-
+    - { role: unison, when: docker_mirror }
     - { role: rsyslog_client }
     - { role: memcached }

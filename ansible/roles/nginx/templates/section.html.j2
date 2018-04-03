@@ -1,8 +1,8 @@
 <section>
   <h2>Project home page {{ project_name }} ({{ project_type|capitalize }})</h2>
   <div class="content">
-    <p>HTTP: <a href="http://{{ project_name }}.app-vm.codeenigma.com">http://{{ project_name }}.app-vm.codeenigma.com</a></p>
-    <p>HTTPS: <a href="https://{{ project_name }}.app-vm.codeenigma.com">https://{{ project_name }}.app-vm.codeenigma.com</a></p>
+    <p>HTTP: <a href="http://{{ project_name }}.{{ domain }}">http://{{ project_name }}.{{ domain }}</a></p>
+    <p>HTTPS: <a href="https://{{ project_name }}.{{ domain }}">https://{{ project_name }}.{{ domain }}</a></p>
     <em>HTTPS uses a self-signed certificate, you will need to add an exception.</em>
   </div>
 </section>

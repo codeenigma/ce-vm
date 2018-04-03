@@ -36,6 +36,7 @@ services:
 net_base: 192.168.56
 net_subnet: "{{ net_base }}.0/24"
 net_gateway: "{{ net_base }}.1"
+domain: 'local.ce-dev.net'
 
 ####### Common settings.
 

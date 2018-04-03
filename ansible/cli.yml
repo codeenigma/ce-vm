@@ -10,6 +10,7 @@
 
   roles:
     
+    - { role: unison, when: docker_mirror }
     - { role: rsyslog_client }
     - { role: postfix }
     - { role: nodejs, nodejs_version: 8.x}
