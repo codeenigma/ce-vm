@@ -8,15 +8,6 @@
 - name: Prepare ignore list.
   set_fact: unison_ignore_string={{ unison_ignore | wrap | join(" -ignore ") }}
 
-- name: Set target ownership/permissions.
-  file: 
-    path: "/{{ project_dir }}"
-    owner: vagrant
-    group: www-data
-    recurse: yes
-    mode: 0777
-    state: directory
-
 - name: Copy run script in place.
   template:
     src: unison.sh.j2
