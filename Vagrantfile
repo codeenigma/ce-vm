@@ -249,8 +249,7 @@ parsed_conf['services'].each do |enabled|
   end
 end
 
-if (parsed_conf['volume_type'] === 'nfaieas')
-  fstab = '';
+if (parsed_conf['volume_type'] === 'naiefs')
   # NFS containers.
   Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     shared_volumes.each.with_index do |synced_folder, key|
@@ -324,8 +323,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       shared_volumes.each.with_index do |synced_folder|
         dest = "#{synced_folder['dest']}"
         source = "#{synced_folder['source']}"
-        unless (service_conf['volume_type'] === 'nfs') && (service != 'cevm')
-          volumes.push("#{source}/:#{dest}:delegated")
+        if (service_conf['volume_type'] != 'nfs') || (['cevm', 'log'].include? service)
+          volumes.push("#{source}/:#{dest}")
+        else
+          container.vm.provision "shell", run: "always", inline: "sudo apt-get update && sudo apt-get install sshfs -y && sudo mkdir -p #{dest} && sudo chown vagrant:vagrant #{dest}"
+          container.vm.provision "shell", run: "always", inline: "echo vagrant | sudo sshfs -o allow_other -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -opassword_stdin vagrant@#{parsed_conf['project_name']}-cevm:#{dest} #{dest}"
         end
       end
       # Run actual playbooks.
