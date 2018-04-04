@@ -249,39 +249,6 @@ parsed_conf['services'].each do |enabled|
   end
 end
 
-if (parsed_conf['volume_type'] === 'naiefs')
-  # NFS containers.
-  Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-    shared_volumes.each.with_index do |synced_folder, key|
-      volumes = []
-      service = "nfs-#{key}"
-      name = "#{parsed_conf['project_name']}-#{service}"
-      config.vm.define "#{service}" do |container|
-        dest = "#{synced_folder['dest']}"
-        source = "#{synced_folder['source']}"
-        volumes.push("#{source}:#{dest}")
-        image = "itsthenetwork/nfs-server-alpine:latest"
-        container.vm.hostname = "#{name}"
-        container.vm.synced_folder ".", "/vagrant", disabled: true
-        container.vm.provider "docker" do |d|
-          docker_args = [
-          "--network=#{net_name}",
-          "--privileged",
-          "-e",
-          "SHARED_DIRECTORY=#{dest}",
-          ]
-          d.force_host_vm = false
-          d.image = image
-          d.name = "#{name}"
-          d.has_ssh = false
-          d.volumes = volumes
-          d.create_args = docker_args
-        end
-      end
-    end
-  end
-end
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -323,11 +290,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       shared_volumes.each.with_index do |synced_folder|
         dest = "#{synced_folder['dest']}"
         source = "#{synced_folder['source']}"
-        if (service_conf['volume_type'] != 'nfs') || (['cevm', 'log'].include? service)
+        if (service_conf['volume_type'] != 'sshfs') || (['cevm', 'log'].include? service)
           volumes.push("#{source}/:#{dest}")
         else
-          container.vm.provision "shell", run: "always", inline: "sudo apt-get update && sudo apt-get install sshfs -y && sudo mkdir -p #{dest} && sudo chown vagrant:vagrant #{dest}"
-          container.vm.provision "shell", run: "always", inline: "echo vagrant | sudo sshfs -o allow_other -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -opassword_stdin vagrant@#{parsed_conf['project_name']}-cevm:#{dest} #{dest}"
+          container.vm.provision "shell", run: "always", inline: "sudo mkdir -p #{dest} && sudo chown vagrant:vagrant #{dest} && mountpoint -q #{dest} || sudo sshfs -o kernel_cache -o cache=yes -o compression=yes -o allow_other -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/vagrant/.ssh/id_rsa vagrant@#{parsed_conf['project_name']}-cevm:#{dest} #{dest}"
         end
       end
       # Run actual playbooks.

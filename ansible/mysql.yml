@@ -9,6 +9,5 @@
       import_tasks: tasks/init.yml
     
   roles:
-    - { role: unison, when: volumes_type === 'unison' }
     - { role: rsyslog_client }
     - { role: mysql }
