@@ -11,6 +11,8 @@
   roles:
     - { role: unison, when: volume_type == 'unison' }
     - { role: php-cli }
+    - { role: xdebug, php_build_type: cli }
+    - { role: blackfire }
     - { role: rsyslog_client }
     - { role: postfix }
     - { role: nodejs, nodejs_version: 8.x}

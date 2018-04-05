@@ -2,3 +2,5 @@
 
 net_ip: "{{ net_base }}.20"
 
+xdebug: no
+blackfire: no

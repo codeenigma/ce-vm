@@ -13,10 +13,21 @@ apt_extra_packages: ''
 # Networking settings.
 # You will need to change your hosts file
 # if you change from defaults.
-net_ip: "{{ net_base }}.11"
+net_ip: "{{ net_base }}.17"
 
-xdebug: yes
-blackfire: no
+# Ports to forward from the host to the guest,
+# in "host:guest" format.
+# Be sure the host port is free. Typically port 80
+# on your host might be already used by an Apache
+# instance.
+# Leave it to auto and we will try to use
+# the most suitable solution based on your OS.
+#net_fwd_ports_mac_os:
+#  - "{{ net_ip }}:{{ memcached_port }}:{{ memcached_port }}"
+#net_fwd_ports_linux:
+#  - 3306:3307
+#net_fwd_ports_windows:
+#  - 3306:3307
 
 # Docker extra options. These varies based on host OS.
 #docker_extra_args_mac_os:

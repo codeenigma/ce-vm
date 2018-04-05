@@ -5,34 +5,34 @@
     pkg: "blackfire-agent"
     state: absent
     purge: yes
-  when: not php_blackfire
+  when: not blackfire
 
 - name: Ensure Blackfire probe is not installed.
   apt:
     pkg: "blackfire-php"
     state: absent
     purge: yes
-  when: not php_blackfire
+  when: not blackfire
 
 - name: Add key for Blackfire repository.
   apt_key: url=https://packagecloud.io/gpg.key state=present
-  when: php_blackfire
+  when: blackfire
 
 - name: Add repository for Blackfire.
   apt_repository: repo='deb http://packages.blackfire.io/debian any main' state=present
-  when: php_blackfire
+  when: blackfire
 
 - name: Ensure Blackfire agent is installed.
   apt:
     pkg: "blackfire-agent"
     state: present
-  when: php_blackfire
+  when: blackfire
 
 - name: Ensure Blackfire probe is installed.
   apt:
     pkg: "blackfire-php"
     state: present
-  when: php_blackfire
+  when: blackfire
 
 - name: Generate agent server configuration.
   template:
@@ -42,7 +42,7 @@
     group: root
     mode: 0644
     force: yes
-  when: php_blackfire
+  when: blackfire
 
 - name: Generate agent client configuration.
   template:
@@ -52,7 +52,7 @@
     group: vagrant
     mode: 0644
     force: yes
-  when: php_blackfire
+  when: blackfire
 
 - name: Copy startup script in place.
   template:
@@ -62,4 +62,4 @@
     group: root
     mode: 0555
     force: yes
-  when: php_blackfire
+  when: blackfire

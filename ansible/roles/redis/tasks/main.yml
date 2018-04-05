@@ -1,0 +1,23 @@
+---
+
+- name: Change listening binding.
+  replace:
+    path: "/etc/redis/redis.conf"
+    regexp: "bind 127.0.0.1"
+    replace: "bind 0.0.0.0"
+
+- name: Enable syslog.
+  replace:
+    path: "/etc/redis/redis.conf"
+    regexp: "# syslog-enabled no"
+    replace: "syslog-enabled yes"
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/postfix"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+    

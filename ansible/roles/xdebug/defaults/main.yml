@@ -1,0 +1,9 @@
+---
+
+xdebug_scream: 0
+xdebug_max_nesting_level: 1024
+xdebug_trace_enable_trigger: 1
+xdebug_profiler_enable_trigger: 1
+xdebug_remote_port: 9000
+xdebug_remote_host: auto
+xdebug_remote_connect_back: auto

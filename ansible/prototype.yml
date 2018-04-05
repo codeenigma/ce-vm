@@ -7,11 +7,12 @@
     
     - name: Run init tasks
       import_tasks: tasks/init.yml
-    
+
   roles:
     - { role: unison, when: volume_type == 'unison' }
+    - { role: php-cli }
     - { role: rsyslog_client }
-    - { role: php-fpm }
-    - { role: xdebug, php_build_type: fpm }
-    - { role: blackfire }
     - { role: postfix }
+    - { role: nodejs, nodejs_version: 8.x}
+    - { role: yarn }
+    - { role: ce_prototype }

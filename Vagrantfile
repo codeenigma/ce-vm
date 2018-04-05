@@ -189,14 +189,6 @@ end
 if (RUBY_PLATFORM =~ /linux/)
   host_platform="linux"
 end
-# Configuration to pass to Ansible.
-ansible_extra_vars = {
-  project_dir: "#{guest_project_dir}",
-  vm_dir: "#{vm_dir}",
-  ce_vm_home: "#{guest_ce_home}",
-  shared_cache_dir: "#{guest_ce_home}/cache",
-  host_platform: "#{host_platform}",
-}
 
 net_name = "codeenigma-cevm"
 
@@ -221,15 +213,6 @@ if [ $OWN_CHANGED -eq 1 ]; then
   exit 1
 fi
 
-SCRIPT
-
-# Initial data sync.
-$mirror = <<SCRIPT
-echo "Initial data mirror synchronisation."
-if [ ! -d "#{guest_project_dir}" ]; then
-  mkdir "#{guest_project_dir}"
-fi
-rsync -av --delete --chown=vagrant:vagrant --chmod=0777 --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/" "#{guest_project_dir}"
 SCRIPT
 
 # On UP operation, create our network if needed.
@@ -283,7 +266,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         container.ssh.host = service_conf["net_ip"]
         container.ssh.port = 22
       end
+      # HostUpdater support.
       container.vm.hostname = "#{name}"
+      container.vm.network :private_network, ip: service_conf["net_ip"]
+      #container.hostsupdater.aliases = ["#{name}.#{parsed_conf['domain']}"]
       # Shared folders
       container.vm.synced_folder ".", "/vagrant", disabled: true
       # Always use native fs for base services.
@@ -316,7 +302,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             ce_vm_home: "#{guest_ce_home}",
             shared_cache_dir: "#{guest_ce_home}/cache",
             host_platform: "#{host_platform}",
-            shared_volumes: shared_volumes,
+            name: "#{name}",
           }
           ansible.playbook = ansible_playbook_file
           ansible.extra_vars = ansible_extra_vars
@@ -331,7 +317,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--network=#{net_name}",
           "--ip",
           "#{service_conf["net_ip"]}",
-          "--privileged",
         ]
         image = "pmce/ce-vm-#{service}:#{ce_vm_version}"
         if(service === "cli")
@@ -341,6 +326,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           service_conf["docker_extra_args_#{host_platform}"].each do |arg|
             docker_args.push(arg)
           end
+        end
+        # We need to run in privileged mode for sshfs.
+        if(service_conf['volume_type'] === 'sshfs')
+          d.privileged = true
         end
         d.force_host_vm = false
         d.image = image
