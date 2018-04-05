@@ -297,7 +297,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         if (service_conf['volume_type'] === 'sshfs')
          container.vm.provision "shell", run: "always", inline: "sudo mkdir -p #{dest} && sudo chown vagrant:vagrant #{dest} && mountpoint -q #{dest} || sudo sshfs -o kernel_cache -o cache=yes -o compression=yes -o allow_other -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/vagrant/.ssh/id_rsa vagrant@#{parsed_conf['project_name']}-cevm:#{dest} #{dest}"
         else
-          if (service_conf['volume_type'] === 'unison') && (dest === data_volume)
+          if (service_conf['volume_type'] === 'unison') && (dest === data_volume['dest'])
             original_dest = dest
             dest = "#{guest_mirror_dir}#{dest}"
             container.vm.provision "shell", inline: "sudo mkdir -p #{original_dest} && sudo chown vagrant:vagrant #{original_dest} && rsync -av --delete --exclude='.git' --exclude='.vagrant' '#{dest}/' '#{original_dest}'"
