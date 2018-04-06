@@ -1,0 +1,9 @@
+---
+
+net_ip: "{{ net_base }}.2"
+
+net_fwd_ports_mac_os:
+  - "{{ net_ip }}:80:80"
+
+host_aliases:
+  - dashboard.ce-vm.local

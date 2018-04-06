@@ -1,7 +1,7 @@
 <section>
   <h2>Memcached</h2>
   <div class="content">
-    <p>Memcached is accessible from other containers at <b>{{ project_name }}-memcached:{{ memcached_port }}</b>.</p>
-    <p>To access it from your host use <b>{{ net_ip }}</b>.</p>
+    <p>Memcached is listening on <b>{{ service_name }}:{{ memcached_port }}</b>.</p>
+    <p>Allocated memory: {{ memcached_memory }}.</p>
   </div>
 </section>

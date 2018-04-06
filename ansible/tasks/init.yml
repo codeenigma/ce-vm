@@ -21,11 +21,6 @@
     group: 'root'
     force: yes
 
-- name: Update apt cache.
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600
-
 - name: Clean up startup scripts folder.
   file:
     path: '/opt/run-parts'
@@ -44,7 +39,13 @@
     path: "{{ ce_vm_webroot }}/includes"
     state: directory
     recurse: yes
-    
+
+- name: Update apt cache.
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: apt_extra_packages | length
+
 - name: Install additional extra packages.
   apt: "name={{ item }} state=present"
   with_items: "{{ apt_extra_packages | list }}"

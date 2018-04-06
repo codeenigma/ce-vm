@@ -2,13 +2,13 @@
 
 - name: Create landing page.
   template:
-    src: "index.php"
+    src: "index.php.j2"
     dest: "{{ ce_vm_webroot }}/index.php"
 
 - name: Copy startup script in place.
   template:
     src: startup.sh.j2
-    dest: "/opt/run-parts/cevm"
+    dest: "/opt/run-parts/dashboard"
     owner: root
     group: root
     mode: 0555

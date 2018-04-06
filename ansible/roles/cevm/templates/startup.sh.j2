@@ -1,3 +1,0 @@
-#!/bin/sh
-
-nohup flock /tmp/cevm.lock /usr/bin/php -S {{ net_ip }}:80 -t {{ ce_vm_webroot }}/ &

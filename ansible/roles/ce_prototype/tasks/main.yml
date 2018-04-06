@@ -2,7 +2,6 @@
 
 - name: Check if we already have a codebase.
   stat: path="{{ project_dir }}/{{ prototype_folder }}"
-  register: prototype_codebase
 
 - name: Install dependencies.
   command: yarn install
@@ -10,7 +9,6 @@
     chdir: "{{ project_dir }}/{{ prototype_folder }}"
   become: true
   become_user: vagrant
-  when: prototype_codebase.stat.exists
 
 - name: Copy startup script in place.
   template:
@@ -19,7 +17,7 @@
     owner: root
     group: root
     mode: 0555
-    
+
 - name: Copy landing page section.
   template:
     src: "section.html.j2"

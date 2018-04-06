@@ -19,8 +19,25 @@
     </nav>
     <main>
       <?php
+      $default = [
+        'cli',
+        'dashboard',
+        'fpm',
+        'log',
+        'memcached',
+        'mkdocs',
+        'mysql',
+        'nginx',
+        'prototype',
+        'redis',
+        'solr',
+      ];
+      $enabled = [{{ services | wrap | join(", ") }}];
       foreach (glob('./includes/*.html') as $include) {
-        print file_get_contents($include);
+        $service = pathinfo($include, PATHINFO_FILENAME);
+        if(!in_array($service, $default) || in_array($service, $enabled)){
+          print file_get_contents($include);
+        }
       }
       ?>
     </main>

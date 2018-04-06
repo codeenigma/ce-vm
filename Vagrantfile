@@ -89,6 +89,20 @@ def ensure_lo_alias(ip)
   puts "Ensure loopback interface alias exists for #{ip}."
 end
 
+# Ensure plugins are installed (taken from https://github.com/roots/trellis/pull/829/commits/b0563ed0492757db4a972b22d20e09f2f7ac2ac4).
+def ensure_plugins(plugins)
+  logger = Vagrant::UI::Colored.new
+  plugins.each do |plugin|
+    manager = Vagrant::Plugin::Manager.instance
+    next if manager.installed_plugins.has_key?(plugin)
+    logger.warn("Installing missing dependancy plugin #{plugin}.")
+    manager.install_plugin(plugin)
+    # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
+    logger.warn("Please re-run the initial command.")
+    exit
+  end
+end
+
 ################ Paths definitions.
 ################################################################################
 # Absolute paths on the host machine.
@@ -151,8 +165,13 @@ guest_playbook_dirs = [
 host_conf_files = build_file_list(host_conf_dirs, ['config.yml'])
 parsed_conf = conf_init(host_conf_files)
 
-################ Branch setup.
+################ Initial setup.
 ################################################################################
+# Ensure we have the needed plugins.
+if (ARGV.include? 'up')
+  plugins = ['vagrant-hostsupdater']
+  ensure_plugins(plugins)
+end
 # Update repo if needed, and ensure we're on the right branch.
 _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
 if (ARGV.include? 'up') || (ARGV.include? 'halt')
@@ -166,6 +185,7 @@ end
 # Reload config on the matching branch.
 Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
 parsed_conf = conf_init(host_conf_files)
+net_name = "ce-vm-#{parsed_conf['net_subnet']}"
 
 ################ Common processing.
 ################################################################################
@@ -189,8 +209,6 @@ end
 if (RUBY_PLATFORM =~ /linux/)
   host_platform="linux"
 end
-
-net_name = "codeenigma-cevm"
 
 # Vagrant uid change.
 $vagrant_uid = <<SCRIPT
@@ -225,9 +243,9 @@ if (ARGV.include? 'up')
 end
 
 # Gather enabled services, and pull images if needed.
-services = ['log', 'cevm']
+services = ['log', 'dashboard']
 parsed_conf['services'].each do |enabled|
-  unless(['log', 'cevm'].include? enabled)
+  unless(['log', 'dashboard'].include? enabled)
     services.push(enabled)
   end
 end
@@ -267,13 +285,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         container.ssh.port = 22
       end
       # HostUpdater support.
-      container.vm.hostname = "#{name}"
+      container.vm.hostname = "#{name}.#{service_conf['domain']}"
       container.vm.network :private_network, ip: service_conf["net_ip"]
-      #container.hostsupdater.aliases = ["#{name}.#{parsed_conf['domain']}"]
+      unless service_conf['host_aliases'].nil?
+        container.hostsupdater.aliases = service_conf['host_aliases']
+      end
       # Shared folders
       container.vm.synced_folder ".", "/vagrant", disabled: true
       # Always use native fs for base services.
-      if (['cevm', 'log'].include? service)
+      if (['dashboard', 'log'].include? service)
        service_conf['volume_type'] = 'native'
       end
       volumes = []
@@ -281,7 +301,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         dest = "#{synced_folder['dest']}"
         source = "#{synced_folder['source']}"
         if (service_conf['volume_type'] === 'sshfs')
-         container.vm.provision "shell", run: "always", inline: "sudo mkdir -p #{dest} && sudo chown vagrant:vagrant #{dest} && mountpoint -q #{dest} || sudo sshfs -o kernel_cache -o cache=yes -o compression=yes -o allow_other -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/vagrant/.ssh/id_rsa vagrant@#{parsed_conf['project_name']}-cevm:#{dest} #{dest}"
+         container.vm.provision "shell", run: "always", inline: "sudo mkdir -p #{dest} && sudo chown vagrant:vagrant #{dest} && mountpoint -q #{dest} || sudo sshfs -o kernel_cache -o cache=yes -o compression=yes -o allow_other -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/vagrant/.ssh/id_rsa vagrant@#{parsed_conf['project_name']}-dashboard:#{dest} #{dest}"
         else
           if (service_conf['volume_type'] === 'unison') && (dest === data_volume['dest'])
             original_dest = dest
@@ -302,7 +322,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             ce_vm_home: "#{guest_ce_home}",
             shared_cache_dir: "#{guest_ce_home}/cache",
             host_platform: "#{host_platform}",
-            name: "#{name}",
+            service_hostname: "#{container.vm.hostname}",
+            service_name: "#{name}",
           }
           ansible.playbook = ansible_playbook_file
           ansible.extra_vars = ansible_extra_vars
