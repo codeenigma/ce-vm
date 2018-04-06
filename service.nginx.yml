@@ -40,3 +40,6 @@ net_fwd_ports_mac_os:
 #docker_extra_args_windows:
 #  - '--privileged=TRUE'
 #  - '--cap-add=SYS_PTRACE'
+
+host_aliases:
+  - php.{{ project_name }}-nginx.{{ domain }}

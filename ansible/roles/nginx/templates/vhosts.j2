@@ -1,6 +1,6 @@
 server {
     listen 80 default_server;
-    server_name "{{ project_name }}.{{ domain }}";
+    server_name "{{ service_hostname }}";
     error_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }} info;
     access_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }};
     root "{{ project_dir }}/{{ webroot }}";
@@ -9,11 +9,28 @@ server {
 
 server {
     listen 443 ssl default_server;
-    server_name "{{ project_name }}.{{ domain }}";
+    server_name "{{ service_hostname }}";
     ssl_certificate /etc/nginx/ssl/ce-vm-self.crt;
     ssl_certificate_key /etc/nginx/ssl/ce-vm-self.key;
     error_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }} info;
     access_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }};
     root "{{ project_dir }}/{{ webroot }}";
     include "/etc/nginx/conf.d/{{ project_type }}";
+}
+
+server {
+    listen 80;
+    server_name "php.{{ service_hostname }}";
+    error_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }} info;
+    access_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }};
+    root "{{ local_var_www_dir }}/php";
+    location / {
+        rewrite ^/ /index.php;
+    }
+    location /index.php {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+        fastcgi_pass {{ project_name }}-fpm:9000;
+    }
 }
