@@ -59,6 +59,9 @@ php_version: 7.1
 # Useful for offline use.
 ce_vm_auto_update: yes
 
+# File mount binding.
+volume_type: native
+
 # Enable xdebug for PHP-FPM
 php_xdebug: yes
 
