@@ -2,7 +2,7 @@ sudo: required
 language: bash
 os:
   - linux
-  - osx
+#  - osx
 services:
  - docker
 install:
