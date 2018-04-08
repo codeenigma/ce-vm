@@ -1,0 +1,9 @@
+sudo: required
+language: bash
+services:
+ - docker
+install:
+ - curl -O https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.deb
+ - dpkg -i vagrant_2.0.3_x86_64.deb
+script:
+ - /bin/bash tests/test.sh

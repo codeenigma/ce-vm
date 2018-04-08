@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
+
+################ Paths definitions.
+################################################################################
+# Absolute paths on the host machine.
+ENV['PROJECT_VAGRANTFILE'] = File.expand_path(__FILE__)
+host_home_dir = File.expand_path('~')
+# Relative paths.
+ce_local_home = '.CodeEnigma'
+ce_vm_local_home = "#{ce_local_home}/ce-vm"
+ce_vm_local_upstream_repo = "#{ce_vm_local_home}/ce-vm-upstream"
+
+# Remote. This is set only here, allowing use of forks.
+ce_vm_upstream_repo = 'https://github.com/codeenigma/ce-vm.git'
+ce_vm_upstream_branch = '5.x'
+
+################ Initial processing.
+################################################################################
+# Create home dirs if needed.
+_ce_home = File.join("#{host_home_dir}", "#{ce_local_home}")
+if(!Dir.exists?("#{_ce_home}"))
+  Dir.mkdir("#{_ce_home}")
+end
+_ce_vm_home = File.join("#{host_home_dir}", "#{ce_vm_local_home}")
+if(!Dir.exists?("#{_ce_vm_home}"))
+  Dir.mkdir("#{_ce_vm_home}")
+end
+# Clone repo if needed.
+_ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
+if(!Dir.exists?("#{_ce_upstream}"))
+  puts "It looks like this is the first time you are using ce-vm."
+  puts "Installing into #{_ce_upstream}"
+  Vagrant::Util::Subprocess.execute("git", "clone", "-b", "#{ce_vm_upstream_branch}", "#{ce_vm_upstream_repo}", "#{_ce_upstream}")
+end
+
+if(File.exists?(File.join("#{_ce_upstream}", "Vagrantfile.virtualbox")))
+  Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "fetch")
+  Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
+end
+
+################ Deferred definitions.
+################################################################################
+# Call actual Vagrantfile.
+ENV['CE_VM_UPSTREAM_REPO'] = ce_vm_upstream_repo
+ENV['CE_VM_UPSTREAM_BRANCH'] = ce_vm_upstream_branch
+upstream_file = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", 'Vagrantfile')
+load upstream_file if File.exist?(upstream_file)
