@@ -11,6 +11,7 @@ install:
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -O https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.dmg ; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo hdiutil attach vagrant_2.0.3_x86_64.dmg ; fi
  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -package /Volumes/Vagrant/vagrant.pkg -target / ; fi
+ - vagrant plugin install vagrant-hostsupdater
 
 script:
  - /bin/bash tests/test.sh
