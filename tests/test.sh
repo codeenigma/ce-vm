@@ -7,8 +7,8 @@ if [ -z "$OWN" ]; then
 fi
 OWN_DIR=$( cd "$( dirname "$OWN" )" && pwd -P)
 
-echo $(id -u vagrant)
-echo $(id -g vagrant)
+echo $(id -u travis)
+echo $(id -g travis)
 
 TESTS="drupal"
 for TEST in $TESTS; do
