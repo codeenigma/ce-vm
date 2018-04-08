@@ -2,11 +2,15 @@ sudo: required
 language: bash
 os:
   - linux
-#  - osx
+  - osx
 services:
  - docker
 install:
  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl -O https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.deb ; fi
  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo dpkg -i vagrant_2.0.3_x86_64.deb ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -O https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.dmg ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo hdiutil attach vagrant_2.0.3_x86_64.dmg ; fi
+ - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -package /Volumes/Vagrant/vagrant.pkg -target / ; fi
+
 script:
  - /bin/bash tests/test.sh
