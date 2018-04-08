@@ -7,6 +7,12 @@
     purge: yes
   when: not xdebug
 
+- name: Update apt cache.
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: xdebug
+
 - name: Ensure xdebug is installed.
   apt:
     pkg: php-xdebug
