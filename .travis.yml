@@ -1,23 +1,21 @@
 sudo: required
 language: bash
+
 os:
   - linux
-#  - osx
+
 services:
  - docker
 
 env: 
- - STACK=drupal FS=native
- - STACK=drupal FS=sshfs
- - STACK=drupal FS=unison
+ - PROJECT=drupal FS=native
+ - PROJECT=drupal FS=sshfs
+ - PROJECT=drupal FS=unison
 
- install:
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl -O https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.deb ; fi
- - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo dpkg -i vagrant_2.0.3_x86_64.deb ; fi
-# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl -O https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.dmg ; fi
-# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo hdiutil attach vagrant_2.0.3_x86_64.dmg ; fi
-# - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo installer -package /Volumes/Vagrant/vagrant.pkg -target / ; fi
+install:
+ - curl -O https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.deb
+ - sudo dpkg -i vagrant_2.0.3_x86_64.deb
  - vagrant plugin install vagrant-hostsupdater
 
 script:
- - /bin/bash tests/test.sh "$STACK" "$FS"
+ - /bin/bash tests/test.sh "$PROJECT" "$FS"
