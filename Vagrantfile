@@ -273,9 +273,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ensure_lo_alias(service_conf["net_ip"])
     end
     is_primary = false
-    if (service === 'app')
+    if (service === 'cli')
       is_primary = true
     end
+    # Grab user uid/gid for vagrant user.
+    if service_conf['docker_vagrant_user_uid'].nil?
+      docker_vagrant_user_uid = 1000
+      if host_platform === 'linux'
+      docker_vagrant_user_uid = Process.uid
+      end
+    end
+
+    if service_conf['docker_vagrant_group_gid'].nil?
+      service_conf['docker_vagrant_group_gid'] = 1000
+      if host_platform === 'linux'
+      service_conf['docker_vagrant_group_gid'] = Process.gid
+      end
+    end
+
     name = "#{service_conf['project_name']}-#{service}"
     ################# Indivual container.
     config.vm.define "#{service}", primary: is_primary do |container|
@@ -314,7 +329,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       # Run actual playbooks.
       run_service_playbooks.each do |ansible_playbook_file|
         container.vm.provision 'ansible_local' do |ansible|
-        # Configuration to pass to Ansible.
+          # Configuration to pass to Ansible.
           ansible_extra_vars = {
             config_files: "#{run_service_conf_files}",
             project_dir: "#{guest_project_dir}",
@@ -327,7 +342,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           }
           ansible.playbook = ansible_playbook_file
           ansible.extra_vars = ansible_extra_vars
-#          ansible.compatibility_mode = '2.0'
+          ansible.compatibility_mode = '2.0'
         end
       end
       # Run startup scripts, post provisioning.
@@ -361,6 +376,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           d.ports = service_conf["net_fwd_ports_#{host_platform}"]
         end
         d.create_args = docker_args
+        d.cmd = ["/bin/sh", "/opt/ce-vm-start.sh", service_conf['docker_vagrant_user_uid'], service_conf['docker_vagrant_group_gid']]
       end
     end
   end

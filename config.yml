@@ -96,5 +96,5 @@ composer_github_oauth_token: ''
 # the only exception being Docker on a 
 # Linux host, where it should match your 
 # actual user uid/gid.
-docker_vagrant_user_uid: 1000
-docker_vagrant_group_gid: 1000
+#docker_vagrant_user_uid: 1000
+#docker_vagrant_group_gid: 1000
