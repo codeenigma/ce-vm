@@ -376,7 +376,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           d.ports = service_conf["net_fwd_ports_#{host_platform}"]
         end
         d.create_args = docker_args
-        d.cmd = ["/bin/sh", "/opt/ce-vm-start.sh", service_conf['docker_vagrant_user_uid'], service_conf['docker_vagrant_group_gid']]
+        d.cmd = ["/bin/sh", "/opt/ce-vm-start.sh", "#{service_conf['docker_vagrant_user_uid']}", "#{service_conf['docker_vagrant_group_gid']}"]
       end
     end
   end
