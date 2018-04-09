@@ -1,5 +1,10 @@
 ---
-  
+
+- name: Create Solr download shared cache dir if needed.
+  file:
+    path: '{{ shared_cache_dir }}/solr'
+    state: directory
+
 - name: Download Solr
   get_url:
     url: "http://archive.apache.org/dist/lucene/solr/{{ solr_version }}/solr-{{ solr_version }}.zip"
