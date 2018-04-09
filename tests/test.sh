@@ -7,12 +7,12 @@ if [ -z "$OWN" ]; then
 fi
 OWN_DIR=$( cd "$( dirname "$OWN" )" && pwd -P)
 
-echo $(id -u travis)
-echo $(id -g travis)
-
-TESTS="drupal"
-for TEST in $TESTS; do
-  cd $OWN_DIR/$TEST
-  curl -O https://raw.githubusercontent.com/codeenigma/ce-vm-model/5.x/ce-vm/Vagrantfile
-  vagrant up
-done
+mkdir "$OWN_DIR/ce-vm"
+cd "$OWN_DIR/ce-vm"
+curl -O https://raw.githubusercontent.com/codeenigma/ce-vm-model/5.x/ce-vm/Vagrantfile
+echo '---' > config.yml
+echo '' >> config.yml
+echo "project_type: $1" >> config.yml
+echo "project_name: $1" >> config.yml
+echo "volume_type: $2" >> config.yml
+vagrant up
