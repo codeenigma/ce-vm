@@ -280,7 +280,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if service_conf['docker_vagrant_user_uid'].nil?
       docker_vagrant_user_uid = 1000
       if host_platform === 'linux'
-      docker_vagrant_user_uid = Process.uid
+      service_conf['docker_vagrant_user_uid'] = Process.uid
       end
     end
 
