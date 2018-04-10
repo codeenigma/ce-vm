@@ -278,16 +278,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     # Grab user uid/gid for vagrant user.
     if service_conf['docker_vagrant_user_uid'].nil?
-      docker_vagrant_user_uid = 1000
-      if host_platform === 'linux'
-      service_conf['docker_vagrant_user_uid'] = Process.uid
+      service_conf['docker_vagrant_user_uid'] = 1000
+      if (host_platform === 'linux')
+        service_conf['docker_vagrant_user_uid'] = Process.uid
       end
     end
 
     if service_conf['docker_vagrant_group_gid'].nil?
       service_conf['docker_vagrant_group_gid'] = 1000
-      if host_platform === 'linux'
-      service_conf['docker_vagrant_group_gid'] = Process.gid
+      if (host_platform === 'linux')
+        service_conf['docker_vagrant_group_gid'] = Process.gid
       end
     end
 
