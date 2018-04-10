@@ -25,7 +25,7 @@
 - name: Require Drupal dependencies.
   composer:
     command: require
-    arguments: "{{ item }} --sort-packages"
+    arguments: "{{ item }} --sort-packages --no-update"
     working_dir: "{{ project_dir }}"
   with_items:
     - "composer/installers"
@@ -131,15 +131,6 @@
 - name: Clear Drupal caches.
   command: drush cr -y -r "{{ project_dir }}/{{ webroot }}"
   when: not ce_drupal_codebase.stat.exists
-
-- name: Set target ownership/permissions.
-  file: 
-    path: "/{{ project_dir }}"
-    owner: vagrant
-    group: www-data
-    recurse: yes
-    mode: 0777
-    state: directory
 
 - name: Copy Drupal ruleset for phpmd.
   template:

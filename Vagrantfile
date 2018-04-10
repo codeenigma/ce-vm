@@ -210,29 +210,6 @@ if (RUBY_PLATFORM =~ /linux/)
   host_platform="linux"
 end
 
-# Vagrant uid change.
-$vagrant_uid = <<SCRIPT
-OWN_CHANGED=0
-if [ "$(id -u vagrant)" != "#{parsed_conf['docker_vagrant_user_uid']}" ]; then
-  usermod -u #{parsed_conf['docker_vagrant_user_uid']} vagrant
-  echo "User ID changed to #{parsed_conf['docker_vagrant_user_uid']}."
-  chown -R vagrant:www-data /vagrant
-  echo "Changed ownership of shared files accordingly."
-  OWN_CHANGED=1
-fi
-if [ "$(id -g vagrant)" != "#{parsed_conf['docker_vagrant_group_gid']}" ]; then
-  groupmod -g #{parsed_conf['docker_vagrant_group_gid']} vagrant
-  OWN_CHANGED=1
-fi
-if [ $OWN_CHANGED -eq 1 ]; then
-  echo "Interrupting the provisioning for the ownership changes to take effect."
-  echo "This will trigger a Vagrant error below, do not panic this is normal."
-  echo "Please manually relaunch the process using 'vagrant up'."
-  exit 1
-fi
-
-SCRIPT
-
 # On UP operation, create our network if needed.
 if (ARGV.include? 'up')
   ensure_network(parsed_conf['net_gateway'], parsed_conf['net_subnet'], net_name)
@@ -321,7 +298,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           if (service_conf['volume_type'] === 'unison') && (dest === data_volume['dest'])
             original_dest = dest
             dest = "#{guest_mirror_dir}#{dest}"
-            container.vm.provision "shell", inline: "sudo mkdir -p #{original_dest} && sudo chown vagrant:vagrant #{original_dest} && rsync -av --delete --exclude='.git' --exclude='.vagrant' '#{dest}/' '#{original_dest}'"
+            container.vm.provision "shell", inline: "sudo mkdir -p #{original_dest} && sudo chown vagrant:vagrant #{original_dest} && rsync -av --chown=vagrant:www-data --chmod=0777 --delete --exclude='.git' --exclude='.vagrant' '#{dest}/' '#{original_dest}'"
           end
           volumes.push("#{source}/:#{dest}:delegated")
         end

@@ -8,10 +8,9 @@ fi
 OWN_DIR=$( cd "$( dirname "$OWN" )" && pwd -P)
 
 BUILD_DIR="$OWN_DIR/build"
-
 # Clean existing build if it exists.
 if [ -d "$BUILD_DIR" ]; then
-  rm -rf "$BUILD_DIR"
+  sudo rm -rf "$BUILD_DIR"
 fi
 # Generate skeleton.
 mkdir -p "$BUILD_DIR/ce-vm"
@@ -24,4 +23,5 @@ echo "project_name: $1" >> config.yml
 echo "volume_type: $2" >> config.yml
 # Start the project.
 vagrant up
-#vagrant destroy --force
+vagrant destroy --force
+
