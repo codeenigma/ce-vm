@@ -9,8 +9,6 @@ services:
 
 env: 
  - PROJECT=drupal FS=native
- - PROJECT=drupal FS=sshfs
- - PROJECT=drupal FS=unison
 
 install:
  - curl -O https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.deb
