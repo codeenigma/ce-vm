@@ -35,7 +35,7 @@ services:
 ####### Networking.
 
 # You will need to change your hosts file if you change from defaults.
-net_base: 192.168.56
+net_base: 192.168.57
 net_subnet: "{{ net_base }}.0/24"
 net_gateway: "{{ net_base }}.1"
 domain: 'ce-vm.local'
