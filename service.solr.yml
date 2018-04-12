@@ -1,46 +1,13 @@
 ---
 
-############# Project settings for the "solr" service. ##########################
-# These are typically shared amongst your team for a given project.
-################################################################################
-
-# Extra Debian packages to install.
-apt_extra_packages: ''
-#apt_extra_packages:
-#  - "ruby"
-#  - "mysql-client"
-  
-
-############# Docker settings. #################################################
-# These can vary for each developer, and should normally be overriden
-# individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config_log.yml instead.
-################################################################################
-
-# Networking settings.
-# You will need to change your hosts file
-# if you change from defaults.
-net_ip: "{{ net_base }}.7"
-
-# Ports to forward from the host to the guest,
-# in "host:guest" format.
-# Be sure the host port is free. Typically port 80
-# on your host might be already used by an Apache
-# instance.
-# Leave it to auto and we will try to use
-# the most suitable solution based on your OS.
-net_fwd_ports_mac_os:
-  - "{{ net_ip }}:8080:8080"
-net_fwd_ports_linux:
-  - "8080:8080"
-net_fwd_ports_windows:
-  - "8080:8080"
-
-# Docker extra options. These varies based on host OS.
 docker_extra_args_mac_os:
-#  - '--privileged=TRUE'
   - '--cap-add=SYS_PTRACE'
 docker_extra_args_linux:
   - '--cap-add=SYS_PTRACE'
 docker_extra_args_windows:
-#  - '--privileged=TRUE'
   - '--cap-add=SYS_PTRACE'
+
+docker_image: "pmce/ce-vm-solr:{{ ce_vm_version }}"
+net_ip: "{{ net_base }}.7"
+net_fwd_ports_mac_os:
+  - "{{ net_ip }}:8080:8080"

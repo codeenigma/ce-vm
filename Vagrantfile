@@ -331,10 +331,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--ip",
           "#{service_conf["net_ip"]}",
         ]
-        image = "pmce/ce-vm-#{service}:#{ce_vm_version}"
-        if(service === "cli")
-          image = "pmce/ce-vm-#{service}-#{service_conf['project_type']}:#{ce_vm_version}"
-        end
         if(service_conf["docker_extra_args_#{host_platform}"])
           service_conf["docker_extra_args_#{host_platform}"].each do |arg|
             docker_args.push(arg)
@@ -345,7 +341,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           d.privileged = true
         end
         d.force_host_vm = false
-        d.image = image
+        d.image = service_conf['docker_image']
         d.name = "#{name}"
         d.has_ssh = true
         d.volumes = volumes

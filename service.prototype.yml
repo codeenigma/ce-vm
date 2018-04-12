@@ -1,20 +1,7 @@
 ---
 
-############# Project settings for the "memcached" service. ##########################
-# These are typically shared amongst your team for a given project.
-################################################################################
-
-# Extra Debian packages to install.
-apt_extra_packages: ''
-#apt_extra_packages:
-#  - "ruby"
-#  - "mysql-client"
-
-# Networking settings.
-# You will need to change your hosts file
-# if you change from defaults.
+docker_image: "pmce/ce-vm-prototype:{{ ce_vm_version }}"
 net_ip: "{{ net_base }}.30"
-
 net_fwd_ports_mac_os:
   - "{{ net_ip }}:8080:8080"
   - "{{ net_ip }}:8000:8000"

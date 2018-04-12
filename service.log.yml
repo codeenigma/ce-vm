@@ -1,29 +1,6 @@
 ---
 
-############# Settings for the "log" service. ##########################
-
-# Extra Debian packages to install.
-apt_extra_packages: ''
-#apt_extra_packages:
-#  - "ruby"
-#  - "mysql-client"
-  
-
-############# Docker settings. #################################################
-# These can vary for each developer, and should normally be overriden
-# individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/log.yml instead.
-################################################################################
-
-# Networking settings.
-# You will need to change your hosts file
-# if you change from defaults.
+docker_image: "pmce/ce-vm-log:{{ ce_vm_version }}"
 net_ip: "{{ net_base }}.5"
-
-# Ports to forward from the host to the guest,
-# in "ip:host:guest" format.
 net_fwd_ports_mac_os:
   - "{{ net_ip }}:80:80"
-#net_fwd_ports_linux:
-#  - "80:80"
-#net_fwd_ports_windows:
-#  - "80:80"

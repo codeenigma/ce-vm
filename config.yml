@@ -27,6 +27,7 @@ services:
   - mkdocs
   - mysql
   - nginx
+  - nodejs
 #  - prototype
   - redis
   - solr
@@ -54,6 +55,8 @@ php_version: 7.1
 # These can vary for each developer, and should normally be overriden
 # individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
 ################################################################################
+
+ce_vm_version: "5.0.0"
 
 # Turn automatic update of the core stack ON/OFF.
 # Useful for offline use.

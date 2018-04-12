@@ -1,6 +1,8 @@
 ---
 
-net_ip: "{{ net_base }}.20"
-
 xdebug: no
 blackfire: no
+
+docker_image: "pmce/ce-vm-cli-{{ project_type }}:{{ ce_vm_version }}
+net_ip: "{{ net_base }}.20"
+        
