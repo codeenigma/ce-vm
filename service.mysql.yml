@@ -1,5 +1,7 @@
 ---
 
+db_dumps: ''
+
 docker_image: "pmce/ce-vm-mysql:{{ ce_vm_version }}"
 net_ip: "{{ net_base }}.3"
 net_fwd_ports_mac_os:
