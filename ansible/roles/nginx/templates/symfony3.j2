@@ -1,5 +1,5 @@
 location / {
-    try_files $uri /app_local.php$is_args$args;
+    try_files $uri /app_{{ symfony3_local_env }}.php$is_args$args;
 }
 
 # Dev only

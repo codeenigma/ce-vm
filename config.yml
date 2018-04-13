@@ -20,6 +20,9 @@ project_type: drupal
 # Webroot, relative to project folder.
 webroot: www
 
+# Symfony 3 dev environment.
+symfony3_local_env: local
+
 ####### Services/containers.
 services:
   - fpm
