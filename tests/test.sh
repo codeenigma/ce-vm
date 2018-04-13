@@ -12,16 +12,22 @@ BUILD_DIR="$OWN_DIR/build"
 if [ -d "$BUILD_DIR" ]; then
   sudo rm -rf "$BUILD_DIR"
 fi
+
 # Generate skeleton.
 mkdir -p "$BUILD_DIR/ce-vm"
+CONFIG_FILE="$BUILD_DIR/ce-vm/config.yml"
+PROJECT_TYPE="$1"
+VOLUME_TYPE="$2"
+
+# Include project specifics.
+. "$OWN_DIR/$PROJECT_TYPE.sh"
+
+# Generate project config.
+generate_config
+
+# Start the project.
 cd "$BUILD_DIR/ce-vm"
 curl -O https://raw.githubusercontent.com/codeenigma/ce-vm-model/5.x/ce-vm/Vagrantfile
-echo '---' > config.yml
-echo '' >> config.yml
-echo "project_type: $1" >> config.yml
-echo "project_name: $1" >> config.yml
-echo "volume_type: $2" >> config.yml
-# Start the project.
 vagrant up || exit 1
 vagrant destroy --force || exit 1
 
