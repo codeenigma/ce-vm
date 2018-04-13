@@ -22,6 +22,6 @@ echo "project_type: $1" >> config.yml
 echo "project_name: $1" >> config.yml
 echo "volume_type: $2" >> config.yml
 # Start the project.
-vagrant up
-vagrant destroy --force
+vagrant up || exit 1
+vagrant destroy --force || exit 1
 
