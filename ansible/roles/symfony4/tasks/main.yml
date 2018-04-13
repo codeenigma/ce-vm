@@ -6,15 +6,14 @@
     
 - name: Create Symfony codebase if needed.
   command: >
-    composer create-project symfony/website-skeleton {{ request_time }}
-    chdir=/tmp
+    composer create-project symfony/website-skeleton /tmp/{{ request_time }}
   become: true
   become_user: vagrant
   when: not symfony_base.stat.exists
 
 - name: Move Symfony codebase in place.
   command: >
-    rsync -a --no-perms --no-owner --no-group /tmp/{{ request_time }}/ {{ project_dir }}
+    rsync -a --owner --group --perms --chmod=0777 --chown=vagrant:vagrant /tmp/{{ request_time }}/ {{ project_dir }}
   when: not symfony_base.stat.exists
   
 - name: Remove Symfony var folder.
@@ -28,12 +27,6 @@
     dest: "{{ project_dir }}/var"
     src: "/tmp"
     state: link
-  when: not symfony_base.stat.exists
-
-- name: Generate a 'local' config.
-  copy:
-    src: "{{ project_dir }}/app/config/config_dev.yml"
-    dest: "{{ project_dir }}/app/config/config_local.yml"
   when: not symfony_base.stat.exists
   
 - name: Generate default .gitignore.

@@ -7,7 +7,8 @@ location ~ \.php(/|$) {
   fastcgi_pass {{ project_name }}-fpm:9000;
   fastcgi_split_path_info ^(.+\.php)(/.*)$;
   include fastcgi_params;
-  fastcgi_param APP_ENV local;
+  fastcgi_param APP_ENV {{ symfony_local_env }};
+  fastcgi_param APP_DEBUG 1;
   fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
   fastcgi_param DOCUMENT_ROOT $realpath_root;
 }
