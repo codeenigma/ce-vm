@@ -6,7 +6,7 @@
     
 - name: Create Symfony codebase if needed.
   command: >
-    symfony new /tmp/{{ request_time }} 3.4
+      symfony new /tmp/{{ request_time }} 3.4
   become: true
   become_user: vagrant
   when: not symfony_base.stat.exists
@@ -32,22 +32,7 @@
 - name: Generate a 'local' app kernel index.
   template:
     src: app_local.php.j2
-    dest: "{{ project_dir }}/{{ webroot }}/app_local.php"
-  when: not symfony_base.stat.exists
-
-- name: Generate a 'local' config.
-  copy:
-    src: "{{ project_dir }}/app/config/config_dev.yml"
-    dest: "{{ project_dir }}/app/config/config_local.yml"
-    owner: "vagrant"
-    group: "vagrant"
-  when: not symfony_base.stat.exists
-
-- name: Generate a 'local' kernel.
-  replace:
-    regexp: "'dev',"
-    replace: "'dev', 'local',"
-    path: "{{ project_dir }}/app/AppKernel.php"
+    dest: "{{ project_dir }}/{{ webroot }}/app_dev.php"
   when: not symfony_base.stat.exists
   
 - name: Generate default .gitignore.
