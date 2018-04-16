@@ -105,6 +105,19 @@ end
 
 ################ Paths definitions.
 ################################################################################
+
+# Remote. Normally passed by the project's Vagrantfile.
+# Default to 3.x for backward compatibilty, as this feature
+# was introduced in 4.x.
+if ENV['CE_VM_UPSTREAM_REPO'].nil?
+  ENV['CE_VM_UPSTREAM_REPO'] = 'https://github.com/codeenigma/ce-vm.git'
+end
+if ENV['CE_VM_UPSTREAM_BRANCH'].nil?
+  ENV['CE_VM_UPSTREAM_BRANCH'] = '3.x'
+end
+ce_vm_upstream_repo = ENV['CE_VM_UPSTREAM_REPO']
+ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
+
 # Absolute paths on the host machine.
 host_project_dir = File.dirname(File.expand_path('..', ENV['PROJECT_VAGRANTFILE']))
 host_home_dir = File.expand_path('~')
@@ -118,21 +131,11 @@ vm_dir = File.basename(File.dirname(File.expand_path(ENV['PROJECT_VAGRANTFILE'])
 ansible_dir = 'ansible'
 ce_local_home = '.CodeEnigma'
 ce_vm_local_home = "#{ce_local_home}/ce-vm"
+unless (['2.x', '3.x', '4.x'].include? ce_vm_upstream_branch)
+  ce_vm_local_home = "#{ce_vm_local_home}/ce-vm/#{ce_vm_upstream_branch}"
+end
 ce_vm_local_upstream_repo = "#{ce_vm_local_home}/ce-vm-upstream"
 ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
-
-# Remote. Normally passed by the project's Vagrantfile.
-# Default to 3.x for backward compatibilty, as this feature
-# was introduced in 4.x.
-if ENV['CE_VM_UPSTREAM_REPO'].nil?
-  ENV['CE_VM_UPSTREAM_REPO'] = 'https://github.com/codeenigma/ce-vm.git'
-end
-if ENV['CE_VM_UPSTREAM_BRANCH'].nil?
-  ENV['CE_VM_UPSTREAM_BRANCH'] = '3.x'
-end
-ce_vm_upstream_repo = ENV['CE_VM_UPSTREAM_REPO']
-ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
-ce_vm_version = '5.0.0'
 
 ################ Configuration loading.
 ################################################################################
