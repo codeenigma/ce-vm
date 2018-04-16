@@ -134,8 +134,8 @@ ce_vm_local_home = File.join(ce_local_home, 'ce-vm')
 unless (['2.x', '3.x', '4.x'].include? ce_vm_upstream_branch)
   ce_vm_local_home = File.join(ce_vm_local_home, ce_vm_upstream_branch)
 end
-ce_vm_local_upstream_repo = File.join(ce_vm_local_home, ce-vm-upstream)
-ce_vm_local_custom_repo = File.join(ce_vm_local_home, ce-vm-custom)
+ce_vm_local_upstream_repo = File.join(ce_vm_local_home, 'ce-vm-upstream')
+ce_vm_local_custom_repo = File.join(ce_vm_local_home, 'ce-vm-custom')
 
 ################ Configuration loading.
 ################################################################################
