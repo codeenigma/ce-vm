@@ -130,12 +130,12 @@ guest_mirror_dir = '/.ce-vm-mirror'
 vm_dir = File.basename(File.dirname(File.expand_path(ENV['PROJECT_VAGRANTFILE'])))
 ansible_dir = 'ansible'
 ce_local_home = '.CodeEnigma'
-ce_vm_local_home = "#{ce_local_home}/ce-vm"
+ce_vm_local_home = File.join(ce_local_home, 'ce-vm')
 unless (['2.x', '3.x', '4.x'].include? ce_vm_upstream_branch)
-  ce_vm_local_home = "#{ce_vm_local_home}/ce-vm/#{ce_vm_upstream_branch}"
+  ce_vm_local_home = File.join(ce_vm_local_home, ce_vm_upstream_branch)
 end
-ce_vm_local_upstream_repo = "#{ce_vm_local_home}/ce-vm-upstream"
-ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
+ce_vm_local_upstream_repo = File.join(ce_vm_local_home, ce-vm-upstream)
+ce_vm_local_custom_repo = File.join(ce_vm_local_home, ce-vm-custom)
 
 ################ Configuration loading.
 ################################################################################
