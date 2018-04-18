@@ -1,0 +1,10 @@
+#!/bin/sh
+
+/usr/sbin/service haproxy stop
+if [ -f /run/haproxy.pid ]; then
+  rm /run/haproxy.pid
+fi
+if [ -f /run/haproxy/admin.sock ]; then
+  rm /run/haproxy/admin.sock
+fi
+/usr/sbin/service haproxy start

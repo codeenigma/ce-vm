@@ -1,0 +1,25 @@
+---
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/haproxy"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/haproxy.html"
+    force: yes
+
+- name: Copy HAProxy configuration.
+  template:
+    src: "haproxy.cfg.j2"
+    dest: "/etc/haproxy/haproxy.cfg"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
