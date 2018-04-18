@@ -1,7 +1,7 @@
 ---
 
 docker_image: "pmce/ce-vm-prototype:{{ ce_vm_version }}"
-net_ip: "{{ net_base }}.30"
+net_ip: "{{ net_base }}.110"
 net_fwd_ports_mac_os:
   - "{{ net_ip }}:8080:8080"
   - "{{ net_ip }}:8000:8000"

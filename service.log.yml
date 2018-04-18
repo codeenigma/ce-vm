@@ -1,6 +1,6 @@
 ---
 
 docker_image: "pmce/ce-vm-log:{{ ce_vm_version }}"
-net_ip: "{{ net_base }}.5"
+net_ip: "{{ net_base }}.50"
 net_fwd_ports_mac_os:
   - "{{ net_ip }}:80:80"

@@ -4,4 +4,4 @@ xdebug: yes
 blackfire: no
 
 docker_image: "pmce/ce-vm-fpm:{{ ce_vm_version }}"
-net_ip: "{{ net_base }}.11"
+net_ip: "{{ net_base }}.30"

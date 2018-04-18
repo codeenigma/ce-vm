@@ -1,4 +1,4 @@
 ---
 
 docker_image: "pmce/ce-vm-redis:{{ ce_vm_version }}"
-net_ip: "{{ net_base }}.17"
+net_ip: "{{ net_base }}.120"

@@ -4,7 +4,7 @@ host_aliases:
   - php.{{ project_name }}-nginx.{{ domain }}
 
 docker_image: "pmce/ce-vm-nginx:{{ ce_vm_version }}"
-net_ip: "{{ net_base }}.10"
+net_ip: "{{ net_base }}.90"
 net_fwd_ports_mac_os:
   - "{{ net_ip }}:80:80"
   - "{{ net_ip }}:443:443"

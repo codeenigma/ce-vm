@@ -3,6 +3,6 @@
 db_dumps: ''
 
 docker_image: "pmce/ce-vm-mysql:{{ ce_vm_version }}"
-net_ip: "{{ net_base }}.3"
+net_ip: "{{ net_base }}.80"
 net_fwd_ports_mac_os:
   - "{{ net_ip }}:3306:3306"
