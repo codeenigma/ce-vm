@@ -1,11 +1,13 @@
 global
-	log {{ project_name }}-log:{{ rsyslog_listen_port }} global notice
+	log {{ project_name }}-log:{{ rsyslog_listen_port }}	local0
+	log {{ project_name }}-log:{{ rsyslog_listen_port }}	local1 notice
 	chroot /var/lib/haproxy
 	stats socket /run/haproxy/admin.sock mode 660 level admin
 	stats timeout 30s
 	user haproxy
 	group haproxy
 	daemon
+	tune.ssl.default-dh-param 2048
 
 	# Default SSL material locations
 	ca-base /etc/ssl/certs
@@ -34,3 +36,18 @@ defaults
 	errorfile 502 /etc/haproxy/errors/502.http
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
+
+frontend {{ project_name }}-https
+   	bind 0.0.0.0:443 ssl crt /etc/haproxy/ssl/haproxy.pem
+   	http-request del-header Proxy
+   	reqadd X-Forwarded-Proto:\ https
+	default_backend {{ project_name }}
+
+frontend {{ project_name }}-http
+   	bind 0.0.0.0:80
+   	http-request del-header Proxy
+   	reqadd X-Forwarded-Proto:\ http
+	default_backend {{ project_name }}
+
+backend {{ project_name }}
+   server {{ project_name }}-nginx {{ project_name }}-nginx:80 check inter 5000
