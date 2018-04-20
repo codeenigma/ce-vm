@@ -322,7 +322,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           }
           ansible.playbook = ansible_playbook_file
           ansible.extra_vars = ansible_extra_vars
-          ansible.compatibility_mode = '2.0'
+          #ansible.compatibility_mode = '2.0'
         end
       end
       # Run startup scripts, post provisioning.
