@@ -9,6 +9,10 @@
 - name: Set php version (php)
   command: "update-alternatives --set php /usr/bin/php{{ php_version }}"
 
+- name: Set php version (php-config)
+  command: "update-alternatives --set php-config /usr/bin/php-config{{ php_version }}"
+
+
 - name: Copy php.ini for php cli.
   template:
     src: php.cli.ini.j2
