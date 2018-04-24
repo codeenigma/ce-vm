@@ -6,6 +6,7 @@ if [ -f /run/mysqld/mysqld.pid ]; then
 fi
 
 touch /var/lib/mysql
+find /var/lib/mysql/mysql -exec touch -c -a {} +
 chown mysql:mysql /var/lib/mysql
 
 /usr/sbin/service mysql start
