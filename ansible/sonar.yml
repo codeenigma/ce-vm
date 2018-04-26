@@ -3,5 +3,10 @@
 - hosts: all
   become: yes
   
+  pre_tasks:
+    
+    - name: Run init tasks
+      import_tasks: tasks/init.yml
+    
   roles:
     - { role: sonar }
