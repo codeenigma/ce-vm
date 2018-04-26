@@ -18,6 +18,6 @@
 
 - name: Generate defaut project configuration.
   template:
-    src: "{{ project_type }}.properties"
+    src: "{{ project_type }}.properties.j2"
     dest: "{{ project_dir }}/sonar-project.properties"
     force: no

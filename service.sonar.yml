@@ -11,5 +11,3 @@ docker_image: "pmce/ce-vm-sonar:{{ ce_vm_version }}"
 net_ip: "{{ net_base }}.140"
 net_fwd_ports_mac_os:
   - "{{ net_ip }}:9000:9000"
-docker_extra_args_linux:
-  - "--privileged=true"
