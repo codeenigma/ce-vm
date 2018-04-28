@@ -30,8 +30,8 @@ run_test(){
     VM_DIR="$RUN_DIR/ce-vm"
     cd "$VM_DIR"
     START_TIME=`date +%s`
-    vagrant ssh -c "cd /vagrant && mkdir test &&  composer create-project symfony/website-skeleton my-project"
-    vagrant ssh -c "sudo rm -rf /vagrant/test"
+    vagrant ssh -c "cd /vagrant &&  composer create-project symfony/website-skeleton my-project"
+    vagrant ssh -c "sudo rm -rf /vagrant/my-project"
     END_TIME=`date +%s`
     RUN_TIME=$((END_TIME-START_TIME))
     LINE="$RUN_TIME,$LINE"
