@@ -18,7 +18,7 @@ prepare_test(){
     cd "$VM_DIR"
     vagrant up dashboard || exit 1
     vagrant up cli || exit 1
-    LINE="$VOL_TYPE,$LINE"
+    LINE="$VOL_TYPE (write), $VOL_TYPE (read),$VOL_TYPE (delete),$LINE"
   done
   echo "$LINE" >> $RESULT_FILE
 }
@@ -29,11 +29,17 @@ run_test(){
     RUN_DIR="$BUILD_DIR/$VOL_TYPE"
     VM_DIR="$RUN_DIR/ce-vm"
     cd "$VM_DIR"
-    START_TIME=`date +%s`
+    start
     vagrant ssh -c "cd /vagrant &&  composer create-project symfony/website-skeleton my-project"
+    end
+    LINE="$RUN_TIME,$LINE"
+    start
+    vagrant ssh -c "sudo cp -a /vagrant/my-project /tmp/"
+    end
+    LINE="$RUN_TIME,$LINE"
+    start
     vagrant ssh -c "sudo rm -rf /vagrant/my-project"
-    END_TIME=`date +%s`
-    RUN_TIME=$((END_TIME-START_TIME))
+    end
     LINE="$RUN_TIME,$LINE"
   done
   echo "$LINE" >> $RESULT_FILE  

@@ -13,7 +13,7 @@ RESULT_DIR="$OWN_DIR/results"
 RESULT_FILE="$RESULT_DIR/$1.csv"
 VAGRANTFILE="$OWN_DIR/Vagrantfile"
 CONFIG_YML="$OWN_DIR/config.yml"
-VOL_TYPES="native sshfs unison"
+VOL_TYPES="native unison"
 
 # Clean existing build if it exists.
 if [ -d "$BUILD_DIR" ]; then
@@ -23,6 +23,15 @@ fi
 if [ -f "$RESULT_FILE" ]; then
   sudo rm "$RESULT_FILE"
 fi
+
+# Abuse the lack of var scope !
+start(){
+  START_TIME=`date +%s`
+}
+end(){
+  END_TIME=`date +%s`
+  RUN_TIME=$((END_TIME-START_TIME))
+}
 
 # Include project specifics.
 # shellcheck source=./write-mount.sh
