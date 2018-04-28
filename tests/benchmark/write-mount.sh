@@ -16,6 +16,7 @@ prepare_test(){
     echo "" >> "$VM_DIR/config.yml" >> "$VM_DIR/config.yml"
     echo "net_base: 192.168.$COUNTER" >> "$VM_DIR/config.yml"
     cd "$VM_DIR"
+    vagrant up dashboard || exit 1
     vagrant up cli || exit 1
     LINE="$VOL_TYPE,$LINE"
   done
