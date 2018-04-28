@@ -301,7 +301,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           if (service_conf['volume_type'] === 'unison') && (dest === data_volume['dest'])
             original_dest = dest
             dest = "#{guest_mirror_dir}#{dest}"
-            container.vm.provision "shell", inline: "mkdir -p #{original_dest} -m 0777 && chown vagrant:vagrant #{original_dest} && rsync -av --owner --perms --chmod=0777 --delete --exclude='.git' --exclude='.vagrant' '#{dest}/' '#{original_dest}'"
+            container.vm.provision "shell", inline: "mkdir -p #{original_dest} -m 0777 && rsync -av --owner --perms --chmod=0777 --delete --exclude='.git' --exclude='.vagrant' '#{dest}/' '#{original_dest}' && chown vagrant:vagrant #{original_dest}"
           end
           volumes.push("#{source}/:#{dest}:delegated")
         end
