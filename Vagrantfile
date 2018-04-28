@@ -296,7 +296,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         dest = "#{synced_folder['dest']}"
         source = "#{synced_folder['source']}"
         if (service_conf['volume_type'] === 'sshfs')
-         container.vm.provision "shell", run: "always", inline: "mkdir -p #{dest} && chown vagrant:vagrant #{dest} && mountpoint -q #{dest} || sshfs -o kernel_cache -o cache=yes -o compression=yes -o allow_other -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/vagrant/.ssh/id_rsa vagrant@#{parsed_conf['project_name']}-dashboard:#{dest} #{dest}"
+          container.vm.provision "shell", run: "always", inline: "sudo mkdir -p #{dest} && sudo chown vagrant:vagrant #{dest} && mountpoint -q #{dest} || sudo sshfs -o kernel_cache -o cache=yes -o compression=yes -o allow_other -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/vagrant/.ssh/id_rsa vagrant@#{parsed_conf['project_name']}-dashboard:#{dest} #{dest}"
         else
           if (service_conf['volume_type'] === 'unison') && (dest === data_volume['dest'])
             original_dest = dest
