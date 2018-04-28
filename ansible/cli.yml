@@ -15,6 +15,7 @@
     - { role: blackfire }
     - { role: rsyslog_client }
     - { role: postfix }
+    - { role: composer }
     - { role: drupal, when: project_type == 'drupal' }
     - { role: symfony3, when: project_type == 'symfony3' }
     - { role: symfony4, when: project_type == 'symfony4' }

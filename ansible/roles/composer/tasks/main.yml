@@ -20,7 +20,7 @@
   file:
     path: '{{ shared_cache_dir }}/composer'
     owner: 'vagrant'
-    group: 'root'
+    group: 'vagrant'
     state: directory
     
 - name: Symlink composer shared cache.
@@ -28,5 +28,5 @@
     path: '/home/vagrant/.composer/cache'
     src: '{{ shared_cache_dir }}/composer'
     owner: 'vagrant'
-    group: 'root'
+    group: 'vagrant'
     state: link
