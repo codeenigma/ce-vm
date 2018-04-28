@@ -31,7 +31,7 @@ run_test(){
     cd "$VM_DIR"
     START_TIME=`date +%s`
     vagrant ssh -c "cd /vagrant && mkdir test &&  composer create-project symfony/website-skeleton my-project"
-    vagrant ssh -c "sudo rm -f /vagrant/test"
+    vagrant ssh -c "sudo rm -rf /vagrant/test"
     END_TIME=`date +%s`
     RUN_TIME=$((END_TIME-START_TIME))
     LINE="$RUN_TIME,$LINE"
