@@ -13,7 +13,6 @@ RESULT_DIR="$OWN_DIR/results"
 RESULT_FILE="$RESULT_DIR/$1.csv"
 VAGRANTFILE="$OWN_DIR/Vagrantfile"
 CONFIG_YML="$OWN_DIR/config.yml"
-VOL_TYPES="native unison"
 
 # Clean existing build if it exists.
 if [ -d "$BUILD_DIR" ]; then
@@ -39,6 +38,7 @@ end(){
 
 # Prepare environment.
 mkdir "$BUILD_DIR"
+
 prepare_test
 
 for PASS in `seq 1 $2`; do

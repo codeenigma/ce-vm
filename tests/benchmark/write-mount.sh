@@ -1,5 +1,7 @@
 #!/bin/sh
 
+VOL_TYPES="native sshfs unison"
+
 prepare_test(){
   COUNTER=10
   LINE=""
