@@ -16,7 +16,7 @@ prepare_test(){
     echo "" >> "$VM_DIR/config.yml" >> "$VM_DIR/config.yml"
     echo "net_base: 192.168.$COUNTER" >> "$VM_DIR/config.yml"
     cd "$VM_DIR"
-    vagrant up log || exit 1
+    vagrant up cli || exit 1
     LINE="$VOL_TYPE,$LINE"
   done
   echo "$LINE" >> $RESULT_FILE
@@ -29,7 +29,8 @@ run_test(){
     VM_DIR="$RUN_DIR/ce-vm"
     cd "$VM_DIR"
     START_TIME=`date +%s`
-    vagrant ssh -c "cd /vagrant &&  composer create-project symfony/website-skeleton my-project"
+    vagrant ssh -c "cd /vagrant && mkdir test &&  composer create-project symfony/website-skeleton my-project"
+    vagrant ssh -c "sudo rm -f /vagrant/test"
     END_TIME=`date +%s`
     RUN_TIME=$((END_TIME-START_TIME))
     LINE="$RUN_TIME,$LINE"
