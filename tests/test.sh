@@ -31,3 +31,7 @@ curl -O https://raw.githubusercontent.com/codeenigma/ce-vm-model/5.x/ce-vm/Vagra
 vagrant up || exit 1
 vagrant destroy --force || exit 1
 
+# Clean existing build if it exists.
+if [ -d "$BUILD_DIR" ]; then
+  sudo rm -rf "$BUILD_DIR"
+fi

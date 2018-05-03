@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LAYERS="overlay volume"
+LAYERS="overlay volume volume-delegated"
 DB_DUMP="replace-me-with-big-db.sql"
 
 prepare_test(){
@@ -17,17 +17,25 @@ prepare_test(){
     if [ "$VOL_TYPE" = "volume" ]; then
       echo "docker_extra_args_mac_os:" >> "$VM_DIR/config.yml"
       echo "  - '--volume'" >> "$VM_DIR/config.yml"
-      echo "  - '/var'" >> "$VM_DIR/config.yml"
+      echo "  - '$VOL_TYPE:/var'" >> "$VM_DIR/config.yml"
       echo "docker_extra_args_linux:" >> "$VM_DIR/config.yml"
       echo "  - '--volume'" >> "$VM_DIR/config.yml"
-      echo "  - '/var'" >> "$VM_DIR/config.yml"
+      echo "  - '$VOL_TYPE:/var'" >> "$VM_DIR/config.yml"
+    fi
+    if [ "$VOL_TYPE" = "volume-delegated" ]; then
+      echo "docker_extra_args_mac_os:" >> "$VM_DIR/config.yml"
+      echo "  - '--volume'" >> "$VM_DIR/config.yml"
+      echo "  - '$VOL_TYPE:/var:delegated'" >> "$VM_DIR/config.yml"
+      echo "docker_extra_args_linux:" >> "$VM_DIR/config.yml"
+      echo "  - '--volume'" >> "$VM_DIR/config.yml"
+      echo "  - '$VOL_TYPE:/var'" >> "$VM_DIR/config.yml"
     fi
     echo "project_name: $VOL_TYPE" >> "$VM_DIR/config.yml"
     echo "" >> "$VM_DIR/config.yml" >> "$VM_DIR/config.yml"
     echo "net_base: 192.168.$COUNTER" >> "$VM_DIR/config.yml"
     cd "$VM_DIR"
     vagrant up mysql || exit 1
-    LINE="$VOL_TYPE (restore),$VOL_TYPE (dump),$VOL_TYPE (drop),$LINE"
+    LINE="$VOL_TYPE (drop),$VOL_TYPE (dump),$VOL_TYPE (restore),$LINE"
   done
   echo "$LINE" >> $RESULT_FILE
 }
@@ -48,7 +56,7 @@ run_test(){
     end
     LINE="$RUN_TIME,$LINE"
     start
-    vagrant ssh -c 'sudo mysql -e "drop database mydb;"'
+    vagrant ssh mysql -c 'sudo mysql -e "drop database mydb;"'
     end
     LINE="$RUN_TIME,$LINE"
   done
