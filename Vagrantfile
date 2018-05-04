@@ -333,6 +333,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           "--network=#{net_name}",
           "--ip",
           "#{service_conf["net_ip"]}",
+          "--volume",
+          "ce-vm-cache:#{guest_ce_home}/cache",
+          "--volume",
+          "/var"
         ]
         if(service_conf["docker_extra_args_#{host_platform}"])
           service_conf["docker_extra_args_#{host_platform}"].each do |arg|
