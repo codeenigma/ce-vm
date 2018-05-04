@@ -10,13 +10,20 @@
   become: true
   become_user: vagrant
 
-- name: Copy startup script in place.
+- name: Remove startup script.
+  file:
+    path: "/opt/run-parts/prototype"
+    state: absent
+  when: not prototype_autostart
+
+  - name: Copy startup script in place.
   template:
     src: startup.sh.j2
     dest: "/opt/run-parts/prototype"
     owner: root
     group: root
     mode: 0555
+  when: prototype_autostart
 
 - name: Copy landing page section.
   template:
