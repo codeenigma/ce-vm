@@ -16,7 +16,7 @@
     state: absent
   when: not prototype_autostart
 
-  - name: Copy startup script in place.
+- name: Copy startup script in place.
   template:
     src: startup.sh.j2
     dest: "/opt/run-parts/prototype"
