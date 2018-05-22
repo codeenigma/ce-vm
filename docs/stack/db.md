@@ -12,7 +12,7 @@ See [vagrantup.com](https://www.vagrantup.com/docs/multi-machine/#controlling-mu
 
 ## Network
 
-It gets assigned the IP 192.168.56.2 and a DNS entry makes *.app-vm.codeenigma.com and point to it. You can access it at whatever.app-vm.codeenigma.com directly.
+It gets assigned the IP 192.168.56.3 and a DNS entry makes *.db-vm.codeenigma.com and point to it. You can access it at db-vm.codeenigma.com directly, or at {project_name}-db from within the "App" instance.
 
 ## Components
 
