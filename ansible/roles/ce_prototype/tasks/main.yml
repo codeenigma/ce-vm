@@ -30,3 +30,8 @@
     src: "section.html.j2"
     dest: "{{ ce_vm_webroot }}/includes/prototype.html"
     force: yes
+
+- name: Ensure sourcemap location for CSS.
+  command: npm config set ce-pl:root "{{ host_project_dir }}/{{ prototype_folder }}"
+  become: true
+  become_user: vagrant

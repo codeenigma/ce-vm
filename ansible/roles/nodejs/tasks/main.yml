@@ -4,10 +4,12 @@
   file:
     path: '{{ shared_cache_dir }}/nodejs'
     owner: 'vagrant'
-    group: 'root'
+    group: 'vagrant'
     state: directory
     
 - name: Set NodeJS cache location.
   template:
     src: npmrc.j2
     dest: "/home/vagrant/.npmrc"
+    owner: 'vagrant'
+    group: 'vagrant'

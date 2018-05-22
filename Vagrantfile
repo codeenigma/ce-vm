@@ -313,6 +313,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           ansible_extra_vars = {
             config_files: "#{run_service_conf_files}",
             project_dir: "#{guest_project_dir}",
+            host_project_dir: "#{host_project_dir}",
             vm_dir: "#{vm_dir}",
             ce_vm_home: "#{guest_ce_home}",
             shared_cache_dir: "#{guest_ce_home}/cache",
