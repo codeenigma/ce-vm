@@ -1,0 +1,11 @@
+module.exports = {
+  'Google\'s Search Functionality' : function (browser) {
+    browser
+      .url('https://duckduckgo.com/')
+      .waitForElementVisible('body', 1000)
+      .setValue('input[type=text]', 'CodeEnigma.com\n')
+      .pause(1000)
+      .assert.title('CodeEnigma.com at DuckDuckGo')
+      .end();
+  }
+};

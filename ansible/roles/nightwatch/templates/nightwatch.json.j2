@@ -1,0 +1,33 @@
+{
+    "src_folders" : [
+        "./tests"
+    ],
+    "output_folder" : "./reports",
+    "test_settings" : {
+        "default" : {
+            "selenium" : {
+                "start_process" : true,
+                "server_path" : "/opt/selenium-server-standalone.jar",
+                "log_path" : "",
+                "port" : 4444,
+                "cli_args" : {
+                    "webdriver.chrome.driver" : "/opt/chromedriver",
+                    "webdriver.gecko.driver" : "/opt/geckodriver"
+                }
+            },
+            "screenshots" : {
+                "enabled" : true,
+                "on_failure": true,
+                "path" : "./reports/screenshots"
+            },
+            "desiredCapabilities": {
+                "browserName": "firefox",
+                "javascriptEnabled": true,
+                "cssSelectorsEnabled": true,
+                "chromeOptions" : {
+                    "args" : ["disable-web-security", "ignore-certificate-errors", "headless"]
+                }
+            }
+        }
+    }
+}
