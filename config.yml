@@ -31,7 +31,7 @@ services:
   - mysql
   - nginx
   - nodejs
-#  - prototype
+  - prototype
   - redis
   - solr
   - haproxy
@@ -49,6 +49,9 @@ domain: 'ce-vm.local'
 ####### Common settings.
 
 php_version: 7.1
+
+# Extra Debian packages to install.
+apt_extra_packages: ''
 
 ############# Development settings. ################################################
 # These can vary for each developer, and should normally be overriden
