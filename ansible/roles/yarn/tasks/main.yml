@@ -1,0 +1,15 @@
+---
+
+- name: Create Yarn shared cache dir if needed.
+  file:
+    path: '{{ shared_cache_dir }}/yarn'
+    owner: 'vagrant'
+    group: 'vagrant'
+    state: directory
+    
+- name: Set Yarn cache location.
+  template:
+    src: yarnrc.j2
+    dest: "/home/vagrant/.yarnrc"
+    owner: 'vagrant'
+    group: 'vagrant'

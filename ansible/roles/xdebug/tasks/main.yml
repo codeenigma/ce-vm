@@ -1,0 +1,63 @@
+---
+
+- name: Ensure xdebug is not installed.
+  apt:
+    pkg: php-xdebug
+    state: absent
+    purge: yes
+  when: not xdebug
+
+- name: Update apt cache.
+  apt:
+    update_cache: yes
+  when: xdebug
+
+- name: Ensure xdebug is installed.
+  apt:
+    pkg: php-xdebug
+    state: present
+  when: xdebug
+
+- name: Ensure host trace/profiling folder exists.
+  file:
+    path: "{{ local_var_vm_dir }}/php-xdebug"
+    state: directory
+  when: xdebug
+
+- name: Set remote host (Default)
+  set_fact: xdebug_remote_host="{{ net_gateway }}"
+  when: 
+    - xdebug
+    - xdebug_remote_host == 'auto'
+    - host_platform != 'mac_os'
+
+- name: Set remote host (Docker for Mac)
+  set_fact: xdebug_remote_host="docker.for.mac.localhost"
+  when: 
+    - xdebug
+    - xdebug_remote_host == 'auto'
+    - host_platform == 'mac_os'
+
+- name: Enable xdebug connect back (Default)
+  set_fact: xdebug_remote_connect_back=1
+  when:
+    - xdebug
+    - xdebug_remote_host == 'auto'
+    - host_platform != 'mac_os'
+  
+- name: Disable xdebug connect back (Docker for Mac)
+  set_fact: xdebug_remote_connect_back=0
+  when:
+    - xdebug
+    - xdebug_remote_connect_back == 'auto'
+    - host_platform == 'mac_os'
+    
+- name: Copy xdebug configuration in place.
+  template:
+    src: 30-xdebug-dev.ini.j2
+    dest: "/etc/php/{{ php_version }}/{{ php_build_type }}/conf.d/30-xdebug-dev.ini"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  when: xdebug

@@ -1,0 +1,144 @@
+---
+
+- name: Ensure mysql-client is installed, drush needs it.
+  apt:
+    pkg: mysql-client
+    state: present
+
+- name: Check if we already have a codebase.
+  stat: path="{{ project_dir }}/{{ webroot }}"
+  register: ce_drupal_codebase
+
+- name: Check if we already have a composer file.
+  stat: path="{{ project_dir }}/composer.json"
+  register: ce_drupal_composer
+
+- name: Generates composer.json file if none exist.
+  template:
+    src: composer.json.j2
+    dest: "{{ project_dir }}/composer.json"
+    owner: vagrant
+  when: 
+    - not ce_drupal_codebase.stat.exists
+    - not ce_drupal_composer.stat.exists
+    
+- name: Require Drupal dependencies.
+  composer:
+    command: require
+    arguments: "{{ item }} --sort-packages --no-update"
+    working_dir: "{{ project_dir }}"
+  with_items:
+    - "composer/installers"
+    - "drupal-composer/drupal-scaffold"
+    - "drupal/core"
+    - "drupal/config_ignore"
+    - "drupal/config_installer"
+    - "drush/drush"
+  become: true
+  become_user: vagrant
+  when: 
+    - not ce_drupal_codebase.stat.exists
+    - not ce_drupal_composer.stat.exists
+
+- name: Check if we now have a composer file.
+  stat: path="{{ project_dir }}/composer.json"
+  register: ce_drupal_composer_new
+  
+- name: Composer install Drupal.
+  composer:
+    command: install
+    working_dir: "{{ project_dir }}"
+  become: true
+  become_user: vagrant
+  when: 
+    - ce_drupal_composer_new.stat.exists
+    - not ce_drupal_composer.stat.exists
+  
+- name: Generate default .gitignore (if needed).
+  template:
+    src: gitignore.j2
+    dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
+    force: no
+
+- name: Check if we already have a ce-vm.settings.php file.
+  stat: path="{{ project_dir }}/{{ webroot }}/sites/default/ce-vm.settings.php"
+  register: ce_vm_settings_php
+
+- name: Generates ce-vm.settings.php file.
+  template:
+    src: ce-vm.settings.php.j2
+    dest: "{{ project_dir }}/{{ webroot }}/sites/default/ce-vm.settings.php"
+    force: no
+  when: not ce_vm_settings_php.stat.exists 
+
+- name: Check if we already have a settings.php file.
+  stat: path="{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
+  register: drupal_install
+  
+- name: Symlink settings.php if needed.
+  file:
+    src: "./ce-vm.settings.php"
+    dest: "{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
+    state: link
+  when: not drupal_install.stat.exists 
+  
+- name: Check for local project drush existence.
+  stat: path="{{ project_dir }}/vendor/bin/drush"
+  register: local_drush
+
+- name: remover legacy drush utility.
+  file:
+    path: "/usr/local/bin/drush"
+    state: absent
+  when: local_drush.stat.exists
+
+- name: Symlink local drush.
+  file:
+    src: "{{ project_dir }}/vendor/bin/drush"
+    dest: "/usr/local/bin/drush"
+    state: link
+  when: local_drush.stat.exists
+
+- name: Trigger drush init tasks.
+  command: >
+    /usr/local/bin/drush init -y
+  become: true
+  become_user: vagrant
+  
+- name: Generate site aliases.
+  template:
+    src: aliases.drushrc.php.j2
+    dest: "/home/vagrant/.drush/aliases.drushrc.php"
+    owner: vagrant
+    group: vagrant
+    force: yes
+
+- name: Create project drush folder.
+  file:
+    path: "{{ project_dir }}/drush"
+    state: directory
+
+- name: Generate project drushrc.php.
+  template:
+    src: drushrc.php.j2
+    dest: "{{ project_dir }}/drush/drushrc.php"
+    force: no
+
+- name: Install Drupal.
+  command: drush si -y -r "{{ project_dir }}/{{ webroot }}" --db-url="mysql://dev:dev@{{ project_name }}-mysql:3306/drupal" --account-name=admin --account-pass=admin --site-name="{{ project_name }}"
+  when: not drupal_install.stat.exists
+
+- name: Clear Drupal caches.
+  command: drush cr -y -r "{{ project_dir }}/{{ webroot }}"
+  when: not ce_drupal_codebase.stat.exists
+
+- name: Copy Drupal ruleset for phpmd.
+  template:
+    src: drupal-ruleset.xml.j2
+    dest: "/home/vagrant/drupal-ruleset.xml"
+
+- name: Copy drupal-coder utility script.
+  template:
+    src: drupal-coder.sh.j2
+    dest: "/usr/local/bin/drupal-coder"
+    mode: 0755

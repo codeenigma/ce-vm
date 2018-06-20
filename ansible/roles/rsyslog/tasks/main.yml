@@ -1,0 +1,10 @@
+---
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/rsyslog"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes

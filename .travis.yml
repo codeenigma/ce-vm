@@ -1,0 +1,23 @@
+sudo: required
+language: bash
+
+os:
+  - linux
+
+services:
+ - docker
+
+env: 
+ - PROJECT=drupal FS=native
+ - PROJECT=wordpress FS=native
+ - PROJECT=symfony3 FS=native
+ - PROJECT=symfony4 FS=native
+ - PROJECT=custom FS=native
+
+install:
+ - curl -O https://releases.hashicorp.com/vagrant/2.0.3/vagrant_2.0.3_x86_64.deb
+ - sudo dpkg -i vagrant_2.0.3_x86_64.deb
+ - vagrant plugin install vagrant-hostsupdater
+
+script:
+ - /bin/bash tests/test.sh "$PROJECT" "$FS"

@@ -1,0 +1,21 @@
+---
+
+php_engine: On
+php_short_open_tag: Off
+php_expose_php: On
+php_max_execution_time: 120
+php_max_input_time: 60
+php_max_input_nesting_level: 64
+php_max_input_vars: 1000
+php_memory_limit: 256M
+php_error_reporting: E_ALL
+php_display_errors: On
+php_display_startup_errors: On
+php_log_errors_max_len: 1024
+php_ignore_repeated_errors: Off
+php_ignore_repeated_source: Off
+php_html_errors: On
+php_post_max_size: 200M
+php_upload_max_filesize: 200M
+php_max_file_uploads: 20
+php_date_timezone: "Europe/London"

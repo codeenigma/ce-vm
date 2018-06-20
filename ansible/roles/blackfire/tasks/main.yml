@@ -1,0 +1,71 @@
+---
+
+- name: Ensure Blackfire agent is not installed.
+  apt:
+    pkg: "blackfire-agent"
+    state: absent
+    purge: yes
+  when: not blackfire
+
+- name: Ensure Blackfire probe is not installed.
+  apt:
+    pkg: "blackfire-php"
+    state: absent
+    purge: yes
+  when: not blackfire
+
+- name: Add key for Blackfire repository.
+  apt_key: url=https://packagecloud.io/gpg.key state=present
+  when: blackfire
+
+- name: Add repository for Blackfire.
+  apt_repository: repo='deb http://packages.blackfire.io/debian any main' state=present
+  when: blackfire
+
+- name: Update apt cache.
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: blackfire
+
+- name: Ensure Blackfire agent is installed.
+  apt:
+    pkg: "blackfire-agent"
+    state: present
+  when: blackfire
+
+- name: Ensure Blackfire probe is installed.
+  apt:
+    pkg: "blackfire-php"
+    state: present
+  when: blackfire
+
+- name: Generate agent server configuration.
+  template:
+    src: agent.j2
+    dest: "/etc/blackfire/agent"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  when: blackfire
+
+- name: Generate agent client configuration.
+  template:
+    src: blackfire.ini.j2
+    dest: "/home/vagrant/.blackfire.ini"
+    owner: vagrant
+    group: vagrant
+    mode: 0644
+    force: yes
+  when: blackfire
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/blackfire"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+  when: blackfire

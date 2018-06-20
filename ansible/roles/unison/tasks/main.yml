@@ -1,0 +1,27 @@
+---
+  
+- name: Create Unison download shared cache dir if needed.
+  file:
+    path: '{{ shared_cache_dir }}/unison'
+    state: directory
+
+- name: Prepare ignore list.
+  set_fact: unison_ignore_string={{ unison_ignore | wrap | join(" -ignore ") }}
+
+- name: Copy run script in place.
+  template:
+    src: unison.sh.j2
+    dest: "/opt/unison.sh"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/unison"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes

@@ -1,0 +1,13 @@
+---
+
+docker_extra_args_mac_os:
+  - '--cap-add=SYS_RESOURCE'
+docker_extra_args_linux:
+  - '--cap-add=SYS_RESOURCE'
+docker_extra_args_windows:
+  - '--cap-add=SYS_RESOURCE'
+
+docker_image: "pmce/ce-vm-sonar:{{ ce_vm_version }}"
+net_ip: "{{ net_base }}.140"
+net_fwd_ports_mac_os:
+  - "{{ net_ip }}:9000:9000"

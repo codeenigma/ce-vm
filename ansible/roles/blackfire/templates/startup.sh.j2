@@ -1,0 +1,7 @@
+#!/bin/sh
+
+/usr/sbin/service blackfire-agent stop
+if [ -e /var/run/blackfire/agent.sock ]; then
+  rm /var/run/blackfire/agent.sock
+fi
+/usr/sbin/service blackfire-agent start

@@ -1,0 +1,16 @@
+---
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/frontail"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/frontail.html"
+    force: yes

@@ -1,0 +1,9 @@
+---
+
+host_aliases:
+  - dashboard.ce-vm.local
+  
+docker_image: "pmce/ce-vm-dashboard:{{ ce_vm_version }}"
+net_ip: "{{ net_base }}.20"
+net_fwd_ports_mac_os:
+  - "{{ net_ip }}:80:80"

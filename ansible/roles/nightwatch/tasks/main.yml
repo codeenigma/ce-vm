@@ -1,0 +1,36 @@
+---
+
+- name: Check if we already have tests.
+  stat: path="{{ project_dir }}/{{ nightwatch_folder }}"
+  register: ce_nightwatch_tests
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/nightwatch.html"
+    force: yes
+
+- name: Create tests folder.
+  file:
+    path: "{{ project_dir }}/{{ nightwatch_folder }}/tests"
+    state: directory
+    recurse: yes
+    owner: vagrant
+    group: vagrant
+  when: not ce_nightwatch_tests.stat.exists
+
+- name: Create example config.
+  template:
+    src: "nightwatch.json.j2"
+    dest: "{{ project_dir }}/{{ nightwatch_folder }}/nightwatch.json"
+    owner: vagrant
+    group: vagrant
+  when: not ce_nightwatch_tests.stat.exists
+
+- name: Create example test.
+  template:
+    src: "example_test.js.j2"
+    dest: "{{ project_dir }}/{{ nightwatch_folder }}/tests/example_test.js"
+    owner: vagrant
+    group: vagrant
+  when: not ce_nightwatch_tests.stat.exists

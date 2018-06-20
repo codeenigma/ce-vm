@@ -1,0 +1,18 @@
+---
+
+- hosts: all
+  become: yes
+  
+  pre_tasks:
+    
+    - name: Run init tasks
+      import_tasks: tasks/init.yml
+
+  roles:
+    - { role: unison, when: volume_type == 'unison' }
+    - { role: php-cli }
+    - { role: rsyslog_client }
+    - { role: postfix }
+    - { role: nodejs, nodejs_version: 8.x}
+    - { role: yarn }
+    - { role: ce_prototype }

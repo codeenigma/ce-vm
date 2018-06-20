@@ -1,0 +1,3 @@
+#!/bin/sh
+
+nohup flock /tmp/dashboard.lock /usr/bin/php -S {{ net_ip }}:80 -t {{ ce_vm_webroot }}/ &

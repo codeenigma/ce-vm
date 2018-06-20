@@ -1,0 +1,37 @@
+---
+
+- name: Check if we already have a codebase.
+  stat: path="{{ project_dir }}/{{ prototype_folder }}"
+
+- name: Install dependencies.
+  command: yarn install
+  args:
+    chdir: "{{ project_dir }}/{{ prototype_folder }}"
+  become: true
+  become_user: vagrant
+
+- name: Remove startup script.
+  file:
+    path: "/opt/run-parts/prototype"
+    state: absent
+  when: not prototype_autostart
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/prototype"
+    owner: root
+    group: root
+    mode: 0555
+  when: prototype_autostart
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/prototype.html"
+    force: yes
+
+- name: Ensure sourcemap location for CSS.
+  command: npm config set ce-pl:root "{{ host_project_dir }}/{{ prototype_folder }}"
+  become: true
+  become_user: vagrant

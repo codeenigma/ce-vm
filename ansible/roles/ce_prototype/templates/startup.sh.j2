@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd {{ project_dir }}/{{ prototype_folder }}
+su vagrant -c 'nohup /usr/bin/npm run start >/dev/null 2>&1 &'

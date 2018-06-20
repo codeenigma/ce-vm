@@ -1,0 +1,14 @@
+---
+
+- hosts: all
+  become: yes
+  
+  pre_tasks:
+    
+    - name: Run init tasks
+      import_tasks: tasks/init.yml
+    
+  roles:
+    - { role: unison, when: volume_type == 'unison' }
+    - { role: rsyslog_client }
+    - { role: solr }

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+while true; do
+  flock /tmp/unison.lock /usr/local/bin/unison -owner -group -batch -ignore {{ unison_ignore_string }} -repeat watch -fastercheckUNSAFE -prefer /.ce-vm-mirror{{ project_dir }} /.ce-vm-mirror{{ project_dir }} {{ project_dir }}
+done

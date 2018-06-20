@@ -1,0 +1,10 @@
+---
+
+memcached_memory: 512
+memcached_port: 11211  
+
+docker_image: "pmce/ce-vm-memcached:{{ ce_vm_version }}"
+net_ip: "{{ net_base }}.60"
+net_fwd_ports_mac_os:
+  - "{{ net_ip }}:{{ memcached_port }}:{{ memcached_port }}"
+

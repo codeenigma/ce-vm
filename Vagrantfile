@@ -5,7 +5,7 @@ VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
 # Prevent Vagrant from looking for VBox.
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
-# We need the database to be always setup first,
+# We need the 'app' to be always setup last,
 # so can't process provisioning in parallel.
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 
@@ -35,33 +35,33 @@ def parse(conf)
 end
 
 # Load configuration (taken from https://github.com/geerlingguy/drupal-vm ?).
-def conf_init(parsed_conf, conf_files)
+def conf_init(conf_files)
+  conf = {}
   conf_files.each do |config_file|
-    if File.exist?("#{config_file}")
-      parsed_conf.merge!(YAML.load_file("#{config_file}"))
+    if File.exist?(config_file)
+      conf.merge!(YAML.load_file(config_file))
     end
   end
-  parsed_conf = parse(parsed_conf)
+  conf = parse(conf)
+  return conf
 end
 
-# Gather potential playbook locations.
-def playbooks_find(host_dirs, run_dirs, filename)
-  filtered = [];
-  host_dirs.each.with_index do |h_dir, key|
-    if(Dir.exists?(h_dir))
-      if(File.exist?(File.join(h_dir, filename)))
-        filtered.push(File.join(run_dirs[key], filename))
-      end
+# Build a list of files.
+def build_file_list(dirs, filenames)
+  files = []
+  filenames.each do |filename|
+    dirs.each do |dir|
+      files.push(File.join(dir, filename))
     end
   end
-  return filtered
+  return files
 end
 
-# Gather potential config files locations.
-def config_files_find(host_files, run_files)
-  filtered = [];
+# Filter existing files for guest.
+def filter_file_list(host_files, run_files)
+  filtered = []
   host_files.each.with_index do |h_file, key|
-    if(File.exists?(h_file))
+    if(File.exist?(h_file))
       filtered.push(run_files[key])
     end
   end
@@ -89,23 +89,22 @@ def ensure_lo_alias(ip)
   puts "Ensure loopback interface alias exists for #{ip}."
 end
 
+# Ensure plugins are installed (taken from https://github.com/roots/trellis/pull/829/commits/b0563ed0492757db4a972b22d20e09f2f7ac2ac4).
+def ensure_plugins(plugins)
+  logger = Vagrant::UI::Colored.new
+  plugins.each do |plugin|
+    manager = Vagrant::Plugin::Manager.instance
+    next if manager.installed_plugins.has_key?(plugin)
+    logger.warn("Installing missing dependancy plugin #{plugin}.")
+    manager.install_plugin(plugin)
+    # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
+    logger.warn("Please re-run the initial command.")
+    exit
+  end
+end
+
 ################ Paths definitions.
 ################################################################################
-# Absolute paths on the host machine.
-host_project_dir = File.dirname(File.expand_path('..', ENV['PROJECT_VAGRANTFILE']))
-host_home_dir = File.expand_path('~')
-# Absolute paths on the guest machine.
-guest_project_dir = '/vagrant'
-guest_home_dir = '/home/vagrant'
-guest_mirror_dir = '/.ce-vm-mirror'
-
-# Relative paths.
-vm_dir = File.basename(File.dirname(File.expand_path(ENV['PROJECT_VAGRANTFILE'])))
-ansible_dir = 'ansible'
-ce_local_home = '.CodeEnigma'
-ce_vm_local_home = "#{ce_local_home}/ce-vm"
-ce_vm_local_upstream_repo = "#{ce_vm_local_home}/ce-vm-upstream"
-ce_vm_local_custom_repo = "#{ce_vm_local_home}/ce-vm-custom"
 
 # Remote. Normally passed by the project's Vagrantfile.
 # Default to 3.x for backward compatibilty, as this feature
@@ -119,50 +118,67 @@ end
 ce_vm_upstream_repo = ENV['CE_VM_UPSTREAM_REPO']
 ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
 
+# Absolute paths on the host machine.
+host_project_dir = File.dirname(File.expand_path('..', ENV['PROJECT_VAGRANTFILE']))
+host_home_dir = File.expand_path('~')
+# Absolute paths on the guest machine.
+guest_project_dir = '/vagrant'
+guest_home_dir = '/home/vagrant'
+guest_mirror_dir = '/.ce-vm-mirror'
+
+# Relative paths.
+vm_dir = File.basename(File.dirname(File.expand_path(ENV['PROJECT_VAGRANTFILE'])))
+ansible_dir = 'ansible'
+ce_local_home = '.CodeEnigma'
+ce_vm_local_home = File.join(ce_local_home, 'ce-vm')
+unless (['2.x', '3.x', '4.x'].include? ce_vm_upstream_branch)
+  ce_vm_local_home = File.join(ce_vm_local_home, ce_vm_upstream_branch)
+end
+ce_vm_local_upstream_repo = File.join(ce_vm_local_home, 'ce-vm-upstream')
+ce_vm_local_custom_repo = File.join(ce_vm_local_home, 'ce-vm-custom')
+
 ################ Configuration loading.
 ################################################################################
 # Order of config files and ansible playbooks does matter !
-host_conf_files = [
-  File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", 'config.yml'),
-  File.join("#{host_project_dir}", "#{vm_dir}", 'config.yml'),
-  File.join("#{host_home_dir}", "#{ce_vm_local_custom_repo}", 'config.yml'),
-  File.join("#{host_project_dir}", "#{vm_dir}", 'local.config.yml'),
+host_conf_dirs = [
+  File.join(host_home_dir, ce_vm_local_upstream_repo),
+  File.join(host_project_dir, vm_dir),
+  File.join(host_home_dir, ce_vm_local_custom_repo),
+  File.join(host_project_dir, vm_dir, 'local'),
 ]
-
-# Initial config. This is reloaded later.
-parsed_conf = conf_init({}, host_conf_files)
-
-guest_conf_files = [
-  File.join("#{guest_home_dir}", "#{ce_vm_local_upstream_repo}", 'config.yml'),
-  File.join("#{guest_project_dir}", "#{vm_dir}", 'config.yml'),
-  File.join("#{guest_home_dir}", "#{ce_vm_local_custom_repo}", 'config.yml'),
-  File.join("#{guest_project_dir}", "#{vm_dir}", 'local.config.yml'),
+guest_conf_dirs = [
+  File.join(guest_home_dir, ce_vm_local_upstream_repo),
+  File.join(guest_project_dir, vm_dir),
+  File.join(guest_home_dir, ce_vm_local_custom_repo),
+  File.join(guest_project_dir, vm_dir, 'local'),
 ]
-
 host_playbook_dirs = [
-  File.join("#{host_project_dir}", "#{vm_dir}",  "#{ansible_dir}"),
-  File.join("#{host_home_dir}", "#{ce_vm_local_custom_repo}", "#{ansible_dir}"),
-  File.join("#{host_project_dir}", "#{vm_dir}", "local.#{ansible_dir}"),
+  File.join(host_home_dir, ce_vm_local_upstream_repo, ansible_dir),
+  File.join(host_project_dir, vm_dir,  ansible_dir),
+  File.join(host_home_dir, ce_vm_local_custom_repo, ansible_dir),
+  File.join(host_project_dir, vm_dir, 'local', ansible_dir),
 ]
-if(parsed_conf['ce_vm_upstream'] === true)
-  host_playbook_dirs.unshift(File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}", "#{ansible_dir}"))
-end
-
 guest_playbook_dirs = [
-  File.join("#{guest_project_dir}", "#{vm_dir}", "#{ansible_dir}"),
-  File.join("#{guest_home_dir}", "#{ce_vm_local_custom_repo}", "#{ansible_dir}"),
-  File.join("#{guest_project_dir}", "#{vm_dir}", "local.#{ansible_dir}"),
+  File.join(guest_home_dir, ce_vm_local_upstream_repo, ansible_dir),
+  File.join(guest_project_dir, vm_dir, ansible_dir),
+  File.join(guest_home_dir, ce_vm_local_custom_repo, ansible_dir),
+  File.join(guest_project_dir, vm_dir, 'local', ansible_dir),
 ]
-if(parsed_conf['ce_vm_upstream'] === true)
-  guest_playbook_dirs.unshift(File.join("#{guest_home_dir}", "#{ce_vm_local_upstream_repo}", "#{ansible_dir}"))
-end
+# Initial config. This is reloaded later.
+host_conf_files = build_file_list(host_conf_dirs, ['config.yml'])
+parsed_conf = conf_init(host_conf_files)
 
-################ Branch setup.
+################ Initial setup.
 ################################################################################
+# Ensure we have the needed plugins.
+if (ARGV.include? 'up')
+  plugins = ['vagrant-hostsupdater']
+  ensure_plugins(plugins)
+end
 # Update repo if needed, and ensure we're on the right branch.
 _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
 if (ARGV.include? 'up') || (ARGV.include? 'halt')
-  if(parsed_conf['ce_vm_upstream_auto_pull'] === true)
+  if(parsed_conf['ce_vm_auto_update'] === true)
     puts "Ensure ce-vm is up-to-date."
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "fetch")
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
@@ -171,7 +187,8 @@ if (ARGV.include? 'up') || (ARGV.include? 'halt')
 end
 # Reload config on the matching branch.
 Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
-parsed_conf = conf_init({}, host_conf_files)
+parsed_conf = conf_init(host_conf_files)
+net_name = "ce-vm-#{parsed_conf['net_subnet']}"
 
 ################ Common processing.
 ################################################################################
@@ -182,10 +199,10 @@ host_ce_home = File.join("#{host_home_dir}", "#{ce_vm_local_home}")
 guest_ce_home = File.join("#{guest_home_dir}", "#{ce_vm_local_home}")
 home_ce_volume = {'source' => "#{host_ce_home}", 'dest' => "#{guest_ce_home}"}
 #@todo, add a setting for "extra" shared volumes.
-shared_volumes = [];
-
-# Gather config files to pass to Ansible.
-run_config_files = config_files_find(host_conf_files, guest_conf_files)
+shared_volumes = [
+  home_ce_volume,
+  data_volume,
+];
 
 # Pass host platform to ansible.
 host_platform="windows"
@@ -194,90 +211,6 @@ if (RUBY_PLATFORM =~ /darwin/)
 end
 if (RUBY_PLATFORM =~ /linux/)
   host_platform="linux"
-end
-# Configuration to pass to Ansible.
-ansible_extra_vars = {
-  config_files: "#{run_config_files}",
-  project_dir: "#{guest_project_dir}",
-  vm_dir: "#{vm_dir}",
-  ce_vm_home: "#{guest_ce_home}",
-  shared_cache_dir: "#{guest_ce_home}/cache",
-  host_platform: "#{host_platform}",
-}
-
-net_name = "codeenigma-cevm"
-
-shared_volumes.push(home_ce_volume)
-
-# Vagrant uid change.
-$vagrant_uid = <<SCRIPT
-OWN_CHANGED=0
-if [ "$(id -u vagrant)" != "#{parsed_conf['docker_vagrant_user_uid']}" ]; then
-  usermod -u #{parsed_conf['docker_vagrant_user_uid']} vagrant
-  echo "User ID changed to #{parsed_conf['docker_vagrant_user_uid']}."
-  chown -R vagrant:www-data /vagrant
-  echo "Changed ownership of shared files accordingly."
-  OWN_CHANGED=1
-fi
-if [ "$(id -g vagrant)" != "#{parsed_conf['docker_vagrant_group_gid']}" ]; then
-  groupmod -g #{parsed_conf['docker_vagrant_group_gid']} vagrant
-  OWN_CHANGED=1
-fi
-if [ $OWN_CHANGED -eq 1 ]; then
-  echo "Interrupting the provisioning for the ownership changes to take effect."
-  echo "This will trigger a Vagrant error below, do not panic this is normal."
-  echo "Please manually relaunch the process using 'vagrant up'."
-  exit 1
-fi
-
-SCRIPT
-
-# Initial data sync.
-$mirror = <<SCRIPT
-echo "Initial data mirror synchronisation."
-if [ ! -d "#{guest_project_dir}" ]; then
-  mkdir "#{guest_project_dir}"
-fi
-rsync -av --chown=vagrant:vagrant --chmod=0777 --exclude=".git" --exclude=".vagrant" --exclude=".unison.*" "#{guest_mirror_dir}#{guest_project_dir}/#{vm_dir}" "#{guest_project_dir}/"
-SCRIPT
-
-# Platform-specific adjustments. 
-# This ugly pile of crap is going to DIE soon !!!
-if (parsed_conf['docker_db_fwd_ports'] == "auto")
-  parsed_conf['docker_db_fwd_ports'] = [];
-  if(host_platform == "mac_os")
-    parsed_conf['docker_db_fwd_ports'] = [
-      "#{parsed_conf['net_db_ip']}:3306:3306",
-      "#{parsed_conf['net_db_ip']}:8080:8080"
-    ];
-  end
-end
-if (parsed_conf['docker_app_fwd_ports'] == "auto")
-  parsed_conf['docker_app_fwd_ports'] = [];
-  if(host_platform == "mac_os")
-    parsed_conf['docker_app_fwd_ports'] = [
-      "#{parsed_conf['net_app_ip']}:80:80",
-      "#{parsed_conf['net_app_ip']}:443:443",
-      "#{parsed_conf['net_app_ip']}:5999:5999",
-      "#{parsed_conf['net_app_ip']}:8000:8000"
-    ];
-  end
-end
-if (parsed_conf['docker_proto_fwd_ports'] == "auto")
-  parsed_conf['docker_proto_fwd_ports'] = [];
-  if(host_platform == "mac_os")
-    parsed_conf['docker_proto_fwd_ports'] = [
-      "#{parsed_conf['net_proto_ip']}:80:80"
-    ];
-  end
-end
-if (parsed_conf['docker_log_fwd_ports'] == "auto")
-  parsed_conf['docker_log_fwd_ports'] = [];
-  if(host_platform == "mac_os")
-    parsed_conf['docker_log_fwd_ports'] = [
-      "#{parsed_conf['net_log_ip']}:80:80"
-    ];
-  end
 end
 
 # On UP operation, create our network if needed.
@@ -289,8 +222,14 @@ if (ARGV.include? 'up')
   end
 end
 
-services = ['log', 'db', 'app']
-ssh_ports = {'log' => 22205,'db' => 22203, 'app'=> 22202}
+# Gather enabled services, and pull images if needed.
+services = ['log', 'dashboard']
+parsed_conf['services'].each do |enabled|
+  unless(['log', 'dashboard'].include? enabled)
+    services.push(enabled)
+  end
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   ################# Common config.
@@ -300,81 +239,125 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Iterate over services.
   services.each do |service|
-    is_primary = false
-    if (service === 'app')
-      is_primary = true
-    end
-    name = "#{parsed_conf['project_name']}-#{service}"
-    # SSH port forwarding.
-    if (parsed_conf["docker_#{service}_ssh_port"] === "auto")
-      parsed_conf["docker_#{service}_ssh_port"] = 22
-      if(host_platform == "mac_os")
-        parsed_conf["docker_#{service}_ssh_port"] = ssh_ports[service]
-      end
-    end
-    # Privileged mode.
-    if (parsed_conf["docker_#{service}_privileged"] == "auto")
-      parsed_conf["docker_#{service}_privileged"] = false
-      if(host_platform == "mac_os") && (service == "db")
-        parsed_conf["docker_#{service}_privileged"] = true
-      end
-    end
-    # Gather playbooks.
-    run_playbooks = playbooks_find(host_playbook_dirs, guest_playbook_dirs, "#{service}.yml")
+    # Reload config for the given service.
+    host_service_conf_files = build_file_list(host_conf_dirs, ['config.yml', "service.#{service}.yml"])
+    guest_service_conf_files = build_file_list(guest_conf_dirs, ['config.yml', "service.#{service}.yml"])
+    run_service_conf_files = filter_file_list(host_service_conf_files, guest_service_conf_files)
+    service_conf = conf_init(host_service_conf_files)
+    # Gather existing playbooks.
+    host_service_playbooks = build_file_list(host_playbook_dirs, ["#{service}.yml"])
+    guest_service_playbooks = build_file_list(guest_playbook_dirs, ["#{service}.yml"])
+    run_service_playbooks = filter_file_list(host_service_playbooks, guest_service_playbooks)
     # Mac OS X, we need interface aliases.
     if(host_platform == "mac_os") && (ARGV.include? 'up')
-      ensure_lo_alias(parsed_conf["net_#{service}_ip"])
+      ensure_lo_alias(service_conf["net_ip"])
     end
+    is_primary = false
+    if (service === 'cli')
+      is_primary = true
+    end
+    # Grab user uid/gid for vagrant user.
+    if service_conf['docker_vagrant_user_uid'].nil?
+      service_conf['docker_vagrant_user_uid'] = 1000
+      if (host_platform === 'linux')
+        service_conf['docker_vagrant_user_uid'] = Process.uid
+      end
+    end
+
+    if service_conf['docker_vagrant_group_gid'].nil?
+      service_conf['docker_vagrant_group_gid'] = 1000
+      if (host_platform === 'linux')
+        service_conf['docker_vagrant_group_gid'] = Process.gid
+      end
+    end
+
+    name = "#{service_conf['project_name']}-#{service}"
     ################# Indivual container.
-    config.vm.define "#{service}-vm", primary: is_primary do |container|
-      # Base properties.
-      container.ssh.host = parsed_conf["net_#{service}_ip"]
-      container.ssh.port = parsed_conf["docker_#{service}_ssh_port"]
-      container.vm.hostname = "#{name}"
-      if(parsed_conf["docker_#{service}_ssh_port"] != 22)
-        # Disable automatic port forwarding, we need a set one for docker.
-        container.vm.network :forwarded_port, guest: 22, host: parsed_conf["docker_#{service}_ssh_port"], host_ip: parsed_conf["net_#{service}_ip"], id: 'ssh'
+    config.vm.define "#{service}", primary: is_primary do |container|
+      # Only Mac needs port forwarding.
+      unless(host_platform == "mac_os")
+        container.ssh.host = service_conf["net_ip"]
+        container.ssh.port = 22
+      end
+      # HostUpdater support.
+      container.vm.hostname = "#{name}.#{service_conf['domain']}"
+      container.vm.network :private_network, ip: service_conf["net_ip"]
+      unless service_conf['host_aliases'].nil?
+        container.hostsupdater.aliases = service_conf['host_aliases']
       end
       # Shared folders
       container.vm.synced_folder ".", "/vagrant", disabled: true
+      # Always use native fs for base services.
+      if (['dashboard', 'log'].include? service)
+       service_conf['volume_type'] = 'native'
+      end
       volumes = []
-      shared_volumes.each do |synced_folder|
-        volumes.push("#{synced_folder['source']}/:#{synced_folder['dest']}:delegated")
-      end
-      dest = "#{data_volume['dest']}"
-      source = "#{data_volume['source']}"
-      if (parsed_conf['docker_mirror']) && (service === 'app')
-        dest = "#{guest_mirror_dir}#{dest}"
-        container.vm.provision "shell", inline: $mirror
-      end
-      volumes.push("#{source}/:#{dest}:delegated")
-      # First ensure 'vagrant' ownership match.
-      container.vm.provision "shell", inline: $vagrant_uid
-      # Run actual playbooks.
-      run_playbooks.each do |ansible_playbook_file|
-        container.vm.provision 'ansible_local' do |ansible|
-          ansible.playbook = ansible_playbook_file
-          ansible.extra_vars = ansible_extra_vars
+      shared_volumes.each.with_index do |synced_folder|
+        dest = "#{synced_folder['dest']}"
+        source = "#{synced_folder['source']}"
+        if (service_conf['volume_type'] === 'sshfs')
+          container.vm.provision "shell", run: "always", inline: "sudo mkdir -p #{dest} && sudo chown vagrant:vagrant #{dest} && mountpoint -q #{dest} || sudo sshfs -o kernel_cache -o cache=yes -o compression=yes -o allow_other -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/vagrant/.ssh/id_rsa vagrant@#{parsed_conf['project_name']}-dashboard:#{dest} #{dest}"
+        else
+          if (service_conf['volume_type'] === 'unison') && (dest === data_volume['dest'])
+            original_dest = dest
+            dest = "#{guest_mirror_dir}#{dest}"
+            container.vm.provision "shell", inline: "mkdir -p #{original_dest} -m 0777 && rsync -av --owner --perms --chmod=0777 --delete --exclude='.git' --exclude='.vagrant' '#{dest}/' '#{original_dest}' && chown vagrant:vagrant #{original_dest}"
+          end
+          volumes.push("#{source}/:#{dest}:delegated")
         end
       end
-      # Run startup scripts.
+      # Run actual playbooks.
+      run_service_playbooks.each do |ansible_playbook_file|
+        container.vm.provision 'ansible_local' do |ansible|
+          # Configuration to pass to Ansible.
+          ansible_extra_vars = {
+            config_files: "#{run_service_conf_files}",
+            project_dir: "#{guest_project_dir}",
+            host_project_dir: "#{host_project_dir}",
+            vm_dir: "#{vm_dir}",
+            ce_vm_home: "#{guest_ce_home}",
+            shared_cache_dir: "#{guest_ce_home}/cache",
+            host_platform: "#{host_platform}",
+            service_hostname: "#{container.vm.hostname}",
+            service_name: "#{name}",
+          }
+          ansible.playbook = ansible_playbook_file
+          ansible.extra_vars = ansible_extra_vars
+          #ansible.compatibility_mode = '2.0'
+        end
+      end
+      # Run startup scripts, post provisioning.
       container.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
       # Docker settings.
       container.vm.provider "docker" do |d|
-        d.force_host_vm = false
-        d.image = "pmce/ce-vm-#{service}:4.1.0"
-        d.name = "#{name}"
-        d.create_args = [
+        docker_args = [
           "--network=#{net_name}",
           "--ip",
-          "#{parsed_conf["net_#{service}_ip"]}",
-          "-P",
-          "--privileged=#{parsed_conf["docker_#{service}_privileged"]}", # Tomcat7 needs this on Mac.
-          "--cap-add=SYS_PTRACE"
+          "#{service_conf["net_ip"]}",
+          "--volume",
+          "ce-vm-cache:#{guest_ce_home}/cache",
+          "--volume",
+          "/var"
         ]
-        d.ports = parsed_conf["docker_#{service}_fwd_ports"]
+        if(service_conf["docker_extra_args_#{host_platform}"])
+          service_conf["docker_extra_args_#{host_platform}"].each do |arg|
+            docker_args.push(arg)
+          end
+        end
+        # We need to run in privileged mode for sshfs.
+        if(service_conf['volume_type'] === 'sshfs')
+          d.privileged = true
+        end
+        d.force_host_vm = false
+        d.image = service_conf['docker_image']
+        d.name = "#{name}"
         d.has_ssh = true
         d.volumes = volumes
+        if (service_conf["net_fwd_ports_#{host_platform}"])
+          d.ports = service_conf["net_fwd_ports_#{host_platform}"]
+        end
+        d.create_args = docker_args
+        d.cmd = ["/bin/sh", "/opt/ce-vm-start.sh", "#{service_conf['docker_vagrant_user_uid']}", "#{service_conf['docker_vagrant_group_gid']}"]
       end
     end
   end

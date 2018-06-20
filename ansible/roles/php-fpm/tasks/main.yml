@@ -1,0 +1,51 @@
+---
+
+- name: Set php version (phar)
+  command: "update-alternatives --set phar /usr/bin/phar{{ php_version }}"
+
+- name: Set php version (phar.phar)
+  command: "update-alternatives --set phar.phar /usr/bin/phar.phar{{ php_version }}"
+
+- name: Set php version (php)
+  command: "update-alternatives --set php /usr/bin/php{{ php_version }}"
+
+- name: Set php version (php-config)
+  command: "update-alternatives --set php-config /usr/bin/php-config{{ php_version }}"
+
+
+- name: Copy php.ini for php-fpm.
+  template:
+    src: php.fpm.ini.j2
+    dest: "/etc/php/{{ php_version }}/fpm/php.ini"
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/php"
+    owner: root
+    group: root
+    mode: 0555
+
+- name: Change UNIX socket to TCP.
+  replace:
+    path: "/etc/php/{{ php_version }}/fpm/pool.d/www.conf"
+    regexp: "/run/php/php{{ php_version }}-fpm.sock"
+    replace: "{{ net_ip }}:9000"
+    group: root
+    mode: 0555    
+    
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/php.html"
+    force: yes
+
+- name: Create PHP info webroot.
+  file:
+    dest: "{{ local_var_www_dir }}/php"
+    state: directory
+    
+- name: Create PHP info page.
+  template:
+    src: "index.php.j2"
+    dest: "{{ local_var_www_dir }}/php/index.php"
