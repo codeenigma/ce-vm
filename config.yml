@@ -35,6 +35,7 @@ services:
   - redis
   - solr
   - haproxy
+  - nightwatch
   - cli
 
 ####### Networking.
@@ -46,12 +47,6 @@ net_gateway: "{{ net_base }}.1"
 domain: 'ce-vm.local'
 
 ####### Common settings.
-
-# Extra Debian packages to install.
-apt_extra_packages: ''
-#apt_extra_packages:
-#  - "ruby"
-#  - "mysql-client"
 
 php_version: 7.1
 
@@ -69,7 +64,7 @@ ce_vm_auto_update: yes
 # File mount binding.
 volume_type: native
 
-# Enable xdebug for PHP-FPM
+# Enable xdebug for PHP
 php_xdebug: yes
 
 # Enable blackfire for PHP
