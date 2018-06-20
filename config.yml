@@ -31,7 +31,6 @@ services:
   - mysql
   - nginx
   - nodejs
-  - prototype
   - redis
   - solr
   - haproxy
