@@ -5,9 +5,11 @@ VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
 # Prevent Vagrant from looking for VBox.
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
-# We need the 'app' to be always setup last,
+# We need to control order,
 # so can't process provisioning in parallel.
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
+# Ensure this is not nil.
+ENV['VAGRANT_DOTFILE_PATH'] = '.vagrant' if ENV['VAGRANT_DOTFILE_PATH'].nil?
 
 require 'yaml'
 
@@ -87,6 +89,30 @@ end
 def ensure_lo_alias(ip)
   Vagrant::Util::Subprocess.execute("sudo", "ifconfig", "lo0", "alias", "#{ip}/32")
   puts "Ensure loopback interface alias exists for #{ip}."
+end
+
+# Forces the 'link' from Vagrant to Docker, as it can get lost in case of failure.
+# This can only work because we have 'set' names, and container names are unique.
+def ensure_docker_id(service, name)
+  docker_id = Vagrant::Util::Subprocess.execute("docker", "inspect", "--format={{.Id}}", name).stdout.strip!;
+  if docker_id.empty?
+    # Nothing to do.
+    return
+  end
+  # Check if we have a vagrant subfolder.
+  docker_id_file = File.join(ENV["VAGRANT_DOTFILE_PATH"], 'machines', service, 'docker', 'id')
+  unless File.exists?(docker_id_file)
+    # Something is totally borked.
+    raise Vagrant::Errors::VagrantError.new, "Missing internal Vagrant marker file #{docker_id_file} but a container with name #{name} was found. \n This should not happen under normal operations and indicates the container failed to start properly or was not stopped properly. !\nThe safest is to delete the container with `docker rm #{docker_id}` and start from fresh.\n If you feeling adventurous and you know what you are doing, you can try to `touch #{docker_id_file}` and `vagrant up` again."
+  end
+  stored_id = File.read(docker_id_file)
+  # Nothing to do, everything matches.
+  if "#{stored_id}" === "#{docker_id}"
+    return;
+  end
+  # Connection somehow got lost. Try to resume.
+  puts "Warning: the container #{name} exists, but is not present in Vagrant machine index. \n Attempting to re-map them, but it might be corrupted.\n You might need to `vagrant destroy #{service}’ and recreate it with a `vagrant up` again in case of issues." 
+  File.write(docker_id_file, docker_id)
 end
 
 # Ensure plugins are installed (taken from https://github.com/roots/trellis/pull/829/commits/b0563ed0492757db4a972b22d20e09f2f7ac2ac4).
@@ -252,6 +278,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if(host_platform == "mac_os") && (ARGV.include? 'up')
       ensure_lo_alias(service_conf["net_ip"])
     end
+    # @TODO this could be an option.
     is_primary = false
     if (service === 'cli')
       is_primary = true
@@ -272,6 +299,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     name = "#{service_conf['project_name']}-#{service}"
+    # Check if container already exists, by grabbing it by name.
+    if (ARGV.include? 'up')
+      ensure_docker_id(service, name)
+    end
     ################# Indivual container.
     config.vm.define "#{service}", primary: is_primary do |container|
       # Only Mac needs port forwarding.
