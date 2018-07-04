@@ -24,13 +24,15 @@ case "$1" in
   restart)
         /opt/selenium-daemon-stop
         sleep 1
-        /opt/selenium-daemon-start
+        runuser -l vagrant -c "/bin/sh /opt/selenium-daemon-start"
         ;;      
 
   status)
         PID=$(pgrep --full "selenium-server-standalone.jar")
         if [ ! -z "$PID" ]; then
          echo "Selenium server appears to be running"
+        else 
+         echo "Selenium server appears to be stopped"
         fi
         ;;
   *)

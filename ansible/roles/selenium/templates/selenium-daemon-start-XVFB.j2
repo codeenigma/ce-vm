@@ -1,0 +1,5 @@
+#!/bin/sh
+
+/usr/bin/Xvfb -ac :99 &
+export DISPLAY=:99
+/usr/bin/java -Dwebdriver.gecko.driver=/opt/geckodriver -Dwebdriver.chrome.driver=/opt/chromedriver -jar /opt/selenium-server-standalone.jar &

@@ -14,4 +14,5 @@
     - { role: postfix }
     - { role: nodejs, nodejs_version: 8.x}
     - { role: yarn }
+    - { role: selenium }
     - { role: nightwatch }

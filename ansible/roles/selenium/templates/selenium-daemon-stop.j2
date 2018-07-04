@@ -14,3 +14,11 @@ PID=$(pgrep --full "Xvfb")
 if [ ! -z "$PID" ]; then
   kill $PID
 fi
+
+if [ -e "/tmp/.X99-lock" ]; then
+  rm "/tmp/.X99-lock"
+fi
+
+if [ -e "/tmp/.X11-unix/X99" ]; then
+  rm "/tmp/.X11-unix/X99"
+fi

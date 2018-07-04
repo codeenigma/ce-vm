@@ -1,0 +1,8 @@
+#!/bin/sh
+
+[ -x /etc/vnc/xstartup ] && exec /etc/vnc/xstartup
+[ -r /home/vagrant/.Xresources ] && xrdb $HOME/.Xresources
+xsetroot -solid grey
+export DISPLAY=:99
+java -Dwebdriver.gecko.driver=/opt/geckodriver -Dwebdriver.chrome.driver=/opt/chromedriver -jar /opt/selenium-server-standalone.jar &
+x-terminal-emulator -ls -title "$VNCDESKTOP Desktop" &
