@@ -1,12 +1,20 @@
 #!/bin/sh
 
+chown -R mysql:mysql /var/lib/mysql
+chown -R mysql:mysql /run/mysqld
+chmod -R 777 /run/mysqld
+
+touch /var/lib/mysql
+find /var/lib/mysql -exec touch -c {} +
+
 /usr/sbin/service mysql stop
 if [ -f /run/mysqld/mysqld.pid ]; then
   rm /run/mysqld/mysqld.pid
 fi
 
-touch /var/lib/mysql
-find /var/lib/mysql/mysql -exec touch -c -a {} +
-chown mysql:mysql /var/lib/mysql
+if [ -f /run/mysqld/mysqld.sock ]; then
+  rm /run/mysqld/mysqld.sock
+fi
+
 
 /usr/sbin/service mysql start
