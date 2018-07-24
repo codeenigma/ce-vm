@@ -57,7 +57,7 @@ apt_extra_packages: ''
 # individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
 ################################################################################
 
-ce_vm_version: "5.0.2"
+ce_vm_version: "5.0.3"
 
 # Turn automatic update of the core stack ON/OFF.
 # Useful for offline use.
