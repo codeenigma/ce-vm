@@ -17,6 +17,10 @@ project_name: default
 # Project type, can be either drupal, symfony, wordpress pr php_generic.
 project_type: drupal
 
+# Skip any installation step (for Drupal/WP), even on fresh setup.
+# Set this to yes when you already using db dumps.
+skip_install: no
+
 # Webroot, relative to project folder.
 webroot: www
 

@@ -126,7 +126,9 @@
 
 - name: Install Drupal.
   command: drush si -y -r "{{ project_dir }}/{{ webroot }}" --db-url="mysql://dev:dev@{{ project_name }}-mysql:3306/drupal" --account-name=admin --account-pass=admin --site-name="{{ project_name }}"
-  when: not drupal_install.stat.exists
+  when: 
+    - not drupal_install.stat.exists
+    - not skip_install
 
 - name: Clear Drupal caches.
   command: drush cr -y -r "{{ project_dir }}/{{ webroot }}"
