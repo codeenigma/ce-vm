@@ -29,6 +29,12 @@
     dest: "{{ ce_vm_webroot }}/includes/nginx.html"
     force: yes
 
+- name: Raise server_names_hash_bucket_size to cope with long names.
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    regexp: 'server_names_hash_bucket_size'
+    line: 'server_names_hash_bucket_size 256;'
+
 - name: Copy startup script in place.
   template:
     src: startup.sh.j2
