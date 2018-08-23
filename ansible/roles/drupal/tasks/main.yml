@@ -75,12 +75,11 @@
   stat: path="{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
   register: drupal_install
   
-- name: Symlink settings.php if needed.
-  file:
-    src: "./ce-vm.settings.php"
+- name: Generate settings.php from ce-vm one.
+  template:
+    src: "{{ project_dir }}/{{ webroot }}/sites/default/ce-vm.settings.php"
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
-    state: link
-  when: not drupal_install.stat.exists 
+    force: yes
   
 - name: Check for local project drush existence.
   stat: path="{{ project_dir }}/vendor/bin/drush"
