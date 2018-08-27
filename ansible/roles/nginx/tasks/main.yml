@@ -66,4 +66,7 @@
     register: letsencrypt_cert
 
 - name: Register certificate if needed.
-  cmd: "/usr/bin/certbot certonly -n --cert-name {{ service_hostname }} --standalone --preferred-challenges http -d {{ service_hostname }} --agree-tos -m {{ ssl_letsencrypt_mail }}"
+  command: "/usr/bin/certbot certonly -n --cert-name {{ service_hostname }} --standalone --preferred-challenges http -d {{ service_hostname }} --agree-tos -m {{ ssl_letsencrypt_mail }}"
+  when: 
+    - ssl_handling == "letsencrypt"
+    - not letsencrypt_cert.stat.exists
