@@ -4,4 +4,9 @@
 if [ -f /run/nginx.pid ]; then
   rm /run/nginx.pid
 fi
+
+{% if ssl_handling == 'letsencrypt' %}
+/usr/bin/certbot renew
+{% endif %}
+
 /usr/sbin/service nginx start
