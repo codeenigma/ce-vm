@@ -63,7 +63,8 @@
 - name: Check if we have a certificate.
   stat:
     path: '/etc/letsencrypt/live/{{ service_hostname }}/fullchain.pem'
-    register: letsencrypt_cert
+  register: letsencrypt_cert
+  when: ssl_handling == "letsencrypt"
 
 - name: Register certificate if needed.
   command: "/usr/bin/certbot certonly -n --cert-name {{ service_hostname }} --standalone --preferred-challenges http -d {{ service_hostname }} --agree-tos -m {{ ssl_letsencrypt_mail }}"
