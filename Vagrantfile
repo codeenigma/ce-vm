@@ -3,6 +3,9 @@
 
 VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
+# Enforce to use a recent vagrant version to use triggers
+Vagrant.require_version '>= 2.1.0'
+
 # Prevent Vagrant from looking for VBox.
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
 # We need to control order,
