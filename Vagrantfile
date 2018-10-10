@@ -123,12 +123,14 @@ def ensure_plugins(plugins)
   logger = Vagrant::UI::Colored.new
   plugins_to_install = plugins.select { |plugin| not Vagrant.has_plugin? plugin }
   if not plugins_to_install.empty?
-    puts "Installing plugins: #{plugins_to_install.join(' ')}"
+    logger.warn("Installing plugins: #{plugins_to_install.join(' ')}")
     if system "vagrant plugin install #{plugins_to_install.join(' ')}"
-      exec "vagrant #{ARGV.join(' ')}"
+      # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
+      logger.warn("Plugins installed. Please re-run the initial command.")
     else
-      abort "Installation of one or more plugins has failed. Aborting."
+      logger.error("Installation of one or more plugins has failed. sudo must be used to install plugins. Aborting.")
     end
+    exit
   end
 end
 
