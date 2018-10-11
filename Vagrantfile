@@ -205,7 +205,7 @@ end
 _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
 if (ARGV.include? 'up') || (ARGV.include? 'halt')
   if(parsed_conf['ce_vm_auto_update'] === true)
-    # We cannot run this using triggers, but this is run at the beginnig.
+    # We cannot run this using triggers, it is run at the beginnig.
     puts "Ensure ce-vm is up-to-date."
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "fetch")
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
