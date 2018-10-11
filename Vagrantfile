@@ -88,15 +88,10 @@ def ensure_network(gateway, subnet, name)
   end
 end
 
-# Create/Ensure loopback interface exists (Mac OS X).
-def ensure_lo_alias(ip)
-  Vagrant::Util::Subprocess.execute("sudo", "ifconfig", "lo0", "alias", "#{ip}/32")
-  puts "Ensure loopback interface alias exists for #{ip}."
-end
-
 # Forces the 'link' from Vagrant to Docker, as it can get lost in case of failure.
 # This can only work because we have 'set' names, and container names are unique.
 def ensure_docker_id(service, name)
+  # We can not use trigger.run here because we need to process the result of the execution.
   docker_id = Vagrant::Util::Subprocess.execute("docker", "inspect", "--format={{.Id}}", name).stdout.strip!;
   if docker_id.empty?
     # Nothing to do.
@@ -210,6 +205,7 @@ end
 _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
 if (ARGV.include? 'up') || (ARGV.include? 'halt')
   if(parsed_conf['ce_vm_auto_update'] === true)
+    # We cannot run this using triggers, but this is run at the beginnig.
     puts "Ensure ce-vm is up-to-date."
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "fetch")
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
@@ -275,19 +271,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     guest_service_conf_files = build_file_list(guest_conf_dirs, ['config.yml', "service.#{service}.yml"])
     run_service_conf_files = filter_file_list(host_service_conf_files, guest_service_conf_files)
     service_conf = conf_init(host_service_conf_files)
+    net_ip = service_conf["net_ip"]
+
     # Gather existing playbooks.
     host_service_playbooks = build_file_list(host_playbook_dirs, ["#{service}.yml"])
     guest_service_playbooks = build_file_list(guest_playbook_dirs, ["#{service}.yml"])
     run_service_playbooks = filter_file_list(host_service_playbooks, guest_service_playbooks)
-    # Mac OS X, we need interface aliases.
-    if(host_platform == "mac_os") && (ARGV.include? 'up')
-      ensure_lo_alias(service_conf["net_ip"])
-    end
-    # @TODO this could be an option.
-    is_primary = false
-    if (service === 'cli')
-      is_primary = true
-    end
+
+    name = "#{service_conf['project_name']}-#{service}"
+
     # Grab user uid/gid for vagrant user.
     if service_conf['docker_vagrant_user_uid'].nil?
       service_conf['docker_vagrant_user_uid'] = 1000
@@ -303,11 +295,32 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
 
-    name = "#{service_conf['project_name']}-#{service}"
-    # Check if container already exists, by grabbing it by name.
-    if (ARGV.include? 'up')
+    ####### General triggers.
+    # We can not run more than one command under the same event.
+    # So we need to define the same event twice here (two .before : up)
+    #######
+
+    if(host_platform == "mac_os")
+      config.trigger.before :up do |trigger|
+        trigger.name = "ensure_lo_alias"
+        trigger.run = {inline: "sudo ifconfig lo0 alias #{ip}/32"}
+        trigger.warn = "Ensure loopback interface alias exists for #{ip}"
+      end
+    end
+
+    config.trigger.before :up do |trigger|
+      trigger.name = "ensure_docker_id"
       ensure_docker_id(service, name)
     end
+
+    ####### END General triggers
+
+    # @TODO this could be an option.
+    is_primary = false
+    if (service === 'cli')
+      is_primary = true
+    end
+    
     ################# Indivual container.
     config.vm.define "#{service}", primary: is_primary do |container|
       # Only Mac needs port forwarding.
