@@ -118,16 +118,18 @@ def ensure_docker_id(service, name)
   File.write(docker_id_file, docker_id)
 end
 
-# Ensure plugins are installed (taken from https://github.com/roots/trellis/pull/829/commits/b0563ed0492757db4a972b22d20e09f2f7ac2ac4).
+# Ensure plugins are installed (updated Aug 31, 2018: https://stackoverflow.com/questions/19492738/demand-a-vagrant-plugin-within-the-vagrantfile/28801317#28801317).
 def ensure_plugins(plugins)
   logger = Vagrant::UI::Colored.new
-  plugins.each do |plugin|
-    manager = Vagrant::Plugin::Manager.instance
-    next if manager.installed_plugins.has_key?(plugin)
-    logger.warn("Installing missing dependancy plugin #{plugin}.")
-    manager.install_plugin(plugin)
-    # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
-    logger.warn("Please re-run the initial command.")
+  plugins_to_install = plugins.select { |plugin| not Vagrant.has_plugin? plugin }
+  if not plugins_to_install.empty?
+    logger.warn("Installing plugins: #{plugins_to_install.join(' ')}")
+    if system "vagrant plugin install #{plugins_to_install.join(' ')}"
+      # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
+      logger.warn("Plugins installed. Please re-run the initial command.")
+    else
+      logger.error("Installation of one or more plugins has failed. sudo must be used to install plugins. Aborting.")
+    end
     exit
   end
 end
@@ -264,7 +266,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   ################# Common config.
   config.ssh.insert_key = false
   config.ssh.forward_agent = true
-  ################# END Common config.  
+  ################# END Common config.
 
   # Iterate over services.
   services.each do |service|
