@@ -34,6 +34,11 @@
 - name: Restart mysql.
   service: name=mysql state=started enabled=yes
 
+- name: Disable foreign keys check during dumps imports.
+  mysql_variables:
+    variable: foreign_key_checks
+    value: 0
+
 - name: Create databases for dumps.
   mysql_db: state=present name="{{ item.name }}" target="{{ project_dir }}/{{ item.source }}"
   with_items: "{{ db_dumps }}"
@@ -44,6 +49,11 @@
   mysql_db: state=import name="{{ item.item.name }}" target="{{ project_dir }}/{{ item.item.source }}"
   with_items: "{{ create_db_dumps.results }}"
   when: (create_db_dumps.results | length) and (item.changed == True) and (item.item.source | length)
+
+- name: Re-enable foreign keys check after dumps imports.
+  mysql_variables:
+    variable: foreign_key_checks
+    value: 1
 
 - name: Copy startup script in place.
   template:

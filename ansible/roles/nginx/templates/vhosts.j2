@@ -10,8 +10,13 @@ server {
 server {
     listen 443 ssl default_server;
     server_name "{{ service_hostname }}";
+    {% if ssl_handling == "letsencrypt" %}
+    ssl_certificate /etc/letsencrypt/live/{{ service_hostname }}/cert.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ service_hostname }}/privkey.pem;
+    {% else %}
     ssl_certificate /etc/nginx/ssl/ce-vm-self.crt;
     ssl_certificate_key /etc/nginx/ssl/ce-vm-self.key;
+    {% endif %}
     error_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }} info;
     access_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }};
     root "{{ project_dir }}/{{ webroot }}";

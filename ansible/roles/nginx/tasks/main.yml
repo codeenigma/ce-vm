@@ -29,6 +29,12 @@
     dest: "{{ ce_vm_webroot }}/includes/nginx.html"
     force: yes
 
+- name: Raise server_names_hash_bucket_size to cope with long names.
+  lineinfile:
+    path: /etc/nginx/nginx.conf
+    regexp: 'server_names_hash_bucket_size'
+    line: 'server_names_hash_bucket_size 256;'
+
 - name: Copy startup script in place.
   template:
     src: startup.sh.j2
@@ -37,3 +43,31 @@
     group: root
     mode: 0555
     force: yes
+
+- name: Ensure Nginx is stopped.
+  service:
+    name: nginx
+    state: stopped
+
+- name: Update apt cache.
+  apt:
+    update_cache: yes
+  when: ssl_handling == "letsencrypt"
+
+- name: Ensure Certbot is installed.
+  apt:
+    pkg: certbot
+    state: present
+  when: ssl_handling == "letsencrypt"
+
+- name: Check if we have a certificate.
+  stat:
+    path: '/etc/letsencrypt/live/{{ service_hostname }}/fullchain.pem'
+  register: letsencrypt_cert
+  when: ssl_handling == "letsencrypt"
+
+- name: Register certificate if needed.
+  command: "/usr/bin/certbot certonly -n --cert-name {{ service_hostname }} --standalone --preferred-challenges http -d {{ service_hostname }} --agree-tos -m {{ ssl_letsencrypt_mail }}"
+  when: 
+    - ssl_handling == "letsencrypt"
+    - not letsencrypt_cert.stat.exists
