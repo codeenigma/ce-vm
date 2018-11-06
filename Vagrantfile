@@ -198,8 +198,10 @@ parsed_conf = conf_init(host_conf_files)
 ################################################################################
 # Ensure we have the needed plugins.
 if (ARGV.include? 'up')
-  plugins = ['vagrant-hostsupdater']
-  ensure_plugins(plugins)
+  unless(parsed_conf['skip_hosts_updater'] === true)
+    plugins = ['vagrant-hostsupdater']
+    ensure_plugins(plugins)
+  end
 end
 # Update repo if needed, and ensure we're on the right branch.
 _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
@@ -312,9 +314,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
       # HostUpdater support.
       container.vm.hostname = "#{name}.#{service_conf['domain']}"
-      container.vm.network :private_network, ip: service_conf["net_ip"]
-      unless service_conf['host_aliases'].nil?
-        container.hostsupdater.aliases = service_conf['host_aliases']
+      unless(parsed_conf['skip_hosts_updater'] === true)
+        container.vm.network :private_network, ip: service_conf["net_ip"]
+        unless service_conf['host_aliases'].nil?
+          container.hostsupdater.aliases = service_conf['host_aliases']
+        end
       end
       # Shared folders
       container.vm.synced_folder ".", "/vagrant", disabled: true
