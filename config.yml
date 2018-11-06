@@ -53,6 +53,8 @@ domain: 'ce-vm.local'
 
 php_version: 7.1
 
+elastic_version: 6.x
+
 # Extra Debian packages to install.
 apt_extra_packages: ''
 
