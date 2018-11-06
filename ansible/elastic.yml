@@ -10,4 +10,4 @@
     
   roles:
     - { role: rsyslog_client }
-    - { role: elastic, elastic_version: 6.x }
+    - { role: elastic }
