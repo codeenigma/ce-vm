@@ -32,6 +32,8 @@ curl -O https://raw.githubusercontent.com/codeenigma/ce-vm-model/5.x/ce-vm/Vagra
 export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$TRAVIS_PULL_REQUEST, BRANCH=$BRANCH"
 
+sed -i -- "s/ce_vm_upstream_branch = '5.x'/ce_vm_upstream_branch = '$BRANCH'/g" Vagrantfile
+
 vagrant up || exit 1
 vagrant destroy --force || exit 1
 
