@@ -46,6 +46,7 @@
   when: apt_extra_packages | length
 
 - name: Install additional extra packages.
-  apt: "name={{ item }} state=present"
-  with_items: "{{ apt_extra_packages | list }}"
+  apt:
+    pkg: "{{ apt_extra_packages | list }}"
+    state: present
   when: apt_extra_packages | length
