@@ -13,6 +13,8 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 # Ensure this is not nil.
 ENV['VAGRANT_DOTFILE_PATH'] = '.vagrant' if ENV['VAGRANT_DOTFILE_PATH'].nil?
+# Define a global logger.
+logger = Vagrant::UI::Colored.new
 
 require 'yaml'
 
@@ -123,11 +125,38 @@ def ensure_plugins(plugins)
       # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
       logger.warn("Plugins installed. Please re-run the initial command.")
     else
-      logger.error("Installation of one or more plugins has failed. sudo must be used to install plugins. Aborting.")
+      logger.error("Installation of one or more plugins has failed. Aborting.")
     end
     exit
   end
 end
+
+# Override configuration using "overrides" folder
+# https://www.vagrantup.com/docs/provisioning/file.html
+def apply_overrides(container, service)
+  host_overrides_dir = File.join(File.dirname(File.expand_path('.', ENV['PROJECT_VAGRANTFILE'])), "overrides")
+  host_overrides_service_dir = File.join(host_overrides_dir, service)
+  if not File.directory?(host_overrides_service_dir)
+    # Nothing to do
+    return
+  end
+  # Copy into /tmp folder first using the provisioner.
+  files = []
+  Find.find(host_overrides_service_dir) do |path|
+    if File.file?(path)
+      # remove the initial path to know where to move it properly inside the guest machine
+      guest_path = path.gsub("#{host_overrides_service_dir}", "")
+      files.push(guest_path)
+      container.vm.provision "file", source:"#{path}", destination:"/tmp/overrides/#{guest_path}"
+    end
+  end
+  # Move to the right folder using the shell provisioner
+  files.each do |file|
+    # We assume that the directory exists
+    container.vm.provision "shell", inline:"sudo mv -f /tmp/overrides/#{file} /#{file}"
+  end
+end
+################ END Helper functions.
 
 ################ Paths definitions.
 ################################################################################
@@ -147,6 +176,7 @@ ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
 # Absolute paths on the host machine.
 host_project_dir = File.dirname(File.expand_path('..', ENV['PROJECT_VAGRANTFILE']))
 host_home_dir = File.expand_path('~')
+
 # Absolute paths on the guest machine.
 guest_project_dir = '/vagrant'
 guest_home_dir = '/home/vagrant'
@@ -198,8 +228,10 @@ parsed_conf = conf_init(host_conf_files)
 ################################################################################
 # Ensure we have the needed plugins.
 if (ARGV.include? 'up')
-  plugins = ['vagrant-hostsupdater']
-  ensure_plugins(plugins)
+  unless(parsed_conf['skip_hosts_updater'] === true)
+    plugins = ['vagrant-hostsupdater']
+    ensure_plugins(plugins)
+  end
 end
 # Update repo if needed, and ensure we're on the right branch.
 _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
@@ -330,9 +362,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
       # HostUpdater support.
       container.vm.hostname = "#{name}.#{service_conf['domain']}"
-      container.vm.network :private_network, ip: service_conf["net_ip"]
-      unless service_conf['host_aliases'].nil?
-        container.hostsupdater.aliases = service_conf['host_aliases']
+      unless(parsed_conf['skip_hosts_updater'] === true)
+        container.vm.network :private_network, ip: service_conf["net_ip"]
+        unless service_conf['host_aliases'].nil?
+          container.hostsupdater.aliases = service_conf['host_aliases']
+        end
       end
       # Shared folders
       container.vm.synced_folder ".", "/vagrant", disabled: true
@@ -375,6 +409,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           #ansible.compatibility_mode = '2.0'
         end
       end
+
       # Run startup scripts, post provisioning.
       container.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
       # Docker settings.
