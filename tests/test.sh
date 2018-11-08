@@ -28,6 +28,10 @@ generate_config
 # Start the project.
 cd "$BUILD_DIR/ce-vm"
 curl -O https://raw.githubusercontent.com/codeenigma/ce-vm-model/5.x/ce-vm/Vagrantfile
+
+BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+sed -i -- "s/ce_vm_upstream_branch = '5.x'/ce_vm_upstream_branch = '$BRANCH'/g" Vagrantfile
+
 vagrant up || exit 1
 vagrant destroy --force || exit 1
 
