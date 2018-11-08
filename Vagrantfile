@@ -13,8 +13,6 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 # Ensure this is not nil.
 ENV['VAGRANT_DOTFILE_PATH'] = '.vagrant' if ENV['VAGRANT_DOTFILE_PATH'].nil?
-# Define a global logger.
-logger = Vagrant::UI::Colored.new
 
 require 'yaml'
 
@@ -117,7 +115,6 @@ end
 
 # Ensure plugins are installed (updated Aug 31, 2018: https://stackoverflow.com/questions/19492738/demand-a-vagrant-plugin-within-the-vagrantfile/28801317#28801317).
 def ensure_plugins(plugins)
-  logger = Vagrant::UI::Colored.new
   plugins_to_install = plugins.select { |plugin| not Vagrant.has_plugin? plugin }
   if not plugins_to_install.empty?
     logger.warn("Installing plugins: #{plugins_to_install.join(' ')}")
@@ -131,31 +128,6 @@ def ensure_plugins(plugins)
   end
 end
 
-# Override configuration using "overrides" folder
-# https://www.vagrantup.com/docs/provisioning/file.html
-def apply_overrides(container, service)
-  host_overrides_dir = File.join(File.dirname(File.expand_path('.', ENV['PROJECT_VAGRANTFILE'])), "overrides")
-  host_overrides_service_dir = File.join(host_overrides_dir, service)
-  if not File.directory?(host_overrides_service_dir)
-    # Nothing to do
-    return
-  end
-  # Copy into /tmp folder first using the provisioner.
-  files = []
-  Find.find(host_overrides_service_dir) do |path|
-    if File.file?(path)
-      # remove the initial path to know where to move it properly inside the guest machine
-      guest_path = path.gsub("#{host_overrides_service_dir}", "")
-      files.push(guest_path)
-      container.vm.provision "file", source:"#{path}", destination:"/tmp/overrides/#{guest_path}"
-    end
-  end
-  # Move to the right folder using the shell provisioner
-  files.each do |file|
-    # We assume that the directory exists
-    container.vm.provision "shell", inline:"sudo mv -f /tmp/overrides/#{file} /#{file}"
-  end
-end
 ################ END Helper functions.
 
 ################ Paths definitions.
@@ -327,26 +299,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
 
-    ####### General triggers.
-    # We can not run more than one command under the same event.
-    # So we need to define the same event twice here (two .before : up)
-    #######
-
-    if(host_platform == "mac_os")
-      config.trigger.before :up do |trigger|
-        trigger.name = "ensure_lo_alias"
-        trigger.run = {inline: "sudo ifconfig lo0 alias #{net_ip}/32"}
-        trigger.warn = "Ensure loopback interface alias exists for #{net_ip}"
-      end
-    end
-
-    config.trigger.before :up do |trigger|
-      trigger.name = "ensure_docker_id"
-      ensure_docker_id(service, name)
-    end
-
-    ####### END General triggers
-
     # @TODO this could be an option.
     is_primary = false
     if (service === 'cli')
@@ -368,6 +320,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           container.hostsupdater.aliases = service_conf['host_aliases']
         end
       end
+      # Triggers.
+      # We can not run more than one command under the same event.
+      # So we need to define the same event twice here (two .before : up)
+      if(host_platform == "mac_os")
+        container.trigger.before :up do |trigger|
+          trigger.name = "ensure_lo_alias"
+          trigger.run = {inline: "sudo ifconfig lo0 alias #{net_ip}/32"}
+          trigger.warn = "Ensure loopback interface alias exists for #{net_ip}"
+        end
+      end
+      container.trigger.before :up do |trigger|
+        trigger.name = "ensure_docker_id"
+        ensure_docker_id(service, name)
+      end
+
       # Shared folders
       container.vm.synced_folder ".", "/vagrant", disabled: true
       # Always use native fs for base services.
