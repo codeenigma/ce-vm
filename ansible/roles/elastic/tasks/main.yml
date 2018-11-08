@@ -1,0 +1,25 @@
+---
+
+- name: Configure Elastic Search.
+  template: 
+    src: 'elasticsearch.yml.j2'
+    dest: '/etc/elasticsearch/elasticsearch.yml'
+    owner: root
+    group: elasticsearch
+    mode: 0660
+    force: yes
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/elastic"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/elastic.html"
+    force: yes

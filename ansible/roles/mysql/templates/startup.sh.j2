@@ -1,5 +1,12 @@
 #!/bin/sh
 
+chown -R mysql:mysql /var/lib/mysql
+chown -R mysql:mysql /run/mysqld
+chmod -R 777 /run/mysqld
+
+touch /var/lib/mysql
+find /var/lib/mysql -exec touch -c {} +
+
 /usr/sbin/service mysql stop
 
 rm -rf /run/mysqld
