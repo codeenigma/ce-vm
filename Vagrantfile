@@ -303,8 +303,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     if(host_platform == "mac_os")
       config.trigger.before :up do |trigger|
         trigger.name = "ensure_lo_alias"
-        trigger.run = {inline: "sudo ifconfig lo0 alias #{ip}/32"}
-        trigger.warn = "Ensure loopback interface alias exists for #{ip}"
+        trigger.run = {inline: "sudo ifconfig lo0 alias #{net_ip}/32"}
+        trigger.warn = "Ensure loopback interface alias exists for #{net_ip}"
       end
     end
 
