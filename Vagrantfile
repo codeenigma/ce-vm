@@ -125,7 +125,7 @@ def ensure_plugins(plugins)
       # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
       $logger.warn("Plugins installed. Please re-run the initial command.")
     else
-      $logger.error("Installation of one or more plugins has failed. sudo must be used to install plugins. Aborting.")
+      $logger.error("Installation of one or more plugins has failed. Aborting.")
     end
     exit
   end
@@ -144,12 +144,11 @@ def apply_overrides(container, service)
   Find.find(host_overrides_service_dir) do |path|
     if File.file?(path)
       # remove the initial path to know where to move it properly inside the guest machine
-      relative_path = path.gsub("./overrides/#{service}/", "")
-      files.push(relative_path)
-      container.vm.provision "file", source:"#{path}", destination:"/tmp/overrides/#{relative_path}"
+      guest_path = path.gsub("#{host_overrides_service_dir}", "")
+      files.push(guest_path)
+      container.vm.provision "file", source:"#{path}", destination:"/tmp/overrides/#{guest_path}"
     end
   end
-  
   # Move to the right folder using the shell provisioner
   files.each do |file|
     # We assume that the directory exists
@@ -176,7 +175,7 @@ ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
 # Absolute paths on the host machine.
 host_project_dir = File.dirname(File.expand_path('..', ENV['PROJECT_VAGRANTFILE']))
 host_home_dir = File.expand_path('~')
-$host_overrides_dir = File.join(".", "overrides")
+$host_overrides_dir = File.join(File.dirname(File.expand_path('.', ENV['PROJECT_VAGRANTFILE'])), "overrides")
 
 # Absolute paths on the guest machine.
 guest_project_dir = '/vagrant'
@@ -386,7 +385,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           #ansible.compatibility_mode = '2.0'
         end
       end
-      
+
       # Run startup scripts, post provisioning.
       container.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
       
