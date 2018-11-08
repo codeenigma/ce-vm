@@ -13,11 +13,8 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
 ENV['VAGRANT_NO_PARALLEL'] = 'yes'
 # Ensure this is not nil.
 ENV['VAGRANT_DOTFILE_PATH'] = '.vagrant' if ENV['VAGRANT_DOTFILE_PATH'].nil?
-# Define a global logger.
-$logger = Vagrant::UI::Colored.new
 
 require 'yaml'
-require 'find'
 
 ################ Helper functions.
 ################################################################################
@@ -118,45 +115,19 @@ end
 
 # Ensure plugins are installed (updated Aug 31, 2018: https://stackoverflow.com/questions/19492738/demand-a-vagrant-plugin-within-the-vagrantfile/28801317#28801317).
 def ensure_plugins(plugins)
+  logger = Vagrant::UI::Colored.new
   plugins_to_install = plugins.select { |plugin| not Vagrant.has_plugin? plugin }
   if not plugins_to_install.empty?
-    $logger.warn("Installing plugins: #{plugins_to_install.join(' ')}")
+    logger.warn("Installing plugins: #{plugins_to_install.join(' ')}")
     if system "vagrant plugin install #{plugins_to_install.join(' ')}"
       # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
-      $logger.warn("Plugins installed. Please re-run the initial command.")
+      logger.warn("Plugins installed. Please re-run the initial command.")
     else
-      $logger.error("Installation of one or more plugins has failed. sudo must be used to install plugins. Aborting.")
+      logger.error("Installation of one or more plugins has failed. sudo must be used to install plugins. Aborting.")
     end
     exit
   end
 end
-
-# Override configuration using "overrides" folder
-# https://www.vagrantup.com/docs/provisioning/file.html
-def apply_overrides(container, service)
-  host_overrides_service_dir = File.join($host_overrides_dir, service)
-  if not File.directory?(host_overrides_service_dir)
-    # Nothing to do
-    return
-  end
-  # Copy into /tmp folder first using the provisioner.
-  files = []
-  Find.find(host_overrides_service_dir) do |path|
-    if File.file?(path)
-      # remove the initial path to know where to move it properly inside the guest machine
-      relative_path = path.gsub("./overrides/#{service}/", "")
-      files.push(relative_path)
-      container.vm.provision "file", source:"#{path}", destination:"/tmp/overrides/#{relative_path}"
-    end
-  end
-  
-  # Move to the right folder using the shell provisioner
-  files.each do |file|
-    # We assume that the directory exists
-    container.vm.provision "shell", inline:"sudo mv -f /tmp/overrides/#{file} /#{file}"
-  end
-end
-################ END Helper functions.
 
 ################ Paths definitions.
 ################################################################################
@@ -176,8 +147,6 @@ ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
 # Absolute paths on the host machine.
 host_project_dir = File.dirname(File.expand_path('..', ENV['PROJECT_VAGRANTFILE']))
 host_home_dir = File.expand_path('~')
-$host_overrides_dir = File.join(".", "overrides")
-
 # Absolute paths on the guest machine.
 guest_project_dir = '/vagrant'
 guest_home_dir = '/home/vagrant'
@@ -326,6 +295,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
 
+    ####### General triggers.
+    # We can not run more than one command under the same event.
+    # So we need to define the same event twice here (two .before : up)
+    #######
+
+    if(host_platform == "mac_os")
+      config.trigger.before :up do |trigger|
+        trigger.name = "ensure_lo_alias"
+        trigger.run = {inline: "sudo ifconfig lo0 alias #{ip}/32"}
+        trigger.warn = "Ensure loopback interface alias exists for #{ip}"
+      end
+    end
+
+    config.trigger.before :up do |trigger|
+      trigger.name = "ensure_docker_id"
+      ensure_docker_id(service, name)
+    end
+
+    ####### END General triggers
+
     # @TODO this could be an option.
     is_primary = false
     if (service === 'cli')
@@ -386,10 +375,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           #ansible.compatibility_mode = '2.0'
         end
       end
-      
       # Run startup scripts, post provisioning.
       container.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
-      
       # Docker settings.
       container.vm.provider "docker" do |d|
         docker_args = [
@@ -421,32 +408,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         d.create_args = docker_args
         d.cmd = ["/bin/sh", "/opt/ce-vm-start.sh", "#{service_conf['docker_vagrant_user_uid']}", "#{service_conf['docker_vagrant_group_gid']}"]
       end
-      
-      ####### Triggers.
-      # We can not run more than one command under the same event.
-      # So we need to define the same event twice here (two .before : up)
-      #######
-
-      if(host_platform == "mac_os")
-        container.trigger.before :up do |trigger|
-          trigger.name = "ensure_lo_alias"
-          trigger.run = {inline: "sudo ifconfig lo0 alias #{net_ip}/32"}
-          trigger.warn = "Ensure loopback interface alias exists for #{net_ip}"
-        end
-      end
-
-      container.trigger.before :up do |trigger|
-        trigger.name = "ensure_docker_id"
-        ensure_docker_id(service, name)
-      end
-
-      container.trigger.after :provision do |trigger|
-        trigger.name = "apply_overrides"
-        trigger.warn = 'Overriding files inside "overrides/#{service}" folder...'
-        apply_overrides(container, service)
-      end
-
-      ####### END General triggers
     end
   end
   ################# END Individual container.
