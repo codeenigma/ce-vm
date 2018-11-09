@@ -115,6 +115,7 @@ end
 
 # Ensure plugins are installed (updated Aug 31, 2018: https://stackoverflow.com/questions/19492738/demand-a-vagrant-plugin-within-the-vagrantfile/28801317#28801317).
 def ensure_plugins(plugins)
+  logger = Vagrant::UI::Colored.new
   plugins_to_install = plugins.select { |plugin| not Vagrant.has_plugin? plugin }
   if not plugins_to_install.empty?
     logger.warn("Installing plugins: #{plugins_to_install.join(' ')}")
