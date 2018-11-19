@@ -1,5 +1,6 @@
 ---
 
+elastic_version: 6.x
 docker_image: "pmce/ce-vm-elastic-{{ elastic_version }}:{{ ce_vm_version }}"
 net_ip: "{{ net_base }}.160"
 net_fwd_ports_mac_os:

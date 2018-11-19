@@ -3,6 +3,9 @@
 
 VAGRANTFILE_API_VERSION = '2' unless defined? VAGRANTFILE_API_VERSION
 
+# Enforce to use a recent vagrant version to use triggers
+Vagrant.require_version '>= 2.1.0'
+
 # Prevent Vagrant from looking for VBox.
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'docker'
 # We need to control order,
@@ -85,15 +88,10 @@ def ensure_network(gateway, subnet, name)
   end
 end
 
-# Create/Ensure loopback interface exists (Mac OS X).
-def ensure_lo_alias(ip)
-  Vagrant::Util::Subprocess.execute("sudo", "ifconfig", "lo0", "alias", "#{ip}/32")
-  puts "Ensure loopback interface alias exists for #{ip}."
-end
-
 # Forces the 'link' from Vagrant to Docker, as it can get lost in case of failure.
 # This can only work because we have 'set' names, and container names are unique.
 def ensure_docker_id(service, name)
+  # We can not use trigger.run here because we need to process the result of the execution.
   docker_id = Vagrant::Util::Subprocess.execute("docker", "inspect", "--format={{.Id}}", name).stdout.strip!;
   if docker_id.empty?
     # Nothing to do.
@@ -115,19 +113,23 @@ def ensure_docker_id(service, name)
   File.write(docker_id_file, docker_id)
 end
 
-# Ensure plugins are installed (taken from https://github.com/roots/trellis/pull/829/commits/b0563ed0492757db4a972b22d20e09f2f7ac2ac4).
+# Ensure plugins are installed (updated Aug 31, 2018: https://stackoverflow.com/questions/19492738/demand-a-vagrant-plugin-within-the-vagrantfile/28801317#28801317).
 def ensure_plugins(plugins)
   logger = Vagrant::UI::Colored.new
-  plugins.each do |plugin|
-    manager = Vagrant::Plugin::Manager.instance
-    next if manager.installed_plugins.has_key?(plugin)
-    logger.warn("Installing missing dependancy plugin #{plugin}.")
-    manager.install_plugin(plugin)
-    # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
-    logger.warn("Please re-run the initial command.")
+  plugins_to_install = plugins.select { |plugin| not Vagrant.has_plugin? plugin }
+  if not plugins_to_install.empty?
+    logger.warn("Installing plugins: #{plugins_to_install.join(' ')}")
+    if system "vagrant plugin install #{plugins_to_install.join(' ')}"
+      # Exit after installation, to avoid https://github.com/hashicorp/vagrant/issues/2435.
+      logger.warn("Plugins installed. Please re-run the initial command.")
+    else
+      logger.error("Installation of one or more plugins has failed. Aborting.")
+    end
     exit
   end
 end
+
+################ END Helper functions.
 
 ################ Paths definitions.
 ################################################################################
@@ -147,6 +149,7 @@ ce_vm_upstream_branch = ENV['CE_VM_UPSTREAM_BRANCH']
 # Absolute paths on the host machine.
 host_project_dir = File.dirname(File.expand_path('..', ENV['PROJECT_VAGRANTFILE']))
 host_home_dir = File.expand_path('~')
+
 # Absolute paths on the guest machine.
 guest_project_dir = '/vagrant'
 guest_home_dir = '/home/vagrant'
@@ -207,6 +210,7 @@ end
 _ce_upstream = File.join("#{host_home_dir}", "#{ce_vm_local_upstream_repo}")
 if (ARGV.include? 'up') || (ARGV.include? 'halt')
   if(parsed_conf['ce_vm_auto_update'] === true)
+    # We cannot run this using triggers, it is run at the beginnig.
     puts "Ensure ce-vm is up-to-date."
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "fetch")
     Vagrant::Util::Subprocess.execute("git", "-C", "#{_ce_upstream}", "checkout", "#{ce_vm_upstream_branch}")
@@ -263,7 +267,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   ################# Common config.
   config.ssh.insert_key = false
   config.ssh.forward_agent = true
-  ################# END Common config.  
+  ################# END Common config.
 
   # Iterate over services.
   services.each do |service|
@@ -272,19 +276,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     guest_service_conf_files = build_file_list(guest_conf_dirs, ['config.yml', "service.#{service}.yml"])
     run_service_conf_files = filter_file_list(host_service_conf_files, guest_service_conf_files)
     service_conf = conf_init(host_service_conf_files)
+    net_ip = service_conf["net_ip"]
+
     # Gather existing playbooks.
     host_service_playbooks = build_file_list(host_playbook_dirs, ["#{service}.yml"])
     guest_service_playbooks = build_file_list(guest_playbook_dirs, ["#{service}.yml"])
     run_service_playbooks = filter_file_list(host_service_playbooks, guest_service_playbooks)
-    # Mac OS X, we need interface aliases.
-    if(host_platform == "mac_os") && (ARGV.include? 'up')
-      ensure_lo_alias(service_conf["net_ip"])
-    end
-    # @TODO this could be an option.
-    is_primary = false
-    if (service === 'cli')
-      is_primary = true
-    end
+
+    name = "#{service_conf['project_name']}-#{service}"
+
     # Grab user uid/gid for vagrant user.
     if service_conf['docker_vagrant_user_uid'].nil?
       service_conf['docker_vagrant_user_uid'] = 1000
@@ -300,11 +300,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
 
-    name = "#{service_conf['project_name']}-#{service}"
-    # Check if container already exists, by grabbing it by name.
-    if (ARGV.include? 'up')
-      ensure_docker_id(service, name)
+    # @TODO this could be an option.
+    is_primary = false
+    if (service === 'cli')
+      is_primary = true
     end
+    
     ################# Indivual container.
     config.vm.define "#{service}", primary: is_primary do |container|
       # Only Mac needs port forwarding.
@@ -320,6 +321,21 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           container.hostsupdater.aliases = service_conf['host_aliases']
         end
       end
+      # Triggers.
+      # We can not run more than one command under the same event.
+      # So we need to define the same event twice here (two .before : up)
+      if(host_platform == "mac_os")
+        container.trigger.before :up do |trigger|
+          trigger.name = "ensure_lo_alias"
+          trigger.run = {inline: "sudo ifconfig lo0 alias #{net_ip}/32"}
+          trigger.warn = "Ensure loopback interface alias exists for #{net_ip}"
+        end
+      end
+      container.trigger.before :up do |trigger|
+        trigger.name = "ensure_docker_id"
+        ensure_docker_id(service, name)
+      end
+
       # Shared folders
       container.vm.synced_folder ".", "/vagrant", disabled: true
       # Always use native fs for base services.
@@ -361,6 +377,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
           #ansible.compatibility_mode = '2.0'
         end
       end
+
       # Run startup scripts, post provisioning.
       container.vm.provision "shell", run: "always", inline: "sudo run-parts /opt/run-parts"
       # Docker settings.

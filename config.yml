@@ -51,9 +51,8 @@ domain: 'ce-vm.local'
 
 ####### Common settings.
 
+# Apply the same php version to both cli and fpm.
 php_version: 7.1
-
-elastic_version: 6.x
 
 # Extra Debian packages to install.
 apt_extra_packages: ''
@@ -63,7 +62,7 @@ apt_extra_packages: ''
 # individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
 ################################################################################
 
-ce_vm_version: "5.1.0"
+ce_vm_version: "6.0.0"
 
 # Turn automatic update of the core stack ON/OFF.
 # Useful for offline use.
