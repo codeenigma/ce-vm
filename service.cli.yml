@@ -5,3 +5,5 @@ blackfire: no
 
 docker_image: "pmce/ce-vm-cli-{{ project_type }}:{{ ce_vm_version }}"
 net_ip: "{{ net_base }}.10"
+
+vagrant_is_primary: yes
