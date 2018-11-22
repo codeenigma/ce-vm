@@ -12,3 +12,9 @@
     - { role: unison, when: volume_type == 'unison' }
     - { role: rsyslog_client }
     - { role: solr }
+
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml

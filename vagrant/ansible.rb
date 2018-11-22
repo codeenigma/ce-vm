@@ -14,6 +14,15 @@ def ansible_get_host_playbook_dirs
   ]
 end
 
+# Absolute paths to playbook overrides directories on the host.
+def ansible_get_host_override_dirs
+  overrides = []
+  ansible_get_host_playbook_dirs.each do |dir|
+    overrides.push(File.join(dir, 'override'))
+  end
+  overrides
+end
+
 # Absolute paths to playbook files directories on the guest.
 def ansible_get_guest_playbook_dirs
   [
@@ -24,10 +33,39 @@ def ansible_get_guest_playbook_dirs
   ]
 end
 
+# Absolute paths to playbook overrides directories on the guest.
+def ansible_get_guest_override_dirs
+  overrides = []
+  ansible_get_guest_playbook_dirs.each do |dir|
+    overrides.push(File.join(dir, 'override'))
+  end
+  overrides
+end
+
 # Absolute paths to playbook files on the guest,
 # filtered to ones that actually exist on the host.
 def ansible_get_guest_active_playbooks(service)
   host_playbooks = build_file_list(ansible_get_host_playbook_dirs, ["#{service}.yml"])
   guest_playbooks = build_file_list(ansible_get_guest_playbook_dirs, ["#{service}.yml"])
   filter_file_list(host_playbooks, guest_playbooks)
+end
+
+# Hash of absolute sources and destinations for override files on the guest.
+def ansible_get_guest_active_override_files(service)
+  host_overrides = build_file_list(ansible_get_host_override_dirs, [service])
+  guest_overrides = build_file_list(ansible_get_guest_override_dirs, [service])
+  overrides = []
+  host_overrides.each.with_index do |dir, index|
+    Dir.glob("#{dir}/**/*", File::FNM_DOTMATCH).each do |file|
+      # Looks funny, eh ?
+      next unless File.file? file
+      file.sub!(dir, '')
+      entry = {
+        'src' => "#{guest_overrides[index]}#{file}",
+        'dest' => file.to_s
+      }
+      overrides.push(entry)
+    end
+  end
+  overrides
 end

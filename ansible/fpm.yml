@@ -15,3 +15,8 @@
     - { role: xdebug, php_build_type: fpm }
     - { role: blackfire }
     - { role: postfix }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml

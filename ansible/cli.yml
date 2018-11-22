@@ -21,3 +21,8 @@
     - { role: symfony4, when: project_type == 'symfony4' }
     - { role: wordpress, when: project_type == 'wordpress' }
     - { role: custom, when: project_type == 'custom' }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml

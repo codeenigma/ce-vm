@@ -12,3 +12,8 @@
 
     - { role: php-cli, php_version: 7.1 }
     - { role: dashboard }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml

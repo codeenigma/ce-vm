@@ -54,6 +54,7 @@ end
 def service_get_ansible_extra_vars(service_name)
   {
     config_files: config_get_guest_active_config_files(service_name),
+    override_files: ansible_get_guest_active_override_files(service_name),
     project_dir: fullpath_get_guest_project_dir,
     host_project_dir: fullpath_get_host_project_dir,
     vm_dir: 'ce-vm',
