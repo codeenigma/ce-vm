@@ -11,3 +11,8 @@
   roles:
     - { role: rsyslog_server }
     - { role: frontail }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml

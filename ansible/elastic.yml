@@ -11,3 +11,9 @@
   roles:
     - { role: rsyslog_client }
     - { role: elastic }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml
+
