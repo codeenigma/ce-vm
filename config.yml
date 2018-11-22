@@ -29,16 +29,17 @@ symfony_local_env: dev
 
 ####### Services/containers.
 services:
+  - elastic
   - fpm
   - memcached
   - mkdocs
   - mysql
-  - nginx
+  - nightwatch
   - nodejs
   - redis
   - solr
+  - nginx
   - haproxy
-  - nightwatch
   - cli
 
 ####### Networking.
