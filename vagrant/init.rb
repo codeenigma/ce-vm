@@ -28,13 +28,32 @@ end
 
 # Add relevant Vagrant triggers.
 def init__trigger(container, service_name)
+  init__trigger_default(container, service_name)
+  init__trigger_custom(container, service_name)
+end
+
+# Add ce-vm specific triggers.
+def init__trigger_default(container, service_name)
   # This is not an actual Trigger, as we need this to act
   # before the Vagrant config is instanciated.
-  docker_ensure_vagrant_id(service_name) if (ARGV.include? 'up')
+  docker_ensure_vagrant_id(service_name) if ARGV.include? 'up'
   # Mac OS X, we need interface aliases.
-  if host_get_platform == 'mac_os'
-    container.trigger.before :up do |trigger|
-      host_trigger_ensure_lo_alias(trigger, service_name)
+  return unless host_get_platform == 'mac_os'
+  container.trigger.before :up do |trigger|
+    host_trigger_ensure_lo_alias(trigger, service_name)
+  end
+end
+
+# Add user defined triggers.
+def init__trigger_custom(container, service_name)
+  custom_triggers = config_get_service_item(service_name, "vagrant_triggers_#{host_get_platform}")
+  return if custom_triggers.nil?
+  custom_triggers.each do |type, events|
+    events.each do |event, triggers|
+      next unless %w[before after].include? type
+      triggers.each do |custom_trigger|
+        container.trigger.public_send(type, event.to_sym, custom_trigger)
+      end
     end
   end
 end
@@ -61,10 +80,9 @@ def init__config_ssh(container, service_name)
   container.ssh.insert_key = false
   container.ssh.forward_agent = true
   # Only Mac needs port forwarding.
-  unless host_platform == 'mac_os'
-    container.ssh.host = config_get_service_item(service_name, 'net_ip')
-    container.ssh.port = 22
-  end
+  return unless host_platform == 'mac_os'
+  container.ssh.host = config_get_service_item(service_name, 'net_ip')
+  container.ssh.port = 22
 end
 
 # HostsUpdater support.
