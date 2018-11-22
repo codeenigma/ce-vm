@@ -31,15 +31,15 @@ symfony_local_env: dev
 services:
   - elastic
   - fpm
-  - haproxy
   - memcached
   - mkdocs
   - mysql
   - nightwatch
-  - nginx
   - nodejs
   - redis
   - solr
+  - nginx
+  - haproxy
   - cli
 
 ####### Networking.
