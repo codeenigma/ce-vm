@@ -11,3 +11,9 @@
   roles:
     - { role: rsyslog_client }
     - { role: haproxy }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml
+

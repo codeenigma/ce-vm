@@ -10,3 +10,9 @@
     
   roles:
     - { role: sonar }
+
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml

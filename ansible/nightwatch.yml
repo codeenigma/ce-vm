@@ -16,3 +16,8 @@
     - { role: yarn }
     - { role: selenium }
     - { role: nightwatch }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml

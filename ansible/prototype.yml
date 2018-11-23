@@ -16,3 +16,8 @@
     - { role: nodejs, nodejs_version: 8.x}
     - { role: yarn }
     - { role: ce_prototype }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml

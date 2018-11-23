@@ -13,3 +13,8 @@
     - { role: rsyslog_client }
     - { role: nodejs }
     - { role: yarn }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml

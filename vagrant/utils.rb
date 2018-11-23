@@ -47,10 +47,10 @@ def build_file_list(dirs, filenames)
 end
 
 # Filter existing files for guest.
-def filter_file_list(host_files, run_files)
+def filter_file_list(host_files, guest_files)
   filtered = []
   host_files.each.with_index do |h_file, key|
-    filtered.push(run_files[key]) if File.exist?(h_file)
+    filtered.push(guest_files[key]) if File.exist?(h_file)
   end
   filtered
 end

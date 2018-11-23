@@ -1,0 +1,8 @@
+---
+
+- name: Install overridden files on the guest.
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    force: yes
+  with_items: "{{ override_files }}"
