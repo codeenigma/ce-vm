@@ -55,6 +55,8 @@ domain: 'ce-vm.local'
 # Apply the same php version to both cli and fpm.
 php_version: 7.1
 
+simplesamlphp: no
+
 # Extra Debian packages to install.
 apt_extra_packages: ''
 
