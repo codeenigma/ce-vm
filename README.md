@@ -9,7 +9,7 @@ Visit [http://ce-vm.codeenigma.net](http://ce-vm.codeenigma.net/) for a quicksta
 
 ## Documention
 
-Read the full documentation at [http://ce-vm.readthedocs.io](http://ce-vm.readthedocs.io)
+Read the full documentation at [https://github.com/codeenigma/ce-vm/wiki](https://github.com/codeenigma/ce-vm/wiki)
 
 ## Contributing
 

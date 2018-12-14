@@ -4,7 +4,7 @@
 # These are typically shared amongst your team for a given project,
 # and should be committed in git alongside your project.
 # 
-# See http://ce-vm.readthedocs.io/en/latest/config/config/ on possible config
+# See https://github.com/codeenigma/ce-vm/wiki/en/latest/config/config/ on possible config
 # files location and variable precedence.
 # 
 ################################################################################
