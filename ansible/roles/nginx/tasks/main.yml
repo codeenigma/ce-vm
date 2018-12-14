@@ -18,6 +18,16 @@
     mode: 0644
     force: yes
 
+- name: Copy SimpleSamlPHP configuration in place.  
+  template:
+    src: "simplesamlphp.j2"
+    dest: "/etc/nginx/conf.d/simplesamlphp"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
+  when: simplesamlphp
+
 - name: Ensure default nginx catch-all is not present
   file:
     path: "/etc/nginx/sites-enabled/default"
@@ -71,3 +81,18 @@
   when: 
     - ssl_handling == "letsencrypt"
     - not letsencrypt_cert.stat.exists
+
+- name: Check if we have a certificate for SimpleSAMLPHP.
+  stat:
+    path: '/etc/letsencrypt/live/simplesamlphp.{{ service_hostname }}/fullchain.pem'
+  register: letsencrypt_simplesaml_cert
+  when: 
+    - ssl_handling == "letsencrypt"
+    - simplesamlphp
+
+- name: Register certificate if needed.
+  command: "/usr/bin/certbot certonly -n --cert-name simplesaml.{{ service_hostname }} --standalone --preferred-challenges http -d simplesamlphp.{{ service_hostname }} --agree-tos -m {{ ssl_letsencrypt_mail }}"
+  when: 
+    - ssl_handling == "letsencrypt"
+    - simplesamlphp
+    - not letsencrypt_simplesaml_cert.stat.exists

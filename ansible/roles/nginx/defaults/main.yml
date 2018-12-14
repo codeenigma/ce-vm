@@ -3,3 +3,4 @@
 # Settings for nginx.
 ssl_handling: 'self'
 ssl_letsencrypt_mail: '{{ project_name }}@{{ domain }}'
+simplesamlphp_config: 'simplesamlphp/local'

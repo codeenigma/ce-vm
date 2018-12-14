@@ -6,4 +6,10 @@
     <p>HTTPS: <a href="https://{{ service_hostname }}">https://{{ service_hostname }}</a></p>
     <em>HTTPS uses a self-signed certificate, you will need to add an exception.</em>
   </div>
+{% if simplesamlphp %}
+  <div class="content">
+    <p>HTTP: <a href="http://simplesamlphp.{{ service_hostname }}">http://simplesamlphp.{{ service_hostname }}</a></p>
+    <p>HTTPS: <a href="https://simplesamlphp.{{ service_hostname }}">https://simplesamlphp.{{ service_hostname }}</a></p>
+  </div>
+{% endif %}
 </section>

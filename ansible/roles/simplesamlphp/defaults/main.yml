@@ -1,0 +1,3 @@
+---
+# Path to the SimpleSAMLPHP config, relative to project's root.
+simplesamlphp_config: 'simplesamlphp/local'
