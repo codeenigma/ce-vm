@@ -29,8 +29,8 @@ generate_config
 cd "$BUILD_DIR/ce-vm"
 curl -O https://raw.githubusercontent.com/codeenigma/ce-vm-model/6.x/ce-vm/Vagrantfile
 
-# BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
-# sed -i -- "s/ce_vm_upstream_branch = '6.x'/ce_vm_upstream_branch = '$BRANCH'/g" Vagrantfile
+BRANCH=$(if [ $APPVEYOR_PULL_REQUEST_NUMBER -lt 1 ]; then echo $APPVEYOR_REPO_BRANCH; else echo $APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH; fi)
+sed -i -- "s/ce_vm_upstream_branch = '6.x'/ce_vm_upstream_branch = '$BRANCH'/g" Vagrantfile
 
 vagrant up --provider=docker || exit 1
 vagrant destroy --force || exit 1
