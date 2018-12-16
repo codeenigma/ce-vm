@@ -1,8 +1,8 @@
 version: 1.0.{build}
 image: Visual Studio 2017
 
-cache:
-- C:\Vagrant
+# cache:
+# - C:\Vagrant
 
 services:
 - docker
@@ -22,4 +22,4 @@ install:
 - vagrant plugin install vagrant-hostsupdater
 
 build_script:
-- ps: bash tests/test.sh $(PROJECT) $(FS)
+- ps: bash tests/test.sh drupal native
