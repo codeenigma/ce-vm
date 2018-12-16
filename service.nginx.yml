@@ -2,6 +2,7 @@
 
 host_aliases:
   - php.{{ project_name }}-nginx.{{ domain }}
+  - simplesamlphp.{{ project_name }}-nginx.{{ domain }}
 
 docker_image: "pmce/ce-vm-nginx:{{ ce_vm_version }}"
 net_ip: "{{ net_base }}.90"

@@ -1,0 +1,64 @@
+---
+
+- name: Check if we already have a composer file.
+  stat: path="{{ project_dir }}/composer.json"
+  register: simplesaml_composer
+
+- name: Generates composer.json file if none exist.
+  template:
+    src: composer.json.j2
+    dest: "{{ project_dir }}/composer.json"
+    owner: vagrant
+    group: vagrant
+  when: 
+    - not simplesaml_composer.stat.exists
+    
+- name: Require SimpleSaml.
+  composer:
+    command: require
+    arguments: "simplesamlphp/simplesamlphp --sort-packages"
+    working_dir: "{{ project_dir }}"
+
+- name: Fix vendor dir permissions.
+  file: 
+    path: "{{ project_dir }}/vendor"
+    state: directory
+    owner: vagrant
+    group: vagrant
+    recurse: yes
+    
+- name: Check if we already have a simplesamlphp config folder.
+  stat: path="{{ project_dir }}/{{ simplesamlphp_config }}"
+  register: simplesaml_config_dir
+
+- name: Creates directory
+  file: 
+    path: "{{ project_dir }}/{{ simplesamlphp_config }}"
+    state: directory
+    recurse: yes
+    owner: vagrant
+    group: vagrant
+
+- name: Generate default SimpleSaml config.
+  synchronize:
+    src: "{{ project_dir }}/vendor/simplesamlphp/simplesamlphp/config-templates/"
+    dest: "{{ project_dir }}/{{ simplesamlphp_config }}/config"
+  become: yes
+  become_user: vagrant
+  when: 
+    - not simplesaml_config_dir.stat.exists
+
+- name: Generate default SimpleSaml metadata.
+  synchronize:
+    src: "{{ project_dir }}/vendor/simplesamlphp/simplesamlphp/metadata-templates/"
+    dest: "{{ project_dir }}/{{ simplesamlphp_config }}/metadata"
+  become: yes
+  become_user: vagrant
+  when: 
+    - not simplesaml_config_dir.stat.exists
+
+- name: Change default SimpleSaml base url.
+  replace:
+    path: "{{ project_dir }}/{{ simplesamlphp_config }}/config/config.php"
+    regexp: "'baseurlpath' => 'simplesaml/',"
+    replace: "'baseurlpath' => '',"

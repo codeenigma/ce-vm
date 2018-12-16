@@ -39,3 +39,31 @@ server {
         fastcgi_pass {{ project_name }}-fpm:9000;
     }
 }
+
+{% if simplesamlphp %}
+
+server {
+    listen 443 ssl;
+    server_name "simplesamlphp.{{ service_hostname }}";
+    {% if ssl_handling == "letsencrypt" %}
+    ssl_certificate /etc/letsencrypt/live/simplesamlphp.{{ service_hostname }}/cert.pem;
+    ssl_certificate_key /etc/letsencrypt/live/simplesamlphp.{{ service_hostname }}/privkey.pem;
+    {% else %}
+    ssl_certificate /etc/nginx/ssl/ce-vm-self.crt;
+    ssl_certificate_key /etc/nginx/ssl/ce-vm-self.key;
+    {% endif %}
+    error_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }} info;
+    access_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }};
+    root "{{ project_dir }}/vendor/simplesamlphp/simplesamlphp/www";
+    include "/etc/nginx/conf.d/simplesamlphp";
+}
+
+server {
+    listen 80;
+    server_name "simplesamlphp.{{ service_hostname }}";
+    error_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }} info;
+    access_log syslog:server={{ project_name }}-log:{{ rsyslog_listen_port }};
+    root "{{ project_dir }}/vendor/simplesamlphp/simplesamlphp/www";
+    include "/etc/nginx/conf.d/simplesamlphp";
+}
+{% endif %}
