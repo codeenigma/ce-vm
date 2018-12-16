@@ -15,8 +15,8 @@ env:
  - PROJECT=custom FS=native
 
 install:
- - curl -O https://releases.hashicorp.com/vagrant/2.2.1/vagrant_2.2.1_x86_64.deb
- - sudo dpkg -i vagrant_2.2.1_x86_64.deb
+ - curl -O https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb
+ - sudo dpkg -i vagrant_2.2.2_x86_64.deb
  - vagrant plugin install vagrant-hostsupdater
 
 script:
