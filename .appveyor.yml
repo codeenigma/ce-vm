@@ -1,0 +1,24 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+
+cache:
+- C:\Vagrant
+
+services:
+- docker
+
+environment:
+  matrix:
+  - PROJECT: drupal
+    FS: native
+  - PROJECT: wordpress
+    FS: native
+
+install:
+- ps: Start-FileDownload "https://releases.hashicorp.com/vagrant/2.2.1/vagrant_2.2.1_x86_64.msi"
+- ps: Start-Process -FilePath "msiexec.exe" -ArgumentList "/a vagrant_2.2.1_x86_64.msi /qb TARGETDIR=C:\Vagrant" -Wait
+- set PATH=C:\Vagrant\HashiCorp\Vagrant\bin;%PATH%
+- vagrant plugin install vagrant-hostsupdater
+
+build_script:
+- ps: bash tests/test.sh $env:PROJECT $env:FS

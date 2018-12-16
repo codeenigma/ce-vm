@@ -20,4 +20,4 @@ install:
  - vagrant plugin install vagrant-hostsupdater
 
 script:
- - /bin/bash tests/test.sh "$PROJECT" "$FS"
+ - /bin/bash tests/test.travis.sh "$PROJECT" "$FS"
