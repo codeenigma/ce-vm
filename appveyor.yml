@@ -21,4 +21,4 @@ install:
 - vagrant plugin install vagrant-hostsupdater
 
 build_script:
-- sh: bash tests/test.sh $PROJECT $FS
+- ps: bash tests/test.sh $env:PROJECT $env:FS
