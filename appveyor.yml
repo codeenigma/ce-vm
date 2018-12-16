@@ -4,6 +4,9 @@ image: Visual Studio 2017
 cache:
 - C:\Vagrant
 
+services:
+- docker
+
 environment:
   matrix:
   - PROJECT: drupal
@@ -18,4 +21,4 @@ install:
 - vagrant plugin install vagrant-hostsupdater
 
 build_script:
-- bash tests/test.sh "%PROJECT%" "%FS%"
+- sh: bash tests/test.sh $PROJECT $FS
