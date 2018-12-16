@@ -1,7 +1,11 @@
 version: 1.0.{build}
 image: Visual Studio 2017
+clone_depth: 1
 
-services:
+build:
+  verbosity: normal
+
+  services:
 - docker
 
 environment:
