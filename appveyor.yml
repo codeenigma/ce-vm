@@ -15,10 +15,11 @@ environment:
     FS: native
 
 install:
+- dism.exe /Online /Disable-Feature:Microsoft-Hyper-V /Quiet
 - ps: Start-FileDownload "https://releases.hashicorp.com/vagrant/2.2.1/vagrant_2.2.1_x86_64.msi"
 - ps: Start-Process -FilePath "msiexec.exe" -ArgumentList "/a vagrant_2.2.1_x86_64.msi /qb TARGETDIR=C:\Vagrant" -Wait
 - set PATH=C:\Vagrant\HashiCorp\Vagrant\bin;%PATH%
 - vagrant plugin install vagrant-hostsupdater
 
 build_script:
-- ps: bash tests/test.sh $env:PROJECT $env:FS
+- ps: bash tests/test.sh $(PROJECT) $(FS)
