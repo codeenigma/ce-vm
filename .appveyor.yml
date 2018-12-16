@@ -5,7 +5,7 @@ clone_depth: 1
 build:
   verbosity: normal
 
-  services:
+services:
 - docker
 
 environment:
