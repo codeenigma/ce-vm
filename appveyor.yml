@@ -1,6 +1,9 @@
 version: 1.0.{build}
 image: Visual Studio 2017
 
+cache:
+- C:\Vagrant
+
 environment:
   matrix:
   - PROJECT: drupal
@@ -12,7 +15,7 @@ install:
 - ps: Start-FileDownload "https://releases.hashicorp.com/vagrant/2.2.1/vagrant_2.2.1_x86_64.msi"
 - ps: Start-Process -FilePath "msiexec.exe" -ArgumentList "/a vagrant_2.2.1_x86_64.msi /qb TARGETDIR=C:\Vagrant" -Wait
 - set PATH=C:\Vagrant\HashiCorp\Vagrant\bin;%PATH%
-- vagrant --version
+- vagrant plugin install vagrant-hostsupdater
 
 build_script:
-- bash tests/test.sh "$PROJECT" "$FS"
+- bash tests/test.sh "%PROJECT%" "%FS%"
