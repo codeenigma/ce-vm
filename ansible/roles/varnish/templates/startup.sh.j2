@@ -1,0 +1,7 @@
+#!/bin/sh
+
+/usr/sbin/service varnish stop
+if [ -f /run/varnishd.pid ]; then
+  rm /run/varnishd.pid
+fi
+/usr/sbin/service varnish start

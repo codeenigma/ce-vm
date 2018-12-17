@@ -1,0 +1,31 @@
+---
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/varnish"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Copy landing page section.
+  template:
+    src: "section.html.j2"
+    dest: "{{ ce_vm_webroot }}/includes/varnish.html"
+    force: yes
+
+- name: Alter init.d script
+  lineinfile:
+    path: /etc/init.d/varnish
+    state: absent
+    regexp: '^ulimit'
+
+- name: Copy Varnish configuration.
+  template:
+    src: "default.vcl.j2"
+    dest: "/etc/varnish/default.vcl"
+    owner: root
+    group: root
+    mode: 0644
+    force: yes
