@@ -1,6 +1,11 @@
 #!/bin/sh
 
-/usr/sbin/service varnish stop
+# Can't properly "stop" it.
+RUNNING=`/bin/pidof varnishd`
+if [ ! -z "$RUNNING" ]; then
+  kill $RUNNING
+  sleep 2
+fi
 if [ -f /run/varnishd.pid ]; then
   rm /run/varnishd.pid
 fi
