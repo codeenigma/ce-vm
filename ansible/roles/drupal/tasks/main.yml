@@ -60,26 +60,15 @@
     dest: "{{ project_dir }}/{{ webroot }}/.gitignore"
     force: no
 
-- name: Check if we already have a ce-vm.settings.php file.
-  stat: path="{{ project_dir }}/{{ webroot }}/sites/default/ce-vm.settings.php"
-  register: ce_vm_settings_php
-
-- name: Generates ce-vm.settings.php file.
-  template:
-    src: ce-vm.settings.php.j2
-    dest: "{{ project_dir }}/{{ webroot }}/sites/default/ce-vm.settings.php"
-    force: no
-  when: not ce_vm_settings_php.stat.exists 
-
 - name: Check if we already have a settings.php file.
   stat: path="{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
-  register: drupal_install
-  
-- name: Generate settings.php from ce-vm one.
+  register: ce_vm_settings_php
+
+- name: Generates a settings.php file.
   template:
-    src: "{{ project_dir }}/{{ webroot }}/sites/default/ce-vm.settings.php"
+    src: settings.php.j2
     dest: "{{ project_dir }}/{{ webroot }}/sites/default/settings.php"
-    force: yes
+  when: not ce_vm_settings_php.stat.exists 
   
 - name: Check for local project drush existence.
   stat: path="{{ project_dir }}/vendor/bin/drush"
@@ -124,9 +113,9 @@
     force: no
 
 - name: Install Drupal.
-  command: drush si -y -r "{{ project_dir }}/{{ webroot }}" --db-url="mysql://dev:dev@{{ project_name }}-mysql:3306/drupal" --account-name=admin --account-pass=admin --site-name="{{ project_name }}"
+  command: drush si -y -r "{{ project_dir }}/{{ webroot }}" --account-name=admin --account-pass=admin --site-name="{{ project_name }}"
   when: 
-    - not drupal_install.stat.exists
+    - not ce_vm_settings_php.stat.exists
     - not skip_install
 
 - name: Clear Drupal caches.
