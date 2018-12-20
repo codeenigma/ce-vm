@@ -1,0 +1,21 @@
+---
+
+docker_image: "pmce/ce-vm-varnish:{{ ce_vm_version }}"
+net_ip: "{{ net_base }}.180"
+net_fwd_ports_mac_os:
+  - "{{ net_ip }}:6081:6081"
+docker_extra_args_mac_os:
+  - '--ulimit'
+  - 'nofile=131072:131072'
+  - '--ulimit'
+  - 'memlock=82000:82000'
+docker_extra_args_linux:
+  - '--ulimit'
+  - 'nofile=131072:131072'
+  - '--ulimit'
+  - 'memlock=82000:82000'
+docker_extra_args_windows:
+  - '--ulimit'
+  - 'nofile=131072:131072'
+  - '--ulimit'
+  - 'memlock=82000:82000'

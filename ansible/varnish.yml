@@ -1,0 +1,19 @@
+---
+
+- hosts: all
+  become: yes
+  
+  pre_tasks:
+    
+    - name: Run init tasks
+      import_tasks: tasks/init.yml
+    
+  roles:
+    - { role: rsyslog_client }
+    - { role: varnish }
+
+  post_tasks:
+    
+    - name: Apply overrides
+      import_tasks: tasks/override.yml
+
