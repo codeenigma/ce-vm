@@ -80,7 +80,7 @@ def init__config_ssh(container, service_name)
   container.ssh.insert_key = false
   container.ssh.forward_agent = true
   # Only Mac needs port forwarding.
-  return unless host_platform == 'mac_os'
+  return if host_platform == 'mac_os'
   container.ssh.host = config_get_service_item(service_name, 'net_ip')
   container.ssh.port = 22
 end
