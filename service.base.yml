@@ -1,0 +1,4 @@
+---
+
+docker_image: "pmce/ce-vm:{{ ce_vm_version }}"
+net_ip: "{{ net_base }}.200"
