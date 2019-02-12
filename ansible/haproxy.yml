@@ -9,6 +9,7 @@
       import_tasks: tasks/init.yml
     
   roles:
+    - { role: cron }
     - { role: rsyslog_client }
     - { role: haproxy }
 
