@@ -1,5 +1,10 @@
 #!/bin/sh
 
+killall -e cron
+if [ -f /var/run/crond.pid ]; then
+  rm /var/run/crond.pid
+fi
+
 /usr/sbin/service cron stop
 
 /usr/sbin/service cron start

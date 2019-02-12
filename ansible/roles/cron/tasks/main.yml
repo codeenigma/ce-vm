@@ -8,3 +8,9 @@
     group: root
     mode: 0555
     force: yes
+
+- name: Workaround PAM cron issue.
+  lineinfile:
+    path: /etc/pam.d/cron
+    state: absent
+    regexp: 'pam_loginuid.so$'
