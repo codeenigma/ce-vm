@@ -1,10 +1,9 @@
 #!/bin/sh
 
-killall -e cron
-if [ -f /var/run/crond.pid ]; then
-  rm /var/run/crond.pid
+CRON_PID=`pgrep cron`
+if [ -z "$CRON_PID" ]; then
+  if [ -f /var/run/crond.pid ]; then
+    rm /var/run/crond.pid
+  fi
 fi
-
-/usr/sbin/service cron stop
-
-/usr/sbin/service cron start
+/usr/sbin/service cron restart
