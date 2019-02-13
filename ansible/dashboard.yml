@@ -9,7 +9,7 @@
       import_tasks: tasks/init.yml
     
   roles:
-
+    - { role: cron }
     - { role: php-cli, php_version: 7.1 }
     - { role: dashboard }
 

@@ -1,0 +1,16 @@
+---
+
+- name: Copy startup script in place.
+  template:
+    src: startup.sh.j2
+    dest: "/opt/run-parts/cron"
+    owner: root
+    group: root
+    mode: 0555
+    force: yes
+
+- name: Workaround PAM cron issue.
+  lineinfile:
+    path: /etc/pam.d/cron
+    state: absent
+    regexp: 'pam_loginuid.so$'
