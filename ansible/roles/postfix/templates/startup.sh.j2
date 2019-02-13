@@ -1,7 +1,13 @@
 #!/bin/sh
 
 /usr/sbin/service postfix stop
+
 if [ -f /var/spool/postfix/pid/master.pid ]; then
   rm /var/spool/postfix/pid/master.pid
 fi
+
+if [ -f /var/lib/postfix/master.lock ]; then
+  rm /var/lib/postfix/master.lock
+fi
+
 /usr/sbin/service postfix start
