@@ -1,0 +1,9 @@
+#!/bin/sh
+
+/usr/sbin/service cron stop > /dev/null 2>&1
+
+if [ -f /var/run/crond.pid ]; then
+  rm /var/run/crond.pid
+fi
+
+/usr/sbin/service cron start

@@ -11,9 +11,3 @@ vagrant_triggers_linux:
       - name: "Allocate host resource for Elastic"
       - run:
           inline: 'sudo sysctl -w vm.max_map_count=262144'
-vagrant_triggers_mac_os:
-  before:
-    up:
-      - name: "Allocate host resource for Elastic"
-      - run:
-          inline: 'sudo sysctl -w vm.max_map_count=262144'

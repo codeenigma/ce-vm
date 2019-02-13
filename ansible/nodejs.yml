@@ -9,6 +9,8 @@
       import_tasks: tasks/init.yml
 
   roles:
+
+    - { role: cron }
     - { role: unison, when: volume_type == 'unison' }
     - { role: rsyslog_client }
     - { role: nodejs }
