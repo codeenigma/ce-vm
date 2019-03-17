@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/codeenigma/ce-vm.svg?branch=6.x)](https://travis-ci.org/codeenigma/ce-vm.svg?branch=6.x)
+[![Build Status](https://travis-ci.org/codeenigma/ce-vm.svg?branch=7.x)](https://travis-ci.org/codeenigma/ce-vm.svg?branch=7.x)
 # Docker based local web development stack
 
 Spins up a dev environment using Docker containers managed by Vagrant and configured with Ansible.
