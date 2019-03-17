@@ -45,8 +45,10 @@ end
 # Absolute paths to playbook files on the guest,
 # filtered to ones that actually exist on the host.
 def ansible_get_guest_active_playbooks(service)
-  host_playbooks = build_file_list(ansible_get_host_playbook_dirs, ["#{service}.yml"])
-  guest_playbooks = build_file_list(ansible_get_guest_playbook_dirs, ["#{service}.yml"])
+  playbook_name = config_get_service_item(service, 'playbook_from')
+  playbook_name = service if playbook_name.nil?
+  host_playbooks = build_file_list(ansible_get_host_playbook_dirs, ["#{playbook_name}.yml"])
+  guest_playbooks = build_file_list(ansible_get_guest_playbook_dirs, ["#{playbook_name}.yml"])
   filter_file_list(host_playbooks, guest_playbooks)
 end
 
