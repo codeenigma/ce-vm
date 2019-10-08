@@ -2,4 +2,8 @@
 
 /usr/sbin/service elasticsearch stop
 
+if [ -f "/var/run/elasticsearch/elasticsearch.pid" ]; then
+  rm /var/run/elasticsearch/elasticsearch.pid
+fi
+
 /usr/sbin/service elasticsearch start

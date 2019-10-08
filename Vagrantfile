@@ -11,6 +11,9 @@ files.each do |file|
 end
 ################ Initial setup.
 
+# Ensure we are not run as root.
+host_ensure_user_not_root
+
 # Ensure we're on the right branch first.
 ce_vm_ensure_branch
 if ARGV.include? 'up'

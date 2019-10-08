@@ -10,6 +10,14 @@ def host_get_platform
   host_platform.to_s
 end
 
+# Prevent users to run Vagrant as root.
+def host_ensure_user_not_root
+  if Process.uid < 1
+    puts 'Do not run Vagrant as root. See https://github.com/codeenigma/ce-vm/wiki/installation#linux-host on how to set up Docker securely instead.'
+    abort
+  end
+end
+
 # Creates a loopback alias for a given service.
 # Mac OS X specific, this allow access to containers
 # without port-forwarding.
