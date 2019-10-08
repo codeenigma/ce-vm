@@ -20,5 +20,5 @@ end
 
 # Ensure Vagrant meets version requirements.
 def vagrant_ensure_version
-  Vagrant.require_version '>= 2.2.0'
+  Vagrant.require_version '>= 2.2.5'
 end

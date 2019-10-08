@@ -24,7 +24,7 @@ if ARGV.include? 'up'
   # Ensure ce-vm is up-to-date.
   ce_vm_uptodate
   # Create our private Docker network.
-  docker_ensure_network
+  # docker_ensure_network
 end
 
 # Note: actual processing is in init.rb
