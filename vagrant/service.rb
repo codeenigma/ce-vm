@@ -34,9 +34,9 @@ end
 # An array of options to pass to docker run.
 def service_get_docker_create_args(service_name)
   docker_args = [
-    #"--network=#{docker_network_get_name}",
-    '--ip',
-    config_get_service_item(service_name, 'net_ip').to_s,
+    # "--network=#{docker_network_get_name}",
+    # '--ip',
+    # config_get_service_item(service_name, 'net_ip').to_s,
     '--volume',
     "ce-vm-cache:#{fullpath_get_guest_ce_vm_homebase}/cache",
     '--volume',

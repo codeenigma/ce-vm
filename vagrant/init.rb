@@ -72,6 +72,7 @@ def init__config_base(container, service_name)
   container.vm.synced_folder '.', '/vagrant', disabled: true
   # Set hostname.
   container.vm.hostname = service_get_hostname(service_name)
+  container.vm.network :private_network, name: docker_network_get_name, ip: config_get_service_item(service_name, 'net_ip')
 end
 
 # SSH config.
@@ -88,7 +89,6 @@ end
 # HostsUpdater support.
 def init__config_hostsupdater(container, service_name)
   return if config_get_service_item(service_name, 'skip_hosts_updater') == true
-  container.vm.network :private_network, ip: config_get_service_item(service_name, 'net_ip')
   return if config_get_service_item(service_name, 'host_aliases').nil?
   container.hostsupdater.aliases = config_get_service_item(service_name, 'host_aliases')
 end
