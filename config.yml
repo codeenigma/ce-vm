@@ -53,7 +53,7 @@ domain: 'ce-vm.local'
 ####### Common settings.
 
 # Apply the same php version to both cli and fpm.
-php_version: 7.2
+php_version: 7.3
 
 simplesamlphp: no
 
@@ -65,7 +65,7 @@ apt_extra_packages: ''
 # individually in ~/.CodeEnigma/ce-vm/ce-vm-custom/config.yml instead.
 ################################################################################
 
-ce_vm_version: "7.0.2"
+ce_vm_version: "7.0.3"
 
 # Turn automatic update of the core stack ON/OFF.
 # Useful for offline use.
