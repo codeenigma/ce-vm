@@ -39,8 +39,8 @@ def service_get_docker_create_args(service_name)
     # config_get_service_item(service_name, 'net_ip').to_s,
     '--volume',
     "ce-vm-cache:#{fullpath_get_guest_ce_vm_homebase}/cache",
-    # '--volume',
-    # '/var'
+    '--volume',
+    '/var'
   ]
   extra_args = config_get_service_item(service_name, "docker_extra_args_#{host_get_platform}")
   return docker_args unless extra_args
