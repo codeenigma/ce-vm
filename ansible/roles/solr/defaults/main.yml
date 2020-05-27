@@ -1,6 +1,38 @@
 ---
+solr_workspace: /root
 
-solr_version: 4.6.1
+solr_create_user: true
+solr_user: solr
+
+solr_version: "8.4.1"
+solr_mirror: "https://archive.apache.org/dist"
+solr_remove_cruft: false
+
+solr_service_manage: true
+solr_service_name: "solr_{{ solr_version }}"
+solr_service_state: started
+
+solr_install_dir: /opt
+solr_install_path: "/opt/{{ solr_service_name }}"
+solr_home: "/var/{{ solr_service_name }}"
+solr_connect_host: localhost
+solr_port: "8080"
+
+solr_xms: "256M"
+solr_xmx: "512M"
+
+solr_timezone: "UTC"
+
 solr_cores:
-  - default
+  - collection
+
+solr_config_file: /etc/default/{{ solr_service_name }}.in.sh
+
 solr_conf_path: ''
+
+# Enable restart solr handler
+solr_restart_handler_enabled: true
+
+# Used only for Solr < 5.
+solr_log_file_path: /var/log/solr.log
+solr_host: "0.0.0.0"

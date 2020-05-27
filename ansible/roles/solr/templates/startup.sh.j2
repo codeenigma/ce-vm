@@ -1,7 +1,0 @@
-#!/bin/sh
-
-/usr/sbin/service tomcat8 stop
-if [ -f /run/tomcat8.pid ]; then
-  rm /run/tomcat8.pid
-fi
-/usr/sbin/service tomcat8 start
