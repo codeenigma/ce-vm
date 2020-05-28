@@ -23,6 +23,16 @@
   become: true
   become_user: "{{ solr_user }}"
 
+- name: Use project configuration if path is given.
+  synchronize:
+    src: "{{ project_dir }}/{{ solr_conf_path }}/{{ item }}/"
+    dest: "{{ solr_home }}/data/{{ item }}/conf"
+    delete: true
+  when: solr_conf_path != ""
+  with_items: "{{ solr_cores }}"
+  become: true
+  become_user: "{{ solr_user }}"
+
 - name: Create configured cores.
   command: "{{ solr_install_path }}/bin/solr create -c {{ item }} -p {{ solr_port }}"
   when: "item not in solr_cores_current.content"
