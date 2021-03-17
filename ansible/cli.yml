@@ -13,6 +13,7 @@
     - { role: unison, when: volume_type == 'unison' }
     - { role: php-cli }
     - { role: xdebug, php_build_type: cli }
+    - { role: gmp, php_build_type: cli }
     - { role: blackfire }
     - { role: rsyslog_client }
     - { role: postfix }
