@@ -15,6 +15,7 @@
     - { role: rsyslog_client }
     - { role: php-fpm }
     - { role: xdebug, php_build_type: fpm }
+    - { role: gmp, php_build_type: fpm }
     - { role: blackfire }
     - { role: postfix }
 

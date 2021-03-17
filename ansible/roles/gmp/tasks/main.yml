@@ -1,0 +1,11 @@
+---
+
+- name: Install gmp library.
+  apt: 
+    name: [ "php{{ php_version }}-gmp" ]
+    state: present
+    
+- name: Enable gmp extension
+  lineinfile:
+    path: '/etc/php/{{ php_version }}/{{ php_build_type }}/conf.d/20-gmp.ini'
+    line: 'extension=gmp.so'
